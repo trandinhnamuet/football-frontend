@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { FANTA_LOGO_URL } from '../lib/assets';
 
 const FANTA = '#FF6B1A';
@@ -23,7 +24,7 @@ export default function AdminHeader() {
     }}>
       {/* Logo + Title */}
       <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <img
+        <Image
           src={FANTA_LOGO_URL}
           alt="Fanta FC Logo"
           width={40}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import AdminGuard from '../../components/AdminGuard';
 import AdminHeader from '../../components/AdminHeader';
 import { Player, FANTA, ROLES } from '../../lib/types';
@@ -100,7 +101,7 @@ function EditModal({ player, onSave, onClose }: EditModalProps) {
                   style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'block' }}
                 />
               ) : (
-                <img
+                <Image
                   src={DEFAULT_PLAYER_AVATAR_URL}
                   alt="Default Avatar"
                   width={90}
@@ -225,7 +226,7 @@ function PlayerCard({ player, onEdit }: { player: Player; onEdit: () => void }) 
         {player.image_url ? (
           <img src={`${BASE}${player.image_url}`} alt={player.first_name} width={80} height={80} style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)' }} />
         ) : (
-          <img src={DEFAULT_PLAYER_AVATAR_URL} alt="Default Avatar" width={80} height={80} style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)' }} />
+          <Image src={DEFAULT_PLAYER_AVATAR_URL} alt="Default Avatar" width={80} height={80} style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)' }} />
         )}
       </div>
 

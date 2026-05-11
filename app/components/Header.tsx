@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useApp } from '../contexts/AppContext';
 import { FANTA_LOGO_URL } from '../lib/assets';
@@ -42,7 +43,7 @@ export default function Header() {
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     }}>
       <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <img
+        <Image
           src={FANTA_LOGO_URL}
           alt="Fanta FC Logo"
           width={40}
