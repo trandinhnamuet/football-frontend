@@ -69,10 +69,10 @@ export default function I18nManagementPage() {
   const [viData, setViData] = useState<any>(translations.vi);
   const [enData, setEnData] = useState<any>(translations.en);
   const [search, setSearch] = useState('');
-  const [activeTab, setActiveTab] = useState<'vi' | 'en'>('vi');
   const [saved, setSaved] = useState(false);
   const [editingKey, setEditingKey] = useState<string | null>(null);
-  const [editValue, setEditValue] = useState('');
+  const [editVi, setEditVi] = useState('');
+  const [editEn, setEditEn] = useState('');
 
   useEffect(() => {
     setViData(loadOverrides(STORAGE_KEY_VI, translations.vi));
@@ -93,20 +93,18 @@ export default function I18nManagementPage() {
 
   function startEdit(key: string) {
     setEditingKey(key);
-    setEditValue(activeTab === 'vi' ? getByKey(viData, key) : getByKey(enData, key));
+    setEditVi(getByKey(viData, key));
+    setEditEn(getByKey(enData, key));
   }
 
   function saveEdit() {
     if (!editingKey) return;
-    if (activeTab === 'vi') {
-      const updated = setByKey(viData, editingKey, editValue);
-      setViData(updated);
-      localStorage.setItem(STORAGE_KEY_VI, JSON.stringify(updated));
-    } else {
-      const updated = setByKey(enData, editingKey, editValue);
-      setEnData(updated);
-      localStorage.setItem(STORAGE_KEY_EN, JSON.stringify(updated));
-    }
+    const viUpdated = setByKey(viData, editingKey, editVi);
+    const enUpdated = setByKey(enData, editingKey, editEn);
+    setViData(viUpdated);
+    setEnData(enUpdated);
+    localStorage.setItem(STORAGE_KEY_VI, JSON.stringify(viUpdated));
+    localStorage.setItem(STORAGE_KEY_EN, JSON.stringify(enUpdated));
     setEditingKey(null);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -114,7 +112,8 @@ export default function I18nManagementPage() {
 
   function cancelEdit() {
     setEditingKey(null);
-    setEditValue('');
+    setEditVi('');
+    setEditEn('');
   }
 
   function resetAll() {
@@ -126,17 +125,14 @@ export default function I18nManagementPage() {
   }
 
   function exportJSON() {
-    const data = activeTab === 'vi' ? viData : enData;
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ vi: viData, en: enData }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `i18n-${activeTab}.json`;
+    a.download = 'i18n-both.json';
     a.click();
     URL.revokeObjectURL(url);
   }
-
-  const currentData = activeTab === 'vi' ? viData : enData;
 
   return (
     <AdminGuard>
@@ -160,7 +156,7 @@ export default function I18nManagementPage() {
           {/* Toolbar */}
           <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
             {/* Search */}
-            <div style={{ flex: 1, minWidth: 280, position: 'relative' }}>
+            <div style={{ flex: 1, minWidth: 280 }}>
               <input
                 value={search}
                 onChange={e => setSearch(e.target.value)}
@@ -171,24 +167,6 @@ export default function I18nManagementPage() {
                   outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box',
                 }}
               />
-            </div>
-
-            {/* Tab */}
-            <div style={{ display: 'flex', gap: 0, border: `1px solid ${FANTA}44` }}>
-              {(['vi', 'en'] as const).map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  style={{
-                    padding: '10px 24px', background: activeTab === tab ? FANTA : 'transparent',
-                    color: activeTab === tab ? '#0a0a0a' : FANTA, border: 'none',
-                    cursor: 'pointer', fontFamily: 'Anton, sans-serif', fontSize: 14,
-                    letterSpacing: '0.06em', textTransform: 'uppercase',
-                  }}
-                >
-                  {tab === 'vi' ? 'Tiếng Việt' : 'English'}
-                </button>
-              ))}
             </div>
 
             <button
@@ -227,13 +205,14 @@ export default function I18nManagementPage() {
           <div style={{ background: CARD, border: `1px solid ${FANTA}22`, overflow: 'hidden' }}>
             {/* Table header */}
             <div style={{
-              display: 'grid', gridTemplateColumns: '2fr 3fr 1fr',
+              display: 'grid', gridTemplateColumns: '1.5fr 2fr 2fr 100px',
               padding: '12px 16px', background: `${FANTA}15`,
               borderBottom: `1px solid ${LINE}`, fontSize: 11,
               color: FANTA, letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 700,
             }}>
               <span>Key</span>
-              <span>Nội dung ({activeTab === 'vi' ? 'Tiếng Việt' : 'English'})</span>
+              <span>Tiếng Việt</span>
+              <span>English</span>
               <span>Thao tác</span>
             </div>
 
@@ -244,55 +223,46 @@ export default function I18nManagementPage() {
             )}
 
             {filtered.map(({ key }, idx) => {
-              const value = getByKey(currentData, key);
+              const viValue = getByKey(viData, key);
+              const enValue = getByKey(enData, key);
               const isEditing = editingKey === key;
               return (
                 <div
                   key={key}
                   style={{
-                    display: 'grid', gridTemplateColumns: '2fr 3fr 1fr',
-                    padding: '10px 16px', alignItems: 'start',
+                    display: 'grid', gridTemplateColumns: '1.5fr 2fr 2fr 100px',
+                    padding: '10px 16px', alignItems: isEditing ? 'start' : 'center',
                     borderBottom: `1px solid ${LINE}`,
                     background: idx % 2 === 0 ? 'transparent' : `${FANTA}05`,
+                    gap: 12,
                   }}
                 >
-                  <div style={{ fontSize: 12, color: FANTA, fontFamily: 'monospace', paddingRight: 12, paddingTop: 2, wordBreak: 'break-all' }}>
+                  {/* Key column */}
+                  <div style={{ fontSize: 12, color: FANTA, fontFamily: 'monospace', wordBreak: 'break-all', paddingTop: isEditing ? 8 : 0 }}>
                     {key}
                   </div>
-                  <div style={{ paddingRight: 12 }}>
+
+                  {/* Vietnamese column */}
+                  <div>
                     {isEditing ? (
-                      <div>
-                        <textarea
-                          value={editValue}
-                          onChange={e => setEditValue(e.target.value)}
-                          style={{
-                            width: '100%', minHeight: 60, padding: '8px',
-                            background: BLACK, border: `1px solid ${FANTA}`,
-                            color: INK, fontSize: 13, fontFamily: 'inherit',
-                            outline: 'none', resize: 'vertical', boxSizing: 'border-box',
-                          }}
-                          autoFocus
-                          onKeyDown={e => {
-                            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveEdit(); }
-                            if (e.key === 'Escape') cancelEdit();
-                          }}
-                        />
-                        <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
-                          <button onClick={saveEdit} style={{ padding: '4px 14px', background: FANTA, color: '#0a0a0a', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: 12 }}>
-                            Lưu
-                          </button>
-                          <button onClick={cancelEdit} style={{ padding: '4px 12px', background: 'transparent', color: MUTED, border: `1px solid ${LINE}`, cursor: 'pointer', fontFamily: 'inherit', fontSize: 12 }}>
-                            Huỷ
-                          </button>
-                        </div>
-                      </div>
+                      <textarea
+                        value={editVi}
+                        onChange={e => setEditVi(e.target.value)}
+                        style={{
+                          width: '100%', minHeight: 60, padding: '8px',
+                          background: BLACK, border: `1px solid ${FANTA}`,
+                          color: INK, fontSize: 13, fontFamily: 'inherit',
+                          outline: 'none', resize: 'vertical', boxSizing: 'border-box',
+                        }}
+                        placeholder="Tiếng Việt..."
+                      />
                     ) : (
                       <div
                         onClick={() => startEdit(key)}
                         style={{
-                          fontSize: 13, color: value ? INK : MUTED, cursor: 'pointer',
+                          fontSize: 13, color: viValue ? INK : MUTED, cursor: 'pointer',
                           minHeight: 24, lineHeight: 1.5,
-                          padding: '2px 6px', borderRadius: 2,
+                          padding: '4px 6px', borderRadius: 2,
                           border: '1px solid transparent',
                           transition: 'border-color 0.15s',
                         }}
@@ -300,12 +270,56 @@ export default function I18nManagementPage() {
                         onMouseLeave={e => (e.currentTarget.style.borderColor = 'transparent')}
                         title="Click để chỉnh sửa"
                       >
-                        {value || <em style={{ color: MUTED }}>chưa có nội dung</em>}
+                        {viValue || <em style={{ color: MUTED }}>chưa có</em>}
                       </div>
                     )}
                   </div>
+
+                  {/* English column */}
                   <div>
-                    {!isEditing && (
+                    {isEditing ? (
+                      <textarea
+                        value={editEn}
+                        onChange={e => setEditEn(e.target.value)}
+                        style={{
+                          width: '100%', minHeight: 60, padding: '8px',
+                          background: BLACK, border: `1px solid ${FANTA}`,
+                          color: INK, fontSize: 13, fontFamily: 'inherit',
+                          outline: 'none', resize: 'vertical', boxSizing: 'border-box',
+                        }}
+                        placeholder="English..."
+                      />
+                    ) : (
+                      <div
+                        onClick={() => startEdit(key)}
+                        style={{
+                          fontSize: 13, color: enValue ? INK : MUTED, cursor: 'pointer',
+                          minHeight: 24, lineHeight: 1.5,
+                          padding: '4px 6px', borderRadius: 2,
+                          border: '1px solid transparent',
+                          transition: 'border-color 0.15s',
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.borderColor = `${FANTA}55`)}
+                        onMouseLeave={e => (e.currentTarget.style.borderColor = 'transparent')}
+                        title="Click để chỉnh sửa"
+                      >
+                        {enValue || <em style={{ color: MUTED }}>chưa có</em>}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Actions column */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {isEditing ? (
+                      <>
+                        <button onClick={saveEdit} style={{ padding: '4px 10px', background: FANTA, color: '#0a0a0a', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          Lưu
+                        </button>
+                        <button onClick={cancelEdit} style={{ padding: '4px 10px', background: 'transparent', color: MUTED, border: `1px solid ${LINE}`, cursor: 'pointer', fontFamily: 'inherit', fontSize: 12 }}>
+                          Huỷ
+                        </button>
+                      </>
+                    ) : (
                       <button
                         onClick={() => startEdit(key)}
                         style={{
