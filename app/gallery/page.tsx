@@ -7,18 +7,26 @@ import type { DriveLink } from '../lib/types';
 
 const FANTA = '#FF6B1A';
 
-function getDriveEmbedUrl(url: string): string | null {
-  // Handle direct file links: https://drive.google.com/file/d/FILE_ID/view
+function getDriveEmbedUrl(url: string): string {
+  // If it's already a full URL with uc?export=view, return as-is
+  if (url.includes('drive.google.com/uc?export=view')) {
+    return url;
+  }
+  // Extract file ID from full URL: https://drive.google.com/file/d/FILE_ID/view
   const fileMatch = url.match(/\/file\/d\/([^/]+)/);
   if (fileMatch) {
     return `https://drive.google.com/uc?export=view&id=${fileMatch[1]}`;
   }
-  // Handle open?id= links
+  // If input is just the file ID (alphanumeric string, 20-40 chars)
+  if (/^[a-zA-Z0-9_-]{20,}$/.test(url.trim())) {
+    return `https://drive.google.com/uc?export=view&id=${url.trim()}`;
+  }
+  // Fallback: try open?id= format
   const openMatch = url.match(/[?&]id=([^&]+)/);
   if (openMatch) {
     return `https://drive.google.com/uc?export=view&id=${openMatch[1]}`;
   }
-  // If it's already a direct URL (uc?export=view) or another format, return as-is
+  // Return original if no match
   return url;
 }
 
@@ -118,12 +126,20 @@ export default function GalleryPage() {
                         onError={e => {
                           (e.currentTarget as HTMLImageElement).style.display = 'none';
                           const parent = (e.currentTarget as HTMLImageElement).parentElement;
-                          if (parent) parent.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#555;font-size:13px">Không tải được ảnh</div>`;
+                          if (parent) {
+                            parent.innerHTML = `
+                              <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#666;font-size:12px;padding:16px;text-align:center;background:#0a0a0a">
+                                <div style="margin-bottom:8px">❌ File ID không hợp lệ</div>
+                                <div style="font-size:11px;color:#555">Lấy File ID từ:</div>
+                                <div style="font-size:10px;color:#555;margin-top:4px">drive.google.com/file/d/<strong>ID_HERE</strong>/view</div>
+                              </div>
+                            `;
+                          }
                         }}
                       />
                     ) : (
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#555', fontSize: 13 }}>
-                        Không hỗ trợ định dạng này
+                        ❓ URL không hỗ trợ
                       </div>
                     )}
                   </div>
@@ -131,15 +147,17 @@ export default function GalleryPage() {
                   <div style={{ padding: '14px 16px' }}>
                     <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)' }}>{link.title}</div>
                     {link.description && <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>{link.description}</div>}
-                    <a
-                      href={link.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={e => e.stopPropagation()}
-                      style={{ display: 'inline-block', marginTop: 8, fontSize: 12, color: FANTA, textDecoration: 'none', fontWeight: 600 }}
-                    >
-                      Mở trên Drive ↗
-                    </a>
+                    {embedUrl && (
+                      <a
+                        href={embedUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        style={{ display: 'inline-block', marginTop: 8, fontSize: 12, color: FANTA, textDecoration: 'none', fontWeight: 600 }}
+                      >
+                        Mở hình ↗
+                      </a>
+                    )}
                   </div>
                 </div>
               );
@@ -163,9 +181,21 @@ export default function GalleryPage() {
               <button onClick={() => setLightbox(null)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: 24, cursor: 'pointer', padding: '4px 8px', lineHeight: 1 }}>×</button>
             </div>
             <img
-              src={getDriveEmbedUrl(lightbox.url) || lightbox.url}
+              src={getDriveEmbedUrl(lightbox.url)}
               alt={lightbox.title}
               style={{ maxWidth: '85vw', maxHeight: '75vh', objectFit: 'contain', display: 'block' }}
+              onError={e => {
+                (e.currentTarget as HTMLImageElement).style.display = 'none';
+                const parent = (e.currentTarget as HTMLImageElement).parentElement;
+                if (parent) {
+                  parent.innerHTML = `
+                    <div style="color:#f87171;padding:40px;text-align:center;font-size:14px">
+                      <div>❌ Không thể load ảnh</div>
+                      <div style="margin-top:12px;font-size:12px;color:#999">File ID có thể không hợp lệ hoặc file đã bị xóa</div>
+                    </div>
+                  `;
+                }
+              }}
             />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <button
@@ -178,8 +208,8 @@ export default function GalleryPage() {
               >
                 ← Trước
               </button>
-              <a href={lightbox.url} target="_blank" rel="noreferrer" style={{ color: FANTA, fontSize: 13, textDecoration: 'none' }}>
-                Mở trên Drive ↗
+              <a href={getDriveEmbedUrl(lightbox.url)} target="_blank" rel="noreferrer" style={{ color: FANTA, fontSize: 13, textDecoration: 'none' }}>
+                Mở hình ↗
               </a>
               <button
                 onClick={() => {
