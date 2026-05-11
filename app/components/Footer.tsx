@@ -1,5 +1,33 @@
 const FANTA = '#FF6B1A';
 
+const YT_COLOR = '#FF0000';
+const FB_COLOR = '#1877F2';
+const TT_COLOR = '#010101';
+
+function YoutubeIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill={YT_COLOR} style={{ flexShrink: 0 }}>
+      <path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/>
+    </svg>
+  );
+}
+
+function FacebookIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill={FB_COLOR} style={{ flexShrink: 0 }}>
+      <path d="M24 12.073C24 5.405 18.629 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.514c-1.491 0-1.956.93-1.956 1.884v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+    </svg>
+  );
+}
+
+function TiktokIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill={TT_COLOR} style={{ flexShrink: 0, background: '#fff', borderRadius: 3 }}>
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.83a8.18 8.18 0 0 0 4.78 1.53V6.91a4.85 4.85 0 0 1-1.01-.22z"/>
+    </svg>
+  );
+}
+
 export default function Footer() {
   return (
     <footer style={{ padding: '60px 48px 36px', background: 'var(--bg)', borderTop: `1px solid ${FANTA}` }}>
@@ -15,8 +43,15 @@ export default function Footer() {
         </div>
         <div>
           <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, color: FANTA, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Theo dõi</div>
-          <a href="https://youtube.com" target="_blank" rel="noreferrer" style={{ display: 'block', marginTop: 12, color: 'var(--ink)', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.02em', textTransform: 'uppercase' }}>▶ YOUTUBE</a>
-          <a href="https://facebook.com" target="_blank" rel="noreferrer" style={{ display: 'block', marginTop: 6, color: 'var(--ink)', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.02em', textTransform: 'uppercase' }}>▶ FACEBOOK</a>
+          <a href="https://www.youtube.com/@fclonfanta" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12, color: 'var(--ink)', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 20, letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+            <YoutubeIcon /> YOUTUBE
+          </a>
+          <a href="https://www.facebook.com/lonfantafc" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8, color: 'var(--ink)', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 20, letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+            <FacebookIcon /> FACEBOOK
+          </a>
+          <a href="https://www.tiktok.com/@lonfantafc" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8, color: 'var(--ink)', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 20, letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+            <TiktokIcon /> TIKTOK
+          </a>
         </div>
         <div>
           <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, color: FANTA, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Sân nhà</div>

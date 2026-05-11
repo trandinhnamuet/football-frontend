@@ -59,6 +59,33 @@ const adminSections: AdminSection[] = [
       'Xóa trận đấu',
     ],
   },
+  {
+    title: 'Quản lý Ngôn Ngữ',
+    description: 'Chỉnh sửa nội dung hiển thị tiếng Việt và tiếng Anh trên toàn bộ website',
+    href: '/admin/i18n-management',
+    icon: '🌐',
+    features: [
+      'Xem toàn bộ nội dung i18n theo key',
+      'Tìm kiếm theo key hoặc nội dung văn bản',
+      'Chỉnh sửa từng chuỗi tiếng Việt / tiếng Anh',
+      'Lưu thay đổi vào localStorage',
+      'Export JSON để cập nhật source code',
+      'Reset về bản gốc',
+    ],
+  },
+  {
+    title: 'Quản lý Ảnh Drive',
+    description: 'Quản lý danh sách link ảnh Google Drive, kiểm soát hiển thị công khai',
+    href: '/admin/drive-links',
+    icon: '🖼️',
+    features: [
+      'Thêm / sửa / xoá link Google Drive',
+      'Bật/tắt hiển thị công khai từng link',
+      'Sắp xếp thứ tự hiển thị',
+      'Xem trước trang Gallery công khai',
+      'Hỗ trợ lightbox xem ảnh lớn',
+    ],
+  },
 ];
 
 export default function AdminPage() {

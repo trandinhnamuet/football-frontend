@@ -57,6 +57,17 @@ export interface TeamStats {
   ga: number;
 }
 
+export interface DriveLink {
+  id: number;
+  title: string;
+  url: string;
+  description: string | null;
+  is_public: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export const ROLES: Record<string, { vi: string; en: string }> = {
   GK: { vi: 'Thủ môn', en: 'Goalkeeper' },
   DEF: { vi: 'Hậu vệ', en: 'Defender' },

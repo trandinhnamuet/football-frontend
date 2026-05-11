@@ -8,6 +8,7 @@ const vi = {
     schedule: 'Lịch thi đấu',
     dashboard: 'Dashboard',
     scoring: 'Cách tính điểm',
+    gallery: 'Ảnh',
   },
   hero: {
     hashtag: '#ĐamMêBấtTận',
@@ -83,6 +84,7 @@ const en = {
     schedule: 'Schedule',
     dashboard: 'Dashboard',
     scoring: 'Scoring',
+    gallery: 'Gallery',
   },
   hero: {
     hashtag: '#NeverStopPlaying',

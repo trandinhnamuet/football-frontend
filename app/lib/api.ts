@@ -1,4 +1,4 @@
-import { Player, Article, Match, TeamStats } from './types';
+import { Player, Article, Match, TeamStats, DriveLink } from './types';
 
 const BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 
@@ -91,4 +91,26 @@ export const api = {
   // Sync
   triggerSync: (force = false) =>
     fetchJSON<{ synced: boolean; message: string }>(`/api/sync${force ? '?force=1' : ''}`),
+
+  // Drive Links
+  getDriveLinksPublic: () => fetchJSON<DriveLink[]>('/api/drive-links/public'),
+  getDriveLinksAdmin: (password: string) =>
+    fetchJSON<DriveLink[]>('/api/drive-links', { headers: { 'x-admin-password': password } }),
+  createDriveLink: (data: Partial<DriveLink>, password: string) =>
+    fetchJSON<DriveLink>('/api/drive-links', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: { 'x-admin-password': password },
+    }),
+  updateDriveLink: (id: number, data: Partial<DriveLink>, password: string) =>
+    fetchJSON<DriveLink>(`/api/drive-links/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+      headers: { 'x-admin-password': password },
+    }),
+  deleteDriveLink: (id: number, password: string) =>
+    fetchJSON(`/api/drive-links/${id}`, {
+      method: 'DELETE',
+      headers: { 'x-admin-password': password },
+    }),
 };
