@@ -52,18 +52,6 @@ function setByKey(obj: any, key: string, value: string): any {
   return result;
 }
 
-function setByKey(obj: any, key: string, value: string): any {
-  const parts = key.split('.');
-  const result = JSON.parse(JSON.stringify(obj));
-  let cur = result;
-  for (let i = 0; i < parts.length - 1; i++) {
-    if (!cur[parts[i]]) cur[parts[i]] = {};
-    cur = cur[parts[i]];
-  }
-  cur[parts[parts.length - 1]] = value;
-  return result;
-}
-
 export default function I18nManagementPage() {
   const [password, setPassword] = useState('');
   const [authed, setAuthed] = useState(false);
