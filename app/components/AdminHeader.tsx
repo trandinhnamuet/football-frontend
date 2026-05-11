@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { FANTA_LOGO_URL } from '../lib/assets';
 
 const FANTA = '#FF6B1A';
 const BLACK = '#0a0a0a';
@@ -22,12 +23,13 @@ export default function AdminHeader() {
     }}>
       {/* Logo + Title */}
       <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{
-          width: 40, height: 40, background: FANTA, color: BLACK,
-          clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.02em',
-        }}>LF</div>
+        <img
+          src={FANTA_LOGO_URL}
+          alt="Fanta FC Logo"
+          width={40}
+          height={40}
+          style={{ objectFit: 'cover', display: 'block' }}
+        />
         <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.04em', color: '#f4f1ea', display: 'flex', alignItems: 'center', gap: 8 }}>
           LON FANTA <span style={{ color: FANTA }}>FC</span>
           <span style={{ color: MUTED, fontSize: 14, fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600 }}>/</span>
