@@ -180,8 +180,11 @@ export default function HomePage() {
 
           {/* Leaderboard */}
           {top1 && (
-            <div style={{ marginTop: 32, background: FANTA, color: '#0a0a0a', padding: '40px 48px', display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: 40, alignItems: 'center', clipPath: 'polygon(0 0, 100% 0, 98% 100%, 2% 100%)' }}>
+            <div style={{ marginTop: 32, background: FANTA, color: '#0a0a0a', padding: '40px 48px', display: 'grid', gridTemplateColumns: 'auto auto 1fr auto', gap: 40, alignItems: 'center', clipPath: 'polygon(0 0, 100% 0, 98% 100%, 2% 100%)' }}>
               <JerseyNumber n={1} size={180} color="#0a0a0a" />
+              <div>
+                <Avatar p={top1} size={140} />
+              </div>
               <div>
                 <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>{t('hero.mvp')}</div>
                 <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 6vw, 80px)', lineHeight: 0.9, textTransform: 'uppercase', letterSpacing: '0.01em', marginTop: 10 }}>
@@ -203,8 +206,9 @@ export default function HomePage() {
           {(top2 || top3) && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16 }}>
               {[top2, top3].filter(Boolean).map((p, i) => p && (
-                <div key={p.id} style={{ background: 'var(--card)', padding: '28px 32px', display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: 24, alignItems: 'center', borderLeft: `4px solid ${FANTA}` }}>
+                <div key={p.id} style={{ background: 'var(--card)', padding: '28px 32px', display: 'grid', gridTemplateColumns: 'auto auto 1fr auto', gap: 20, alignItems: 'center', borderLeft: `4px solid ${FANTA}` }}>
                   <JerseyNumber n={i + 2} size={80} color={FANTA} />
+                  <Avatar p={p} size={80} />
                   <div>
                     <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>#{p.num} {roleLabel(p.role)}</div>
                     <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 32, lineHeight: 0.95, textTransform: 'uppercase', marginTop: 4 }}>{p.first_name} {p.last_name}</div>
