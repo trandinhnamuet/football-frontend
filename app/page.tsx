@@ -8,10 +8,11 @@ import Footer from './components/Footer';
 import { Player, Article, Match, TeamStats, FANTA, ROLES, fmtDate } from './lib/types';
 import { api } from './lib/api';
 import { useApp } from './contexts/AppContext';
+import { DEFAULT_PLAYER_AVATAR_URL } from './lib/assets';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const SQUAD_PAGE_SIZE = 5;
-const DEFAULT_AVATAR = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRScUPMFqdRYeJ853J1E8FgYtic5djKfcDytg&s';
+const DEFAULT_AVATAR = DEFAULT_PLAYER_AVATAR_URL;
 
 function JerseyNumber({ n, size = 80, color = 'var(--ink)' }: { n: number | string; size?: number; color?: string }) {
   return (

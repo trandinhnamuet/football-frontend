@@ -3,9 +3,10 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SyncTrigger from '../components/SyncTrigger';
 import { Player, FANTA, ROLES } from '../lib/types';
+import { DEFAULT_PLAYER_AVATAR_URL } from '../lib/assets';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-const DEFAULT_AVATAR = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRScUPMFqdRYeJ853J1E8FgYtic5djKfcDytg&s';
+const DEFAULT_AVATAR = DEFAULT_PLAYER_AVATAR_URL;
 const BLACK = 'var(--bg)';
 const CARD = 'var(--card)';
 const INK = 'var(--ink)';

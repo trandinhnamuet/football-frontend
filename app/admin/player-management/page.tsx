@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import AdminGuard from '../../components/AdminGuard';
 import AdminHeader from '../../components/AdminHeader';
-import { Player, FANTA, ROLES, initials, avatarColor } from '../../lib/types';
+import { Player, FANTA, ROLES } from '../../lib/types';
 import { api } from '../../lib/api';
+import { DEFAULT_PLAYER_AVATAR_URL } from '../../lib/assets';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const BLACK = '#0a0a0a';
@@ -99,13 +101,13 @@ function EditModal({ player, onSave, onClose }: EditModalProps) {
                   style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'block' }}
                 />
               ) : (
-                <div style={{
-                  width: 90, height: 90,
-                  background: avatarColor(player)[0], color: avatarColor(player)[1],
-                  clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontFamily: 'Anton, sans-serif', fontSize: 36,
-                }}>{initials(player)}</div>
+                <Image
+                  src={DEFAULT_PLAYER_AVATAR_URL}
+                  alt="Default Avatar"
+                  width={90}
+                  height={90}
+                  style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'block' }}
+                />
               )}
             </div>
             <div style={{ flex: 1 }}>
@@ -216,8 +218,6 @@ function StatMini({ label, value, accent }: { label: string; value: number; acce
 }
 
 function PlayerCard({ player, onEdit }: { player: Player; onEdit: () => void }) {
-  const [bg, fg] = avatarColor(player);
-
   return (
     <div style={{ background: CARD, padding: 20, position: 'relative', overflow: 'hidden', borderLeft: `4px solid ${roleColors[player.role] || FANTA}` }}>
       <div style={{ position: 'absolute', top: 8, right: 10, fontFamily: 'Anton, sans-serif', fontSize: 72, lineHeight: 0.85, color: 'rgba(255,255,255,0.04)' }}>{player.num}</div>
@@ -226,9 +226,7 @@ function PlayerCard({ player, onEdit }: { player: Player; onEdit: () => void }) 
         {player.image_url ? (
           <img src={`${BASE}${player.image_url}`} alt={player.first_name} width={80} height={80} style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)' }} />
         ) : (
-          <div style={{ width: 80, height: 80, background: bg, color: fg, clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 32 }}>
-            {initials(player)}
-          </div>
+          <Image src={DEFAULT_PLAYER_AVATAR_URL} alt="Default Avatar" width={80} height={80} style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'block' }} />
         )}
       </div>
 

@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useApp } from '../contexts/AppContext';
+import { FANTA_LOGO_URL } from '../lib/assets';
 
 const FANTA = '#FF6B1A';
 
@@ -41,12 +43,13 @@ export default function Header() {
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     }}>
       <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{
-          width: 40, height: 40, background: FANTA, color: '#0a0a0a',
-          clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.02em',
-        }}>LF</div>
+        <Image
+          src={FANTA_LOGO_URL}
+          alt="Fanta FC Logo"
+          width={40}
+          height={40}
+          style={{ objectFit: 'contain', display: 'block' }}
+        />
         <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.04em', color: '#f4f1ea' }}>
           LON FANTA <span style={{ color: FANTA }}>FC</span>
         </div>
