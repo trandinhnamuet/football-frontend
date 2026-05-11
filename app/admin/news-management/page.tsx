@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import AdminGuard from '../../components/AdminGuard';
+import AdminHeader from '../../components/AdminHeader';
 import { Article, FANTA, fmtDate } from '../../lib/types';
 import { api } from '../../lib/api';
 
@@ -151,16 +152,7 @@ function NewsManagementContent() {
 
   return (
     <div style={{ background: BLACK, color: INK, minHeight: '100vh', fontFamily: '"Space Grotesk", system-ui, sans-serif' }}>
-      <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: BLACK, borderBottom: `1px solid ${FANTA}`, padding: '14px 48px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.04em' }}>
-          LON FANTA <span style={{ color: FANTA }}>FC</span> <span style={{ color: MUTED, fontSize: 14 }}>/ Admin</span>
-        </div>
-        <div style={{ display: 'flex', gap: 20, fontSize: 12, color: MUTED, letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>
-          <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>← Trang chủ</Link>
-          <Link href="/admin/player-management" style={{ color: 'inherit', textDecoration: 'none' }}>Quản lý cầu thủ</Link>
-          <button onClick={() => { localStorage.removeItem('lffc_admin_pw'); location.reload(); }} style={{ background: 'none', border: 'none', color: '#cc4444', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>Đăng xuất</button>
-        </div>
-      </nav>
+      <AdminHeader />
 
       <main style={{ padding: '40px 48px 80px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 36 }}>
