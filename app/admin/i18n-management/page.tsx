@@ -1,13 +1,11 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import AdminGuard from '../../components/AdminGuard';
 import { FANTA } from '../../lib/types';
 import { translations } from '../../lib/i18n';
-
-const STORAGE_KEY_VI = 'lffc_i18n_vi';
-const STORAGE_KEY_EN = 'lffc_i18n_en';
+import { api } from '../../lib/api';
 
 const BLACK = 'var(--bg)';
 const CARD = 'var(--card)';
@@ -15,13 +13,13 @@ const INK = 'var(--ink)';
 const MUTED = 'var(--muted)';
 const LINE = 'var(--line)';
 
-type FlatEntry = { key: string; vi: string; en: string };
+type FlatEntry = { key: string };
 
 function flattenObject(obj: any, prefix = ''): FlatEntry[] {
   const entries: FlatEntry[] = [];
   function walk(node: any, path: string) {
     if (typeof node === 'string') {
-      entries.push({ key: path, vi: '', en: '' });
+      entries.push({ key: path });
     } else if (typeof node === 'object' && node !== null) {
       for (const k of Object.keys(node)) {
         walk(node[k], path ? `${path}.${k}` : k);
@@ -54,32 +52,61 @@ function setByKey(obj: any, key: string, value: string): any {
   return result;
 }
 
-function loadOverrides(key: string, defaults: any): any {
-  if (typeof window === 'undefined') return defaults;
-  try {
-    const saved = localStorage.getItem(key);
-    if (!saved) return defaults;
-    return JSON.parse(saved);
-  } catch {
-    return defaults;
+function setByKey(obj: any, key: string, value: string): any {
+  const parts = key.split('.');
+  const result = JSON.parse(JSON.stringify(obj));
+  let cur = result;
+  for (let i = 0; i < parts.length - 1; i++) {
+    if (!cur[parts[i]]) cur[parts[i]] = {};
+    cur = cur[parts[i]];
   }
+  cur[parts[parts.length - 1]] = value;
+  return result;
 }
 
 export default function I18nManagementPage() {
+  const [password, setPassword] = useState('');
+  const [authed, setAuthed] = useState(false);
   const [viData, setViData] = useState<any>(translations.vi);
   const [enData, setEnData] = useState<any>(translations.en);
   const [search, setSearch] = useState('');
-  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [saveMsg, setSaveMsg] = useState('');
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [editVi, setEditVi] = useState('');
   const [editEn, setEditEn] = useState('');
 
-  useEffect(() => {
-    setViData(loadOverrides(STORAGE_KEY_VI, translations.vi));
-    setEnData(loadOverrides(STORAGE_KEY_EN, translations.en));
-  }, []);
-
   const allKeys = useMemo(() => flattenObject(translations.vi), []);
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setSaveMsg('');
+    try {
+      await api.updateI18n({}, password);
+      const data = await api.getI18n();
+      function deepMerge(base: any, overrides: any): any {
+        if (!overrides || typeof overrides !== 'object') return base;
+        const result = { ...base };
+        for (const key of Object.keys(overrides)) {
+          if (typeof overrides[key] === 'object' && overrides[key] !== null) {
+            result[key] = deepMerge(base[key] || {}, overrides[key]);
+          } else if (typeof overrides[key] === 'string' && overrides[key] !== '') {
+            result[key] = overrides[key];
+          }
+        }
+        return result;
+      }
+      setViData(deepMerge(translations.vi, data.vi || {}));
+      setEnData(deepMerge(translations.en, data.en || {}));
+      setAuthed(true);
+    } catch (err: any) {
+      setSaveMsg('Sai mật khẩu hoặc lỗi kết nối');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -97,31 +124,30 @@ export default function I18nManagementPage() {
     setEditEn(getByKey(enData, key));
   }
 
-  function saveEdit() {
+  async function saveEdit() {
     if (!editingKey) return;
-    const viUpdated = setByKey(viData, editingKey, editVi);
-    const enUpdated = setByKey(enData, editingKey, editEn);
-    setViData(viUpdated);
-    setEnData(enUpdated);
-    localStorage.setItem(STORAGE_KEY_VI, JSON.stringify(viUpdated));
-    localStorage.setItem(STORAGE_KEY_EN, JSON.stringify(enUpdated));
-    setEditingKey(null);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setSaving(true);
+    setSaveMsg('');
+    try {
+      const viUpdated = setByKey(viData, editingKey, editVi);
+      const enUpdated = setByKey(enData, editingKey, editEn);
+      await api.updateI18n({ vi: viUpdated, en: enUpdated }, password);
+      setViData(viUpdated);
+      setEnData(enUpdated);
+      setEditingKey(null);
+      setSaveMsg('✓ Đã lưu — áp dụng cho tất cả người dùng');
+      setTimeout(() => setSaveMsg(''), 3500);
+    } catch (err: any) {
+      setSaveMsg('❌ Lỗi: ' + (err.message || 'không rõ'));
+    } finally {
+      setSaving(false);
+    }
   }
 
   function cancelEdit() {
     setEditingKey(null);
     setEditVi('');
     setEditEn('');
-  }
-
-  function resetAll() {
-    if (!confirm('Reset tất cả về bản gốc?')) return;
-    localStorage.removeItem(STORAGE_KEY_VI);
-    localStorage.removeItem(STORAGE_KEY_EN);
-    setViData(translations.vi);
-    setEnData(translations.en);
   }
 
   function exportJSON() {
@@ -132,6 +158,36 @@ export default function I18nManagementPage() {
     a.download = 'i18n-both.json';
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  if (!authed) {
+    return (
+      <AdminGuard>
+        <div style={{ background: BLACK, color: INK, fontFamily: '"Space Grotesk", system-ui, sans-serif', minHeight: '100vh' }}>
+          <header style={{ padding: '48px 48px 32px', borderBottom: `1px solid ${FANTA}33` }}>
+            <Link href="/admin" style={{ color: FANTA, textDecoration: 'none', fontSize: 14, fontWeight: 600 }}>← Admin</Link>
+            <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(36px, 6vw, 72px)', lineHeight: 0.92, textTransform: 'uppercase', margin: '16px 0 0' }}>
+              QUẢN LÝ <span style={{ color: FANTA }}>NGÔN NGỮ</span>
+            </h1>
+          </header>
+          <div style={{ padding: '48px', maxWidth: 400 }}>
+            <form onSubmit={handleLogin}>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', fontSize: 12, color: FANTA, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>Mật khẩu Admin</label>
+                <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+                  style={{ width: '100%', padding: '10px 12px', background: CARD, border: `1px solid ${FANTA}44`, color: INK, fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
+                  placeholder="Nhập mật khẩu..." required />
+              </div>
+              {saveMsg && <div style={{ color: '#f87171', fontSize: 13, marginBottom: 12 }}>{saveMsg}</div>}
+              <button type="submit" disabled={loading}
+                style={{ width: '100%', padding: '12px', background: FANTA, color: '#0a0a0a', border: 'none', cursor: 'pointer', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                {loading ? 'Đang xác thực...' : 'Đăng nhập'}
+              </button>
+            </form>
+          </div>
+        </div>
+      </AdminGuard>
+    );
   }
 
   return (
@@ -147,9 +203,9 @@ export default function I18nManagementPage() {
           <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(36px, 6vw, 72px)', lineHeight: 0.92, textTransform: 'uppercase', margin: 0 }}>
             QUẢN LÝ <span style={{ color: FANTA }}>NGÔN NGỮ</span>
           </h1>
-          <p style={{ color: MUTED, fontSize: 14, marginTop: 12 }}>
-            Chỉnh sửa nội dung hiển thị tiếng Việt & tiếng Anh trên website. Thay đổi được lưu vào localStorage của trình duyệt.
-          </p>
+            <p style={{ color: MUTED, fontSize: 14, marginTop: 12 }}>
+              Chỉnh sửa nội dung hiển thị tiếng Việt &amp; tiếng Anh. Thay đổi <strong style={{ color: FANTA }}>áp dụng ngay cho tất cả người dùng</strong>.
+            </p>
         </header>
 
         <main style={{ padding: '32px 48px' }}>
@@ -180,19 +236,8 @@ export default function I18nManagementPage() {
               ↓ Export JSON
             </button>
 
-            <button
-              onClick={resetAll}
-              style={{
-                padding: '10px 20px', background: 'transparent', border: `1px solid rgba(255,255,255,0.15)`,
-                color: MUTED, cursor: 'pointer', fontFamily: 'inherit', fontSize: 13,
-                letterSpacing: '0.06em', textTransform: 'uppercase',
-              }}
-            >
-              ↺ Reset gốc
-            </button>
-
-            {saved && (
-              <span style={{ color: '#4ade80', fontSize: 13, fontWeight: 600 }}>✓ Đã lưu</span>
+            {saveMsg && (
+              <span style={{ fontSize: 13, fontWeight: 600, color: saveMsg.startsWith('✓') ? '#4ade80' : '#f87171' }}>{saveMsg}</span>
             )}
           </div>
 
@@ -223,8 +268,6 @@ export default function I18nManagementPage() {
             )}
 
             {filtered.map(({ key }, idx) => {
-              const viValue = getByKey(viData, key);
-              const enValue = getByKey(enData, key);
               const isEditing = editingKey === key;
               return (
                 <div
@@ -260,7 +303,7 @@ export default function I18nManagementPage() {
                       <div
                         onClick={() => startEdit(key)}
                         style={{
-                          fontSize: 13, color: viValue ? INK : MUTED, cursor: 'pointer',
+                          fontSize: 13, color: getByKey(viData, key) ? INK : MUTED, cursor: 'pointer',
                           minHeight: 24, lineHeight: 1.5,
                           padding: '4px 6px', borderRadius: 2,
                           border: '1px solid transparent',
@@ -270,7 +313,7 @@ export default function I18nManagementPage() {
                         onMouseLeave={e => (e.currentTarget.style.borderColor = 'transparent')}
                         title="Click để chỉnh sửa"
                       >
-                        {viValue || <em style={{ color: MUTED }}>chưa có</em>}
+                        {getByKey(viData, key) || <em style={{ color: MUTED }}>chưa có</em>}
                       </div>
                     )}
                   </div>
@@ -293,7 +336,7 @@ export default function I18nManagementPage() {
                       <div
                         onClick={() => startEdit(key)}
                         style={{
-                          fontSize: 13, color: enValue ? INK : MUTED, cursor: 'pointer',
+                          fontSize: 13, color: getByKey(enData, key) ? INK : MUTED, cursor: 'pointer',
                           minHeight: 24, lineHeight: 1.5,
                           padding: '4px 6px', borderRadius: 2,
                           border: '1px solid transparent',
@@ -303,7 +346,7 @@ export default function I18nManagementPage() {
                         onMouseLeave={e => (e.currentTarget.style.borderColor = 'transparent')}
                         title="Click để chỉnh sửa"
                       >
-                        {enValue || <em style={{ color: MUTED }}>chưa có</em>}
+                        {getByKey(enData, key) || <em style={{ color: MUTED }}>chưa có</em>}
                       </div>
                     )}
                   </div>
@@ -312,8 +355,8 @@ export default function I18nManagementPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     {isEditing ? (
                       <>
-                        <button onClick={saveEdit} style={{ padding: '4px 10px', background: FANTA, color: '#0a0a0a', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                          Lưu
+                        <button onClick={saveEdit} disabled={saving} style={{ padding: '4px 10px', background: FANTA, color: '#0a0a0a', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          {saving ? '...' : 'Lưu'}
                         </button>
                         <button onClick={cancelEdit} style={{ padding: '4px 10px', background: 'transparent', color: MUTED, border: `1px solid ${LINE}`, cursor: 'pointer', fontFamily: 'inherit', fontSize: 12 }}>
                           Huỷ

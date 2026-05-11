@@ -113,4 +113,13 @@ export const api = {
       method: 'DELETE',
       headers: { 'x-admin-password': password },
     }),
+
+  // i18n global overrides
+  getI18n: () => fetchJSON<{ vi: Record<string, any>; en: Record<string, any> }>('/api/i18n'),
+  updateI18n: (data: { vi?: Record<string, any>; en?: Record<string, any> }, password: string) =>
+    fetchJSON<void>('/api/i18n', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: { 'x-admin-password': password },
+    }),
 };

@@ -2,9 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { translations, Lang } from '../lib/i18n';
-
-const I18N_STORAGE_KEY_VI = 'lffc_i18n_vi';
-const I18N_STORAGE_KEY_EN = 'lffc_i18n_en';
+import { api } from '../lib/api';
 
 interface AppContextType {
   lang: Lang;
@@ -28,27 +26,16 @@ function deepMerge(base: any, overrides: any): any {
   for (const key of Object.keys(overrides)) {
     if (typeof overrides[key] === 'object' && overrides[key] !== null && !Array.isArray(overrides[key])) {
       result[key] = deepMerge(base[key] || {}, overrides[key]);
-    } else {
+    } else if (typeof overrides[key] === 'string' && overrides[key] !== '') {
       result[key] = overrides[key];
     }
   }
   return result;
 }
 
-function loadI18nOverrides(storageKey: string, defaults: any): any {
-  try {
-    const saved = localStorage.getItem(storageKey);
-    if (!saved) return defaults;
-    return deepMerge(defaults, JSON.parse(saved));
-  } catch {
-    return defaults;
-  }
-}
-
 export function AppContextProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>('vi');
   const [theme, setThemeState] = useState<'dark' | 'light'>('dark');
-  const [mounted, setMounted] = useState(false);
   const [i18nData, setI18nData] = useState(translations);
 
   useEffect(() => {
@@ -57,11 +44,16 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     setLangState(savedLang);
     setThemeState(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
-    setI18nData({
-      vi: loadI18nOverrides(I18N_STORAGE_KEY_VI, translations.vi),
-      en: loadI18nOverrides(I18N_STORAGE_KEY_EN, translations.en),
+
+    // Fetch global i18n overrides from backend
+    api.getI18n().then(overrides => {
+      setI18nData({
+        vi: deepMerge(translations.vi, overrides.vi),
+        en: deepMerge(translations.en, overrides.en),
+      });
+    }).catch(() => {
+      // Fallback to base translations if API unavailable
     });
-    setMounted(true);
   }, []);
 
   function setLang(l: Lang) {

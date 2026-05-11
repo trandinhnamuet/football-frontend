@@ -8,25 +8,21 @@ import type { DriveLink } from '../lib/types';
 const FANTA = '#FF6B1A';
 
 function getDriveEmbedUrl(url: string): string {
-  // If it's already a full URL with uc?export=view, return as-is
-  if (url.includes('drive.google.com/uc?export=view')) {
-    return url;
-  }
   // Extract file ID from full URL: https://drive.google.com/file/d/FILE_ID/view
   const fileMatch = url.match(/\/file\/d\/([^/]+)/);
   if (fileMatch) {
-    return `https://drive.google.com/uc?export=view&id=${fileMatch[1]}`;
+    return `https://drive.google.com/thumbnail?id=${fileMatch[1]}&sz=w800`;
   }
-  // If input is just the file ID (alphanumeric string, 20-40 chars)
+  // If input is just the file ID (alphanumeric, 20-60 chars)
   if (/^[a-zA-Z0-9_-]{20,}$/.test(url.trim())) {
-    return `https://drive.google.com/uc?export=view&id=${url.trim()}`;
+    return `https://drive.google.com/thumbnail?id=${url.trim()}&sz=w800`;
   }
-  // Fallback: try open?id= format
+  // Extract from ?id= query param
   const openMatch = url.match(/[?&]id=([^&]+)/);
   if (openMatch) {
-    return `https://drive.google.com/uc?export=view&id=${openMatch[1]}`;
+    return `https://drive.google.com/thumbnail?id=${openMatch[1]}&sz=w800`;
   }
-  // Return original if no match
+  // Fallback to original
   return url;
 }
 
