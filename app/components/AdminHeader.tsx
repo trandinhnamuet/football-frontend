@@ -29,7 +29,7 @@ export default function AdminHeader() {
           alt="Fanta FC Logo"
           width={40}
           height={40}
-          style={{ objectFit: 'cover', display: 'block' }}
+          style={{ objectFit: 'contain', display: 'block' }}
         />
         <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.04em', color: '#f4f1ea', display: 'flex', alignItems: 'center', gap: 8 }}>
           LON FANTA <span style={{ color: FANTA }}>FC</span>

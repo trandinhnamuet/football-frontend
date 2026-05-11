@@ -226,7 +226,7 @@ function PlayerCard({ player, onEdit }: { player: Player; onEdit: () => void }) 
         {player.image_url ? (
           <img src={`${BASE}${player.image_url}`} alt={player.first_name} width={80} height={80} style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)' }} />
         ) : (
-          <Image src={DEFAULT_PLAYER_AVATAR_URL} alt="Default Avatar" width={80} height={80} style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)' }} />
+          <Image src={DEFAULT_PLAYER_AVATAR_URL} alt="Default Avatar" width={80} height={80} style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'block' }} />
         )}
       </div>
 
