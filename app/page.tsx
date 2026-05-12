@@ -294,8 +294,8 @@ export default function HomePage() {
             <div style={{ paddingTop: 110, overflow: 'visible' }}>
               <div
                 key={animKey}
-                className={slideClass}
-                className="mob-squad-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}
+                className={`${slideClass} mob-squad-grid`}
+                style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}
               >
                 {squadVisible.map(p => {
                   return (
