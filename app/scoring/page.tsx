@@ -22,7 +22,7 @@ export default function ScoringPage() {
     <div style={{ background: 'var(--bg)', color: 'var(--ink)', fontFamily: '"Space Grotesk", system-ui, sans-serif', minHeight: '100vh' }}>
       <Header />
 
-      <main style={{ padding: '64px 48px 100px', maxWidth: 960, margin: '0 auto' }}>
+      <main className="mob-p-main" style={{ padding: '64px 48px 100px', maxWidth: 960, margin: '0 auto' }}>
         {/* Breadcrumb */}
         <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, marginBottom: 24 }}>
           <Link href="/" style={{ color: 'var(--muted)', textDecoration: 'none' }}>← Trang chủ</Link>
@@ -38,7 +38,7 @@ export default function ScoringPage() {
         </p>
 
         {/* Formula cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginTop: 48 }}>
+        <div className="mob-scoring-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginTop: 48 }}>
           {FORMULA.map((f) => (
             <div key={f.action} style={{
               background: 'var(--card)',
@@ -74,7 +74,7 @@ export default function ScoringPage() {
           <div style={{ fontSize: 12, color: 'var(--muted)', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, marginBottom: 20 }}>Ví dụ tính điểm</div>
           <div style={{ display: 'grid', gap: 12 }}>
             {EXAMPLES.map((ex) => (
-              <div key={ex.name} style={{ background: 'var(--card)', padding: '20px 28px', display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gap: 24, alignItems: 'center' }}>
+              <div key={ex.name} className="mob-scoring-ex-row" style={{ background: 'var(--card)', padding: '20px 28px', display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gap: 24, alignItems: 'center' }}>
                 <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, textTransform: 'uppercase' }}>{ex.name}</div>
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 28, color: FANTA }}>{ex.goals}</div>

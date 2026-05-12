@@ -58,7 +58,7 @@ export default function GalleryPage() {
   return (
     <div style={{ background: 'var(--bg)', color: 'var(--ink)', fontFamily: '"Space Grotesk", system-ui, sans-serif', minHeight: '100vh' }}>
       {/* Header */}
-      <header style={{ padding: '48px 48px 32px', borderBottom: `1px solid ${FANTA}33` }}>
+      <header className="mob-gallery-hdr" style={{ padding: '48px 48px 32px', borderBottom: `1px solid ${FANTA}33` }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
           <Link href="/" style={{ color: FANTA, textDecoration: 'none', fontSize: 14, fontWeight: 600 }}>← Trang chủ</Link>
         </div>
@@ -70,7 +70,7 @@ export default function GalleryPage() {
         </p>
       </header>
 
-      <main style={{ padding: '48px' }}>
+      <main className="mob-gallery-main" style={{ padding: '48px' }}>
         {loading && (
           <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--muted)', fontSize: 16 }}>
             Đang tải ảnh...

@@ -30,10 +30,10 @@ function TiktokIcon() {
 
 export default function Footer() {
   return (
-    <footer style={{ padding: '60px 48px 36px', background: 'var(--bg)', borderTop: `1px solid ${FANTA}` }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 48 }}>
+    <footer style={{ padding: '60px 48px 36px', background: 'var(--bg)', borderTop: `1px solid ${FANTA}` }} className="mob-p-section">
+      <div className="mob-footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 48 }}>
         <div>
-          <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 64, lineHeight: 0.9, textTransform: 'uppercase', letterSpacing: '0.01em', color: 'var(--ink)' }}>
+          <div className="mob-footer-title" style={{ fontFamily: 'Anton, sans-serif', fontSize: 64, lineHeight: 0.9, textTransform: 'uppercase', letterSpacing: '0.01em', color: 'var(--ink)' }}>
             LON FANTA <span style={{ color: FANTA }}>FC</span>
           </div>
           <div style={{ fontSize: 12, marginTop: 12, color: FANTA, letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 700 }}>#ĐamMêBấtTận</div>
@@ -61,7 +61,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <div style={{ marginTop: 40, paddingTop: 20, borderTop: '1px solid var(--line)', fontSize: 11, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', display: 'flex', justifyContent: 'space-between' }}>
+      <div className="mob-footer-copy" style={{ marginTop: 40, paddingTop: 20, borderTop: '1px solid var(--line)', fontSize: 11, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', display: 'flex', justifyContent: 'space-between' }}>
         <span>© 2026 LON FANTA FC</span>
         <span>ĐÁ THẬT · VUI THẬT</span>
       </div>

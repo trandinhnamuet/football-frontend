@@ -94,10 +94,121 @@ input, textarea, select, button {
 .slide-from-left > *:nth-child(4) { animation-delay: 120ms; }
 .slide-from-left > *:nth-child(5) { animation-delay: 160ms; }
 
-/* Responsive */
+/* ================================================
+   RESPONSIVE / MOBILE UTILITIES
+   All use !important to override inline React styles
+   ================================================ */
+
+/* Nav hamburger - hidden on desktop, shown on mobile */
+.nav-mobile-btn { display: none !important; }
+
 @media (max-width: 768px) {
-  nav { padding: 12px 20px !important; }
-  section { padding: 40px 20px !important; }
-  footer { padding: 40px 20px 24px !important; }
-  .grid-hide-mobile { display: none !important; }
+  /* --- Navigation --- */
+  .main-nav { padding: 12px 16px !important; }
+  .nav-desktop { display: none !important; }
+  .nav-mobile-btn { display: flex !important; align-items: center; }
+
+  /* --- Grid overrides --- */
+  .mob-grid-1 { grid-template-columns: 1fr !important; }
+  .mob-grid-2 { grid-template-columns: 1fr 1fr !important; }
+
+  /* --- Section/page padding --- */
+  .mob-p-section { padding: 40px 16px !important; }
+  .mob-p-hero    { padding: 32px 16px 48px !important; }
+  .mob-p-main    { padding: 32px 16px 60px !important; }
+
+  /* --- Display helpers --- */
+  .mob-hide  { display: none !important; }
+  .mob-block { display: block !important; }
+
+  /* --- Flex helpers --- */
+  .mob-stack       { flex-direction: column !important; }
+  .mob-align-start { align-items: flex-start !important; }
+
+  /* --- Footer --- */
+  .mob-footer-grid  { grid-template-columns: 1fr !important; gap: 32px !important; }
+  .mob-footer-title { font-size: 40px !important; line-height: 1 !important; }
+  .mob-footer-copy  { flex-direction: column !important; gap: 6px !important; }
+
+  /* --- Hero / Leaderboard --- */
+  .mob-hero-top1 {
+    grid-template-columns: auto auto 1fr auto !important;
+    padding: 16px !important;
+    gap: 10px !important;
+    clip-path: none !important;
+  }
+  /* Scale down the huge jersey number (180px) and avatar (140px) */
+  .mob-hero-top1 > *:first-child       { font-size: 64px !important; }
+  .mob-hero-top1 > *:nth-child(2) img  { width: 64px !important; height: 64px !important; }
+  .mob-hero-top1 > *:nth-child(3) > *:nth-child(2) { font-size: 26px !important; }
+  .mob-hero-top1 > *:last-child > *:first-child     { font-size: 48px !important; }
+
+  .mob-hero-top2-3 { grid-template-columns: 1fr !important; }
+  .mob-hero-top2-3-card {
+    grid-template-columns: auto auto 1fr auto !important;
+    padding: 16px 14px !important;
+    gap: 12px !important;
+  }
+
+  .mob-hero-rest { padding: 4px 0 !important; }
+  .mob-hero-rest-row {
+    grid-template-columns: 44px 1fr 56px !important;
+    gap: 8px !important;
+    padding: 8px 12px !important;
+  }
+  /* Hide the progress bar column on very small screens */
+  .mob-hero-rest-row > *:nth-child(3) { display: none !important; }
+
+  /* --- Squad carousel --- */
+  .mob-squad-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* --- Section header (title + view-all button row) --- */
+  .mob-section-hdr { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+
+  /* --- News grid (home & news page) --- */
+  .mob-news-grid { grid-template-columns: 1fr !important; }
+  .mob-news-grid > * { grid-row: auto !important; grid-column: auto !important; }
+
+  /* --- Schedule --- */
+  .mob-schedule-cols { grid-template-columns: 1fr !important; gap: 24px !important; }
+
+  /* --- CTA section --- */
+  .mob-cta-inner { flex-direction: column !important; align-items: flex-start !important; gap: 20px !important; }
+
+  /* --- Intro / About section --- */
+  .mob-intro-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+  .mob-stats-grid { grid-template-columns: 1fr 1fr !important; }
+
+  /* --- Dashboard --- */
+  .mob-kpi-grid  { grid-template-columns: repeat(3, 1fr) !important; }
+  .mob-dash-split { grid-template-columns: 1fr !important; }
+  /* Leaderboard row: rank | name | value (hide bar) */
+  .mob-dash-rank-row {
+    grid-template-columns: 28px 1fr 64px !important;
+    gap: 8px !important;
+  }
+  .mob-dash-rank-row > *:nth-child(3) { display: none !important; }
+
+  /* --- Scoring page --- */
+  .mob-scoring-cards { grid-template-columns: 1fr !important; }
+  .mob-scoring-ex-row {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+  /* The "= total" last column spans to new row */
+  .mob-scoring-ex-row > *:last-child {
+    grid-column: 1 / -1 !important;
+    border-left: none !important;
+    border-top: 2px solid var(--fanta) !important;
+    padding-left: 0 !important;
+    padding-top: 12px !important;
+    text-align: left !important;
+  }
+
+  /* --- Players page --- */
+  .mob-players-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* --- Gallery header padding --- */
+  .mob-gallery-hdr { padding: 32px 16px 24px !important; }
+  .mob-gallery-main { padding: 16px !important; }
 }

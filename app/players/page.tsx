@@ -46,7 +46,7 @@ export default async function PlayersPage() {
     <div style={{ background: BLACK, color: INK, fontFamily: '"Space Grotesk", system-ui, sans-serif', minHeight: '100vh' }}>
       <SyncTrigger />
       <Header />
-      <main style={{ padding: '48px 48px 80px' }}>
+      <main className="mob-p-main" style={{ padding: '48px 48px 80px' }}>
         <div style={{ marginBottom: 48 }}>
           <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>
             <Link href="/" style={{ color: MUTED, textDecoration: 'none' }}>← Trang chủ</Link>
@@ -75,7 +75,7 @@ export default async function PlayersPage() {
                     <div style={{ fontSize: 12, color: MUTED, letterSpacing: '0.1em', textTransform: 'uppercase' }}>{group.length} cầu thủ</div>
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16 }}>
+                <div className="mob-players-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16 }}>
                   {group.map(p => (
                     <div key={p.id} style={{ background: CARD, padding: 20, position: 'relative', overflow: 'hidden', borderLeft: `4px solid ${roleColors[role]}` }}>
                       <div style={{ position: 'absolute', top: 8, right: 10, fontFamily: 'Anton, sans-serif', fontSize: 80, lineHeight: 0.85, color: 'rgba(255,255,255,0.04)', letterSpacing: '-0.02em' }}>{p.num}</div>

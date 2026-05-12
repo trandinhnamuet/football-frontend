@@ -78,7 +78,7 @@ export default function DashboardPage() {
       <SyncTrigger />
       <Header />
 
-      <main style={{ padding: '48px 48px 80px' }}>
+      <main className="mob-p-main" style={{ padding: '48px 48px 80px' }}>
         {/* Title */}
         <div style={{ marginBottom: 40 }}>
           <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>
@@ -93,7 +93,7 @@ export default function DashboardPage() {
 
         {/* KPIs */}
         {kpis.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 14, marginBottom: 40 }}>
+          <div className="mob-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 14, marginBottom: 40 }}>
             {kpis.map(k => (
               <div key={k.label} style={{ background: CARD, border: `1px solid ${LINE}`, padding: '20px 20px' }}>
                 <div style={{ fontSize: 11, color: MUTED, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 600 }}>{k.label}</div>
@@ -193,7 +193,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Split: Leaderboard + Role Dist */}
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 20 }}>
+        <div className="mob-dash-split" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 20 }}>
           {/* Full ranking */}
           <div style={{ background: CARD, border: `1px solid ${LINE}`, padding: '28px' }}>
             <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, letterSpacing: '0.02em', textTransform: 'uppercase', marginBottom: 16 }}>
@@ -204,7 +204,7 @@ export default function DashboardPage() {
               const w = max > 0 ? (val / max) * 100 : 0;
               const [bg, fg] = avatarColor(p);
               return (
-                <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '36px 160px 1fr 80px', gap: 14, alignItems: 'center', padding: '9px 0', borderBottom: i < sorted.length - 1 ? `1px dashed ${LINE}` : 'none' }}>
+                <div key={p.id} className="mob-dash-rank-row" style={{ display: 'grid', gridTemplateColumns: '36px 160px 1fr 80px', gap: 14, alignItems: 'center', padding: '9px 0', borderBottom: i < sorted.length - 1 ? `1px dashed ${LINE}` : 'none' }}>
                   <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, color: MUTED, letterSpacing: '0.02em' }}>{i + 1}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 28, height: 28, borderRadius: '50%', background: bg, color: fg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 11, flexShrink: 0 }}>

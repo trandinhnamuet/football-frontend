@@ -111,7 +111,7 @@ export default function HomePage() {
       <Header />
 
       {/* HERO — Leaderboard */}
-      <section style={{ position: 'relative', overflow: 'hidden', padding: '48px 48px 64px', backgroundImage: 'repeating-linear-gradient(45deg, transparent 0 60px, rgba(255,107,26,0.025) 60px 61px)' }}>
+      <section className="mob-p-hero" style={{ position: 'relative', overflow: 'hidden', padding: '48px 48px 64px', backgroundImage: 'repeating-linear-gradient(45deg, transparent 0 60px, rgba(255,107,26,0.025) 60px 61px)' }}>
         <div style={{ position: 'absolute', top: 20, right: -100, pointerEvents: 'none', fontFamily: 'Anton, sans-serif', fontSize: 380, lineHeight: 0.8, color: FANTA, opacity: 0.07, letterSpacing: '-0.04em', whiteSpace: 'nowrap' }}>2026</div>
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
@@ -181,7 +181,7 @@ export default function HomePage() {
 
           {/* Leaderboard */}
           {top1 && (
-            <div style={{ marginTop: 32, background: FANTA, color: '#0a0a0a', padding: '40px 48px', display: 'grid', gridTemplateColumns: 'auto auto 1fr auto', gap: 40, alignItems: 'center', clipPath: 'polygon(0 0, 100% 0, 98% 100%, 2% 100%)' }}>
+            <div className="mob-hero-top1" style={{ marginTop: 32, background: FANTA, color: '#0a0a0a', padding: '40px 48px', display: 'grid', gridTemplateColumns: 'auto auto 1fr auto', gap: 40, alignItems: 'center', clipPath: 'polygon(0 0, 100% 0, 98% 100%, 2% 100%)' }}>
               <JerseyNumber n={1} size={180} color="#0a0a0a" />
               <div>
                 <Avatar p={top1} size={140} />
@@ -205,9 +205,9 @@ export default function HomePage() {
           )}
 
           {(top2 || top3) && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16 }}>
+            <div className="mob-hero-top2-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16 }}>
               {[top2, top3].filter(Boolean).map((p, i) => p && (
-                <div key={p.id} style={{ background: 'var(--card)', padding: '28px 32px', display: 'grid', gridTemplateColumns: 'auto auto 1fr auto', gap: 20, alignItems: 'center', borderLeft: `4px solid ${FANTA}` }}>
+                <div key={p.id} className="mob-hero-top2-3-card" style={{ background: 'var(--card)', padding: '28px 32px', display: 'grid', gridTemplateColumns: 'auto auto 1fr auto', gap: 20, alignItems: 'center', borderLeft: `4px solid ${FANTA}` }}>
                   <JerseyNumber n={i + 2} size={80} color={FANTA} />
                   <Avatar p={p} size={80} />
                   <div>
@@ -224,12 +224,12 @@ export default function HomePage() {
           )}
 
           {rest.length > 0 && (
-            <div style={{ marginTop: 16, background: 'var(--card)', padding: '8px 0' }}>
+            <div className="mob-hero-rest" style={{ marginTop: 16, background: 'var(--card)', padding: '8px 0' }}>
               {rest.map((p, i) => {
                 const max = rest[0]?.stat_points || 1;
                 const w = max > 0 ? (p.stat_points / max) * 100 : 0;
                 return (
-                  <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '64px 1fr 1fr 70px', alignItems: 'center', gap: 20, padding: '10px 28px', borderBottom: i < rest.length - 1 ? '1px solid var(--line)' : 'none' }}>
+                  <div key={p.id} className="mob-hero-rest-row" style={{ display: 'grid', gridTemplateColumns: '64px 1fr 1fr 70px', alignItems: 'center', gap: 20, padding: '10px 28px', borderBottom: i < rest.length - 1 ? '1px solid var(--line)' : 'none' }}>
                     <JerseyNumber n={i + 4} size={22} color="var(--muted)" />
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       <Avatar p={p} size={32} />
@@ -257,8 +257,8 @@ export default function HomePage() {
       </section>
 
       {/* SQUAD */}
-      <section id="squad" style={{ padding: '80px 48px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 36 }}>
+      <section id="squad" className="mob-p-section" style={{ padding: '80px 48px' }}>
+        <div className="mob-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 36 }}>
           <div>
             <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s02')}</div>
             <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 12 }}>{t('squad.title')}</h2>
@@ -295,7 +295,7 @@ export default function HomePage() {
               <div
                 key={animKey}
                 className={slideClass}
-                style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}
+                className="mob-squad-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}
               >
                 {squadVisible.map(p => {
                   return (
@@ -338,8 +338,8 @@ export default function HomePage() {
       </section>
 
       {/* NEWS */}
-      <section id="news" style={{ padding: '80px 48px', background: 'var(--alt-bg)', borderTop: `1px solid ${FANTA}33` }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 36 }}>
+      <section id="news" className="mob-p-section" style={{ padding: '80px 48px', background: 'var(--alt-bg)', borderTop: `1px solid ${FANTA}33` }}>
+        <div className="mob-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 36 }}>
           <div>
             <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s03')}</div>
             <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 12 }}>{t('news.title')}</h2>
@@ -354,7 +354,7 @@ export default function HomePage() {
             <Link href="/admin/news-management" style={{ color: FANTA }}>{t('news.addNews')}</Link>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+          <div className="mob-news-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
             {articles.slice(0, 6).map((article, i) => (
               <Link key={article.id} href={`/news/${article.id}`} style={{
                 textDecoration: 'none', color: 'inherit', background: 'var(--card)', overflow: 'hidden', display: 'block',
@@ -386,12 +386,12 @@ export default function HomePage() {
       </section>
 
       {/* SCHEDULE */}
-      <section id="schedule" style={{ padding: '80px 48px' }}>
+      <section id="schedule" className="mob-p-section" style={{ padding: '80px 48px' }}>
         <div style={{ marginBottom: 36 }}>
           <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s04')}</div>
           <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 12 }}>{t('schedule.title')}</h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+        <div className="mob-schedule-cols" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
           <div>
             <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, color: FANTA, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 14 }}>▶ {t('schedule.upcoming')}</div>
             {upcoming.length === 0 ? (
@@ -425,9 +425,9 @@ export default function HomePage() {
       </section>
 
       {/* CTA Dashboard */}
-      <section style={{ padding: '64px 48px', background: FANTA, color: '#0a0a0a', position: 'relative', overflow: 'hidden' }}>
+      <section className="mob-p-section" style={{ padding: '64px 48px', background: FANTA, color: '#0a0a0a', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', right: -40, top: -40, fontFamily: 'Anton, sans-serif', fontSize: 280, lineHeight: 0.8, color: '#0a0a0a', opacity: 0.07, letterSpacing: '-0.04em' }}>STATS</div>
-        <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 40 }}>
+        <div className="mob-cta-inner" style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 40 }}>
           <div>
             <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>{t('cta.label')}</div>
             <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 8 }}>
@@ -441,8 +441,8 @@ export default function HomePage() {
       </section>
 
       {/* ABOUT — moved to bottom */}
-      <section id="intro" style={{ padding: '80px 48px', background: 'var(--alt-bg)', borderTop: `1px solid ${FANTA}33` }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 56 }}>
+      <section id="intro" className="mob-p-section" style={{ padding: '80px 48px', background: 'var(--alt-bg)', borderTop: `1px solid ${FANTA}33` }}>
+        <div className="mob-intro-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 56 }}>
           <div>
             <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s01')}</div>
             <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 5vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', letterSpacing: '0.01em', marginTop: 16 }}>{t('intro.label')}</h2>
@@ -451,7 +451,7 @@ export default function HomePage() {
             <p style={{ fontSize: 17, lineHeight: 1.6, color: 'var(--muted)', margin: 0 }}>
               {t('intro.body')}
             </p>
-            <div style={{ marginTop: 36, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+            <div className="mob-stats-grid" style={{ marginTop: 36, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
               {[
                 { n: 2019, l: t('intro.founded') },
                 { n: players.length, l: t('intro.members') },

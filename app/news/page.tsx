@@ -24,7 +24,7 @@ export default async function NewsPage() {
     <div style={{ background: BLACK, color: INK, fontFamily: '"Space Grotesk", system-ui, sans-serif', minHeight: '100vh' }}>
       <SyncTrigger />
       <Header />
-      <main style={{ padding: '48px 48px 80px' }}>
+      <main className="mob-p-main" style={{ padding: '48px 48px 80px' }}>
         <div style={{ marginBottom: 40 }}>
           <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>
             <Link href="/" style={{ color: MUTED, textDecoration: 'none' }}>← Trang chủ</Link>
@@ -44,7 +44,7 @@ export default async function NewsPage() {
             </Link>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+          <div className="mob-news-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
             {articles.map(article => (
               <Link key={article.id} href={`/news/${article.id}`} style={{ textDecoration: 'none', color: 'inherit', background: CARD, overflow: 'hidden', display: 'block' }}>
                 <div style={{
