@@ -14,6 +14,7 @@ const MUTED = 'var(--muted)';
 const LINE = 'var(--line)';
 
 const EMPTY_FORM = { title: '', url: '', description: '', is_public: true, sort_order: 0 };
+const KEY = 'lffc_admin_pw';
 
 export default function DriveLinksAdminPage() {
   const [links, setLinks] = useState<DriveLink[]>([]);
@@ -24,6 +25,15 @@ export default function DriveLinksAdminPage() {
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [editId, setEditId] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(KEY);
+    if (saved) {
+      setPassword(saved);
+      loadLinks(saved);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function loadLinks(pw: string) {
     setLoading(true);
