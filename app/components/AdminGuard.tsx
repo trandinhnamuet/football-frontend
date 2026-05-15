@@ -12,12 +12,25 @@ export default function AdminGuard({ children }: Props) {
   const [authenticated, setAuthenticated] = useState(false);
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     const saved = localStorage.getItem(KEY);
     if (saved) verifyPassword(saved, true);
     else setChecking(false);
+  }, []);
+
+  useEffect(() => {
+    function onUnauthorized() {
+      setAuthenticated(false);
+      setChecking(false);
+      setInput('');
+      setError('');
+      setMessage('Mật khẩu admin không hợp lệ hoặc đã hết hạn, vui lòng đăng nhập lại.');
+    }
+    window.addEventListener('admin-unauthorized', onUnauthorized);
+    return () => window.removeEventListener('admin-unauthorized', onUnauthorized);
   }, []);
 
   async function verifyPassword(pw: string, silent = false) {
@@ -29,6 +42,7 @@ export default function AdminGuard({ children }: Props) {
         localStorage.setItem(KEY, pw);
         setAuthenticated(true);
         setError('');
+        setMessage('');
       } else {
         if (!silent) setError('Sai mật khẩu');
         localStorage.removeItem(KEY);
@@ -56,6 +70,11 @@ export default function AdminGuard({ children }: Props) {
             Admin Access
           </div>
           <div style={{ color: '#a09b94', fontSize: 13, marginBottom: 28 }}>Nhập mật khẩu để tiếp tục</div>
+          {message && (
+            <div style={{ color: '#facc15', fontSize: 13, marginBottom: 16, padding: '10px 14px', background: 'rgba(250,204,21,0.08)', border: '1px solid rgba(250,204,21,0.3)' }}>
+              {message}
+            </div>
+          )}
           <input
             type="password"
             value={input}

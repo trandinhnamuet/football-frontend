@@ -2,11 +2,22 @@ import { Player, Article, Match, TeamStats, DriveLink } from './types';
 
 const BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 
+function handleUnauthorized() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('lffc_admin_pw');
+    window.dispatchEvent(new CustomEvent('admin-unauthorized'));
+  }
+}
+
 async function fetchJSON<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     ...options,
     headers: { 'Content-Type': 'application/json', ...(options?.headers || {}) },
   });
+  if (res.status === 401) {
+    handleUnauthorized();
+    throw new Error('Unauthorized');
+  }
   if (!res.ok) {
     const err = await res.text();
     throw new Error(err || `HTTP ${res.status}`);
@@ -25,14 +36,16 @@ export const api = {
       body: JSON.stringify(data),
       headers: { 'x-admin-password': password },
     }),
-  uploadPlayerImage: (id: number, file: File, password: string) => {
+  uploadPlayerImage: async (id: number, file: File, password: string) => {
     const form = new FormData();
     form.append('image', file);
-    return fetch(`${BASE}/api/players/${id}/image`, {
+    const r = await fetch(`${BASE}/api/players/${id}/image`, {
       method: 'PATCH',
       headers: { 'x-admin-password': password },
       body: form,
-    }).then(r => r.json());
+    });
+    if (r.status === 401) { handleUnauthorized(); throw new Error('Unauthorized'); }
+    return r.json();
   },
 
   // Articles
@@ -55,14 +68,16 @@ export const api = {
       method: 'DELETE',
       headers: { 'x-admin-password': password },
     }),
-  uploadArticleImage: (file: File, password: string) => {
+  uploadArticleImage: async (file: File, password: string) => {
     const form = new FormData();
     form.append('image', file);
-    return fetch(`${BASE}/api/articles/upload-image`, {
+    const r = await fetch(`${BASE}/api/articles/upload-image`, {
       method: 'POST',
       headers: { 'x-admin-password': password },
       body: form,
-    }).then(r => r.json() as Promise<{ url: string }>);
+    });
+    if (r.status === 401) { handleUnauthorized(); throw new Error('Unauthorized'); }
+    return r.json() as Promise<{ url: string }>;
   },
 
   // Matches
