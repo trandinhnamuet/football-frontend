@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import AdminGuard from '../../components/AdminGuard';
 import { FANTA } from '../../lib/types';
@@ -67,12 +67,11 @@ export default function I18nManagementPage() {
 
   const allKeys = useMemo(() => flattenObject(translations.vi), []);
 
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
+  async function doLogin(pw: string) {
     setLoading(true);
     setSaveMsg('');
     try {
-      await api.updateI18n({}, password);
+      await api.updateI18n({}, pw);
       const data = await api.getI18n();
       function deepMerge(base: any, overrides: any): any {
         if (!overrides || typeof overrides !== 'object') return base;
@@ -94,6 +93,20 @@ export default function I18nManagementPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  useEffect(() => {
+    const saved = localStorage.getItem('lffc_admin_pw');
+    if (saved) {
+      setPassword(saved);
+      doLogin(saved);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    await doLogin(password);
   }
 
   const filtered = useMemo(() => {
