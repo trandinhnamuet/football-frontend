@@ -71,7 +71,16 @@ export default function I18nManagementPage() {
     setLoading(true);
     setSaveMsg('');
     try {
-      await api.updateI18n({}, pw);
+      const check = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/players`,
+        { headers: { 'x-admin-password': pw } },
+      );
+      if (!check.ok) {
+        setSaveMsg('Sai mật khẩu hoặc lỗi kết nối');
+        localStorage.removeItem('lffc_admin_pw');
+        setLoading(false);
+        return;
+      }
       const data = await api.getI18n();
       function deepMerge(base: any, overrides: any): any {
         if (!overrides || typeof overrides !== 'object') return base;
@@ -87,8 +96,9 @@ export default function I18nManagementPage() {
       }
       setViData(deepMerge(translations.vi, data.vi || {}));
       setEnData(deepMerge(translations.en, data.en || {}));
+      localStorage.setItem('lffc_admin_pw', pw);
       setAuthed(true);
-    } catch (err: any) {
+    } catch {
       setSaveMsg('Sai mật khẩu hoặc lỗi kết nối');
     } finally {
       setLoading(false);
