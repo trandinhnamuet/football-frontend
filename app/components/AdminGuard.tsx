@@ -35,7 +35,7 @@ export default function AdminGuard({ children }: Props) {
 
   async function verifyPassword(pw: string, silent = false) {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/admin/verify`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/drive-links`, {
         headers: { 'x-admin-password': pw },
       });
       if (res.ok) {

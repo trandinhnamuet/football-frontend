@@ -72,7 +72,7 @@ export default function I18nManagementPage() {
     setSaveMsg('');
     try {
       const check = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/admin/verify`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/drive-links`,
         { headers: { 'x-admin-password': pw } },
       );
       if (!check.ok) {
