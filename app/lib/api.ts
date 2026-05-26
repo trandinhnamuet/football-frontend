@@ -1,4 +1,4 @@
-import { Player, Article, Match, TeamStats, DriveLink } from './types';
+import { Player, Article, Match, TeamStats, DriveLink, VideoHighlight } from './types';
 
 const BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 
@@ -133,6 +133,15 @@ export const api = {
   getI18n: () => fetchJSON<{ vi: Record<string, any>; en: Record<string, any> }>('/api/i18n'),
   updateI18n: (data: { vi?: Record<string, any>; en?: Record<string, any> }, password: string) =>
     fetchJSON<void>('/api/i18n', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: { 'x-admin-password': password },
+    }),
+
+  // Video Highlight
+  getVideoHighlight: () => fetchJSON<VideoHighlight>('/api/video-highlight'),
+  updateVideoHighlight: (data: Partial<VideoHighlight>, password: string) =>
+    fetchJSON<VideoHighlight>('/api/video-highlight', {
       method: 'PUT',
       body: JSON.stringify(data),
       headers: { 'x-admin-password': password },

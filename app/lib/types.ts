@@ -68,6 +68,15 @@ export interface DriveLink {
   updated_at: string;
 }
 
+export interface VideoHighlight {
+  id: number;
+  youtube_url: string;
+  title: string;
+  title_en: string;
+  is_active: boolean;
+  updated_at: string;
+}
+
 export const ROLES: Record<string, { vi: string; en: string }> = {
   GK: { vi: 'Thủ môn', en: 'Goalkeeper' },
   DEF: { vi: 'Hậu vệ', en: 'Defender' },

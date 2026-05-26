@@ -86,6 +86,18 @@ const adminSections: AdminSection[] = [
       'Hỗ trợ lightbox xem ảnh lớn',
     ],
   },
+  {
+    title: 'Video Highlight',
+    description: 'Quản lý video highlight nhúng YouTube hiển thị trên trang chủ',
+    href: '/admin/video-highlight',
+    icon: '🎬',
+    features: [
+      'Nhập link YouTube (youtube.com hoặc youtu.be)',
+      'Đặt tiêu đề tiếng Việt và tiếng Anh',
+      'Bật/tắt hiển thị video trên trang chủ',
+      'Xem trước video ngay trong trang admin',
+    ],
+  },
 ];
 
 export default function AdminPage() {

@@ -14,6 +14,19 @@ const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const SQUAD_PAGE_SIZE = 5;
 const DEFAULT_AVATAR = DEFAULT_PLAYER_AVATAR_URL;
 
+function toYoutubeEmbed(url: string): string {
+  if (!url) return '';
+  // Already embed URL
+  if (url.includes('youtube.com/embed/')) return url;
+  // youtu.be/VIDEO_ID
+  const shortMatch = url.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
+  if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
+  // youtube.com/watch?v=VIDEO_ID
+  const watchMatch = url.match(/[?&]v=([A-Za-z0-9_-]{11})/);
+  if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}`;
+  return url;
+}
+
 function JerseyNumber({ n, size = 80, color = 'var(--ink)' }: { n: number | string; size?: number; color?: string }) {
   return (
     <div style={{ fontFamily: 'Anton, sans-serif', fontSize: size, lineHeight: 0.85, color, letterSpacing: '-0.02em' }}>
@@ -43,6 +56,7 @@ export default function HomePage() {
   const [played, setPlayed] = useState<Match[]>([]);
   const [upcoming, setUpcoming] = useState<Match[]>([]);
   const [teamStats, setTeamStats] = useState<TeamStats>({ played: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0 });
+  const [videoHighlight, setVideoHighlight] = useState<{ youtube_url: string; title: string; title_en: string; is_active: boolean } | null>(null);
 
   // Squad carousel
   const [squadPage, setSquadPage] = useState(0);
@@ -61,12 +75,14 @@ export default function HomePage() {
         api.getPlayed(),
         api.getUpcoming(),
         api.getTeamStats(),
-      ]).then(([p, a, pl, up, ts]) => {
+        api.getVideoHighlight(),
+      ]).then(([p, a, pl, up, ts, vh]) => {
         setPlayers(p);
         setArticles(a);
         setPlayed(pl);
         setUpcoming(up);
         setTeamStats(ts);
+        setVideoHighlight(vh);
       }).catch(() => {});
 
     // Load from DB immediately
@@ -424,9 +440,29 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* VIDEO HIGHLIGHT */}
+      {videoHighlight && videoHighlight.is_active && videoHighlight.youtube_url && (
+        <section id="video" className="mob-p-section" style={{ padding: '80px 48px', background: 'var(--bg)', borderTop: `1px solid ${FANTA}33` }}>
+          <div style={{ marginBottom: 36 }}>
+            <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>■ VIDEO</div>
+            <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 72px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 12 }}>
+              {lang === 'en' && videoHighlight.title_en ? videoHighlight.title_en : videoHighlight.title || 'HIGHLIGHT'}
+            </h2>
+          </div>
+          <div style={{ position: 'relative', width: '100%', maxWidth: 900, margin: '0 auto', aspectRatio: '16/9', background: '#0a0a0a', borderLeft: `4px solid ${FANTA}` }}>
+            <iframe
+              src={toYoutubeEmbed(videoHighlight.youtube_url)}
+              title={videoHighlight.title || 'Video Highlight'}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
+            />
+          </div>
+        </section>
+      )}
+
       {/* CTA Dashboard */}
       <section className="mob-p-section" style={{ padding: '64px 48px', background: FANTA, color: '#0a0a0a', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', right: -40, top: -40, fontFamily: 'Anton, sans-serif', fontSize: 280, lineHeight: 0.8, color: '#0a0a0a', opacity: 0.07, letterSpacing: '-0.04em' }}>STATS</div>
         <div className="mob-cta-inner" style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 40 }}>
           <div>
             <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>{t('cta.label')}</div>
