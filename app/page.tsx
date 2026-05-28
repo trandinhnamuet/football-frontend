@@ -281,7 +281,7 @@ export default function HomePage() {
           <div>
             <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s02')}</div>
             <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 1.0, textTransform: 'uppercase', marginTop: 16 }}>{t('squad.title')}</h2>
-            <p style={{ color: 'var(--muted)', fontSize: 15, marginTop: 6 }}>{players.length} {t('squad.subtitle')}</p>
+            <p style={{ color: 'var(--muted)', fontSize: 15, marginTop: 14 }}>{players.length} {t('squad.subtitle')}</p>
           </div>
           <Link href="/players" style={{ background: FANTA, color: '#0a0a0a', padding: '14px 24px', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
             {t('squad.viewAll')}
