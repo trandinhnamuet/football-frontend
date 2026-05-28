@@ -68,7 +68,6 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className="nav-link"
               style={{
                 color: link.accent ? FANTA : (pathname === link.href ? '#f4f1ea' : 'inherit'),
                 textDecoration: 'none',
@@ -85,7 +84,6 @@ export default function Header() {
           {/* Language toggle */}
           <button
             onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')}
-            className="nav-btn"
             style={{ ...btnStyle, color: FANTA, borderColor: `${FANTA}55` }}
           >
             {lang === 'vi' ? 'Tiếng Việt' : 'English'}
@@ -94,7 +92,6 @@ export default function Header() {
           {/* Theme toggle */}
           <button
             onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            className="nav-btn"
             style={btnStyle}
             title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
           >
@@ -141,7 +138,6 @@ export default function Header() {
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="nav-link-mobile"
               style={{
                 color: link.accent ? FANTA : '#f4f1ea',
                 textDecoration: 'none',
@@ -160,14 +156,12 @@ export default function Header() {
           <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
             <button
               onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')}
-              className="nav-btn"
               style={{ ...btnStyle, color: FANTA, borderColor: `${FANTA}55`, flex: 1, padding: '10px', fontSize: 13 }}
             >
               {lang === 'vi' ? 'Tiếng Việt' : 'English'}
             </button>
             <button
               onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-              className="nav-btn"
               style={{ ...btnStyle, flex: 1, padding: '10px', fontSize: 13 }}
               title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
             >
