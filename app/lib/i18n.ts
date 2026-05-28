@@ -41,8 +41,13 @@ const vi = {
     founded: 'Thành lập',
     members: 'Thành viên',
     wins: 'Trận thắng',
-    goals: 'Bàn ghi',
+    goals: 'Bàn ghi',    learnMore: 'Tìm hiểu thêm →',
   },
+  about: {
+    title: 'Về chúng tôi',
+    backHome: '← Trang chủ',
+    noContent: 'Nội dung đang được cập nhật...',
+    editHint: 'Chỉnh sửa nội dung này trong trang Admin',  },
   squad: {
     title: 'Đội hình',
     subtitle: 'cầu thủ · Bốn vai trò · Một tinh thần',
@@ -73,14 +78,6 @@ const vi = {
     MID: 'Tiền vệ',
     FWD: 'Tiền đạo',
     'Tự do': 'Tự do',
-  },
-  footer: {
-    tagline: 'Đội bóng phong trào Hà Nội. Đá là vào trận, ra trận là cười.',
-    follow: 'Theo dõi',
-    ground: 'Sân nhà',
-    groundAddress: 'Sân Mỹ Đình A · Q. Nam Từ Liêm, Hà Nội',
-    groundTime: 'Thứ 7 · 17:30',
-    motto: 'ĐÁ THẬT · VUI THẬT',
   },
 };
 
@@ -125,8 +122,13 @@ const en = {
     founded: 'Founded',
     members: 'Members',
     wins: 'Wins',
-    goals: 'Goals Scored',
+    goals: 'Goals Scored',    learnMore: 'Learn More →',
   },
+  about: {
+    title: 'About Us',
+    backHome: '← Home',
+    noContent: 'Content coming soon...',
+    editHint: 'Edit this content in the Admin panel',  },
   squad: {
     title: 'Squad',
     subtitle: 'players · Four positions · One spirit',
@@ -157,14 +159,6 @@ const en = {
     MID: 'Midfielder',
     FWD: 'Forward',
     'Tự do': 'Free Role',
-  },
-  footer: {
-    tagline: 'Amateur football club from Hanoi. Play hard, laugh harder.',
-    follow: 'Follow Us',
-    ground: 'Home Ground',
-    groundAddress: 'Mỹ Đình A · Nam Từ Liêm Dist., Hanoi',
-    groundTime: 'Saturday · 17:30',
-    motto: 'PLAY HARD · LAUGH HARDER',
   },
 };
 

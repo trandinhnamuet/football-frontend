@@ -17,18 +17,6 @@ async function getArticle(id: string): Promise<Article | null> {
   } catch { return null; }
 }
 
-/** Auto-fix <a>URL</a> that are missing href, and open all links in new tab */
-function processContent(html: string): string {
-  // Add href to <a> tags whose text content is a bare URL
-  return html.replace(
-    /<a(\s[^>]*)?>\s*(https?:\/\/[^\s<]+)\s*<\/a>/gi,
-    (match, attrs = '', url) => {
-      if (/href=/i.test(attrs)) return match;
-      return `<a href="${url}" target="_blank" rel="noreferrer noopener">${url}</a>`;
-    }
-  );
-}
-
 export default async function ArticlePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const article = await getArticle(id);
@@ -71,9 +59,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ id: st
         )}
 
         <div
-          className="article-content"
           style={{ fontSize: 16, lineHeight: 1.8, color: '#d8d3cb' }}
-          dangerouslySetInnerHTML={{ __html: processContent(article.content ?? '') }}
+          dangerouslySetInnerHTML={{ __html: article.content }}
         />
       </main>
       <Footer />

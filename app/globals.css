@@ -56,16 +56,6 @@ input, textarea, select, button {
   background-image: repeating-linear-gradient(45deg, transparent 0 60px, rgba(255,107,26,0.025) 60px 61px);
 }
 
-/* Links inside article content */
-.article-content a {
-  color: var(--fanta);
-  text-decoration: underline;
-  word-break: break-all;
-}
-.article-content a:hover {
-  opacity: 0.75;
-}
-
 /* Tag chip */
 .tag {
   background: var(--fanta);

@@ -98,6 +98,18 @@ const adminSections: AdminSection[] = [
       'Xem trước video ngay trong trang admin',
     ],
   },
+  {
+    title: 'Trang Giới Thiệu',
+    description: 'Chỉnh sửa nội dung trang giới thiệu chi tiết và ảnh banner',
+    href: '/admin/about-management',
+    icon: '📖',
+    features: [
+      'Upload ảnh banner (hiển thị trên trang chủ và trang giới thiệu)',
+      'Chỉnh sửa nội dung tiếng Việt (HTML)',
+      'Chỉnh sửa nội dung tiếng Anh (HTML)',
+      'Xem trước nội dung và banner ngay trong admin',
+    ],
+  },
 ];
 
 export default function AdminPage() {

@@ -15,7 +15,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navLinks = [
-    { href: '/#intro', labelKey: 'nav.intro' },
+    { href: '/about', labelKey: 'nav.intro' },
     { href: '/#squad', labelKey: 'nav.squad' },
     { href: '/#news', labelKey: 'nav.news' },
     { href: '/#schedule', labelKey: 'nav.schedule' },

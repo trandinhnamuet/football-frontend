@@ -57,6 +57,7 @@ export default function HomePage() {
   const [upcoming, setUpcoming] = useState<Match[]>([]);
   const [teamStats, setTeamStats] = useState<TeamStats>({ played: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0 });
   const [videoHighlight, setVideoHighlight] = useState<{ youtube_url: string; title: string; title_en: string; is_active: boolean } | null>(null);
+  const [aboutData, setAboutData] = useState<{ banner_image_url: string } | null>(null);
 
   // Squad carousel
   const [squadPage, setSquadPage] = useState(0);
@@ -76,13 +77,15 @@ export default function HomePage() {
         api.getUpcoming(),
         api.getTeamStats(),
         api.getVideoHighlight(),
-      ]).then(([p, a, pl, up, ts, vh]) => {
+        api.getAboutPage(),
+      ]).then(([p, a, pl, up, ts, vh, ab]) => {
         setPlayers(p);
         setArticles(a);
         setPlayed(pl);
         setUpcoming(up);
         setTeamStats(ts);
         setVideoHighlight(vh);
+        setAboutData(ab);
       }).catch(() => {});
 
     // Load from DB immediately
@@ -481,6 +484,13 @@ export default function HomePage() {
         <div className="mob-intro-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 56 }}>
           <div>
             <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s01')}</div>
+            {aboutData?.banner_image_url && (
+              <img
+                src={`${BASE}${aboutData.banner_image_url}`}
+                alt="Lon Fanta FC"
+                style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', marginTop: 16, marginBottom: 8 }}
+              />
+            )}
             <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 5vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', letterSpacing: '0.01em', marginTop: 16 }}>{t('intro.label')}</h2>
           </div>
           <div>
@@ -500,6 +510,9 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
+            <Link href="/about" style={{ display: 'inline-block', marginTop: 24, background: FANTA, color: '#0a0a0a', padding: '12px 28px', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase', textDecoration: 'none' }}>
+              {t('intro.learnMore')}
+            </Link>
           </div>
         </div>
       </section>

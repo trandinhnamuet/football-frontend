@@ -146,4 +146,24 @@ export const api = {
       body: JSON.stringify(data),
       headers: { 'x-admin-password': password },
     }),
+
+  // About Page
+  getAboutPage: () => fetchJSON<{ id: number; banner_image_url: string; content_vi: string; content_en: string; updated_at: string }>('/api/about'),
+  updateAboutPage: (data: { banner_image_url?: string; content_vi?: string; content_en?: string }, password: string) =>
+    fetchJSON<{ id: number; banner_image_url: string; content_vi: string; content_en: string; updated_at: string }>('/api/about', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: { 'x-admin-password': password },
+    }),
+  uploadAboutBanner: async (file: File, password: string) => {
+    const form = new FormData();
+    form.append('image', file);
+    const r = await fetch(`${BASE}/api/about/upload-banner`, {
+      method: 'POST',
+      headers: { 'x-admin-password': password },
+      body: form,
+    });
+    if (r.status === 401) { handleUnauthorized(); throw new Error('Unauthorized'); }
+    return r.json() as Promise<{ url: string }>;
+  },
 };
