@@ -139,7 +139,7 @@ export default function HomePage() {
             <span style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.16em', textTransform: 'uppercase' }}>{t('hero.season')} · {t('hero.week')} {played.length}</span>
           </div>
 
-          <h1 style={{ fontFamily: 'Anton, sans-serif', fontWeight: 400, fontSize: 'clamp(40px, 6vw, 90px)', lineHeight: 0.82, letterSpacing: '-0.02em', margin: '24px 0 0', textTransform: 'uppercase' }}>
+          <h1 style={{ fontFamily: 'Anton, sans-serif', fontWeight: 400, fontSize: 'clamp(40px, 6vw, 90px)', lineHeight: 0.92, letterSpacing: '-0.02em', margin: '28px 0 0', textTransform: 'uppercase' }}>
             {t('hero.line1')}<br />
             {t('hero.line2')} <span style={{ color: FANTA }}>{t('hero.accent')}</span>
           </h1>
@@ -280,7 +280,7 @@ export default function HomePage() {
         <div className="mob-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 36 }}>
           <div>
             <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s02')}</div>
-            <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 12 }}>{t('squad.title')}</h2>
+            <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 1.0, textTransform: 'uppercase', marginTop: 16 }}>{t('squad.title')}</h2>
             <p style={{ color: 'var(--muted)', fontSize: 15, marginTop: 6 }}>{players.length} {t('squad.subtitle')}</p>
           </div>
           <Link href="/players" style={{ background: FANTA, color: '#0a0a0a', padding: '14px 24px', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
