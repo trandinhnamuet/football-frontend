@@ -48,7 +48,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ id: st
           <img
             src={`${BASE}${article.image_url}`}
             alt={article.title}
-            style={{ width: '100%', maxHeight: 500, objectFit: 'cover', marginBottom: 40 }}
+            style={{ width: '100%', height: 'auto', display: 'block', marginBottom: 40 }}
           />
         )}
 
