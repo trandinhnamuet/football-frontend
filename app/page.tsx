@@ -481,7 +481,7 @@ export default function HomePage() {
 
       {/* ABOUT — moved to bottom */}
       <section id="intro" className="mob-p-section" style={{ padding: '80px 48px', background: 'var(--alt-bg)', borderTop: `1px solid ${FANTA}33` }}>
-        <div className="mob-intro-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 56 }}>
+        <div className="mob-intro-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 56, alignItems: 'stretch' }}>
           <div>
             <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s01')}</div>
             {aboutData?.banner_image_url && (
@@ -493,7 +493,7 @@ export default function HomePage() {
             )}
             <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 5vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', letterSpacing: '0.01em', marginTop: 16 }}>{t('intro.label')}</h2>
           </div>
-          <div>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <p style={{ fontSize: 17, lineHeight: 1.6, color: 'var(--muted)', margin: 0 }}>
               {t('intro.body')}
             </p>
