@@ -1,3 +1,6 @@
+import Image from 'next/image';
+import { FANTA_LOGO_URL } from '../lib/assets';
+
 const FANTA = '#FF6B1A';
 
 const YT_COLOR = '#FF0000';
@@ -33,8 +36,17 @@ export default function Footer() {
     <footer style={{ padding: '60px 48px 36px', background: 'var(--bg)', borderTop: `1px solid ${FANTA}` }} className="mob-p-section">
       <div className="mob-footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 48 }}>
         <div>
-          <div className="mob-footer-title" style={{ fontFamily: 'Anton, sans-serif', fontSize: 64, lineHeight: 0.9, textTransform: 'uppercase', letterSpacing: '0.01em', color: 'var(--ink)' }}>
-            LON FANTA <span style={{ color: FANTA }}>FC</span>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+            <Image
+              src={FANTA_LOGO_URL}
+              alt="Lon Fanta FC Logo"
+              width={80}
+              height={80}
+              style={{ objectFit: 'contain', flexShrink: 0 }}
+            />
+            <div className="mob-footer-title" style={{ fontFamily: 'Anton, sans-serif', fontSize: 64, lineHeight: 0.9, textTransform: 'uppercase', letterSpacing: '0.01em', color: 'var(--ink)' }}>
+              LON FANTA <span style={{ color: FANTA }}>FC</span>
+            </div>
           </div>
           <div style={{ fontSize: 12, marginTop: 12, color: FANTA, letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 700 }}>#ĐamMêBấtTận</div>
           <p style={{ fontSize: 14, color: 'var(--muted)', marginTop: 20, maxWidth: 360, lineHeight: 1.55 }}>
