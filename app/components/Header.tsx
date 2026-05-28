@@ -85,8 +85,7 @@ export default function Header() {
           {/* Language toggle */}
           <button
             onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')}
-            className="nav-btn"
-            style={{ ...btnStyle, color: FANTA, borderColor: `${FANTA}55` }}
+            className="nav-btn nav-btn-lang"
           >
             {lang === 'vi' ? 'Tiếng Việt' : 'English'}
           </button>
@@ -95,7 +94,6 @@ export default function Header() {
           <button
             onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
             className="nav-btn"
-            style={btnStyle}
             title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
           >
             {theme === 'light' ? '◑' : '○'}
@@ -160,15 +158,13 @@ export default function Header() {
           <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
             <button
               onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')}
-              className="nav-btn"
-              style={{ ...btnStyle, color: FANTA, borderColor: `${FANTA}55`, flex: 1, padding: '10px', fontSize: 13 }}
+              className="nav-btn nav-btn-lang nav-btn-mobile"
             >
               {lang === 'vi' ? 'Tiếng Việt' : 'English'}
             </button>
             <button
               onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-              className="nav-btn"
-              style={{ ...btnStyle, flex: 1, padding: '10px', fontSize: 13 }}
+              className="nav-btn nav-btn-mobile"
               title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
             >
               {theme === 'light' ? '◑ Light' : '○ Dark'}

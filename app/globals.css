@@ -122,12 +122,31 @@ input, textarea, select, button {
 }
 
 .nav-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #a09b94;
+  padding: 4px 10px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
   transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
+.nav-btn-lang {
+  color: #FF6B1A;
+  border-color: rgba(255, 107, 26, 0.33);
+}
+.nav-btn-mobile {
+  padding: 10px;
+  font-size: 13px;
+  flex: 1;
+}
 .nav-btn:hover {
-  background: #FF6B1A !important;
-  color: #0a0a0a !important;
-  border-color: #FF6B1A !important;
+  background: #FF6B1A;
+  color: #0a0a0a;
+  border-color: #FF6B1A;
 }
 
 /* Nav hamburger - hidden on desktop, shown on mobile */
