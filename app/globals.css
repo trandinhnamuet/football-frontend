@@ -17,6 +17,7 @@
   --nav-ink: #f4f1ea;
   --nav-muted: #a09b94;
   --shadow: rgba(0,0,0,0.08);
+  --btn-shadow: #1a1a1a;
 }
 
 /* Dark theme */
@@ -31,6 +32,7 @@
   --nav-ink: #f4f1ea;
   --nav-muted: #a09b94;
   --shadow: rgba(0,0,0,0.4);
+  --btn-shadow: #aaaaaa;
 }
 
 html, body {
@@ -218,9 +220,11 @@ input, textarea, select, button {
   position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 10px;
   margin-top: 24px;
   padding: 13px 28px;
+  min-width: 380px;
   background: var(--fanta);
   color: #0a0a0a;
   font-family: 'Anton', sans-serif;
@@ -229,33 +233,98 @@ input, textarea, select, button {
   text-transform: uppercase;
   text-decoration: none;
   border-radius: 6px;
-  /* Offset hard shadow — bottom + right = hiệu ứng nổi rõ */
-  box-shadow: 5px 5px 0px #1a1a1a;
+  box-shadow: 5px 5px 0px var(--btn-shadow);
   transition:
     background 0.38s ease,
     color      0.38s ease,
     transform  0.22s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow 0.22s ease;
   cursor: pointer;
 }
 
-/* Hover: button trượt vào đúng vị trí bóng, bóng biến mất; đổi màu grey + chữ cyan */
+/* ── Sparkle burst 1 — white stars ───────────────────────────────────────── */
+.btn-learn-more::before {
+  content: '';
+  position: absolute;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: #fff;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  opacity: 0;
+  box-shadow:
+    -44px -28px 0 2px #fff,  44px -28px 0 2px #fff,
+    -60px   0px 0 1px #fff,  60px   0px 0 1px #fff,
+    -44px  28px 0 2px #fff,  44px  28px 0 2px #fff,
+      0px -56px 0 2px #fff,   0px  56px 0 2px #fff,
+    -28px -52px 0 2px #fff,  28px -52px 0 2px #fff,
+    -28px  52px 0 2px #fff,  28px  52px 0 2px #fff;
+}
+
+/* ── Sparkle burst 2 — coloured stars ───────────────────────────────────── */
+.btn-learn-more::after {
+  content: '';
+  position: absolute;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: #00e5ff;
+  top: 38%; left: 42%;
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  opacity: 0;
+  box-shadow:
+    -34px -22px 0 2px #00e5ff,  36px -18px 0 2px #ffdd00,
+    -50px  16px 0 2px #ff6b1a,  48px  14px 0 2px #00e5ff,
+    -24px  40px 0 2px #ffdd00,  26px  38px 0 2px #ff6b1a,
+      8px -50px 0 2px #00e5ff, -12px  46px 0 2px #ffdd00,
+    -62px  -8px 0 1px #ff6b1a,  64px   6px 0 1px #00e5ff;
+}
+
+/* ── Hover ───────────────────────────────────────────────────────────────── */
 .btn-learn-more:hover {
   background: #555;
   color: #00e5ff;
   transform: translate(5px, 5px);
-  box-shadow: 0px 0px 0px #1a1a1a;
+  box-shadow: 0px 0px 0px var(--btn-shadow);
+  animation: btn-bounce-idle 0.9s ease-in-out 0.3s infinite;
+}
+.btn-learn-more:hover::before {
+  animation: sparkle-burst-w 0.75s ease forwards;
+}
+.btn-learn-more:hover::after {
+  animation: sparkle-burst-c 0.90s ease 0.12s forwards;
 }
 
 .btn-learn-more:active {
   transform: translate(5px, 5px);
-  box-shadow: 0px 0px 0px #1a1a1a;
+  box-shadow: 0px 0px 0px var(--btn-shadow);
+  animation: none;
 }
 
-/* Text wrapper: chứa 2 label chồng nhau */
+/* ── Keyframes ───────────────────────────────────────────────────────────── */
+@keyframes btn-bounce-idle {
+  0%, 100% { transform: translate(5px, 5px); }
+  50%       { transform: translate(5px, 2px); }
+}
+@keyframes sparkle-burst-w {
+  0%   { opacity: 0;   transform: translate(-50%, -50%) scale(0);    }
+  25%  { opacity: 1;   transform: translate(-50%, -50%) scale(0.55); }
+  65%  { opacity: 0.7; transform: translate(-50%, -50%) scale(1);    }
+  100% { opacity: 0;   transform: translate(-50%, -50%) scale(2.1);  }
+}
+@keyframes sparkle-burst-c {
+  0%   { opacity: 0;   transform: translate(-50%, -50%) scale(0);    }
+  30%  { opacity: 1;   transform: translate(-50%, -50%) scale(0.65); }
+  70%  { opacity: 0.6; transform: translate(-50%, -50%) scale(1.1);  }
+  100% { opacity: 0;   transform: translate(-50%, -50%) scale(2.4);  }
+}
+
+/* ── Text wrapper ────────────────────────────────────────────────────────── */
 .btn-learn-more .btn-text-wrap {
   position: relative;
-  display: inline-block;
+  display: block;
+  flex: 1;
   height: 1.2em;
   overflow: hidden;
 }
@@ -264,25 +333,20 @@ input, textarea, select, button {
 .btn-learn-more .btn-label-hover {
   display: block;
   white-space: nowrap;
-  /* Chậm hơn + diagonal */
   transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
               opacity   0.45s ease;
 }
 
-/* Mặc định: primary hiện, hover label ẩn ở góc trái-trên */
 .btn-learn-more .btn-label-primary {
   transform: translate(0, 0);
   opacity: 1;
 }
 .btn-learn-more .btn-label-hover {
   position: absolute;
-  top: 0;
-  left: 0;
-  transform: translate(-14px, -110%);   /* bắt đầu từ góc trái-trên */
+  top: 0; left: 0;
+  transform: translate(-14px, -110%);
   opacity: 0;
 }
-
-/* Hover: primary thoát góc phải-dưới; hover vào từ góc trái-trên */
 .btn-learn-more:hover .btn-label-primary {
   transform: translate(14px, 110%);
   opacity: 0;
@@ -292,15 +356,14 @@ input, textarea, select, button {
   opacity: 1;
 }
 
-/* Arrow — dịch sang phải và đổi màu cùng text */
+/* ── Arrow: kéo về gần text mặc định, trượt ra tận phải khi hover ────────── */
 .btn-learn-more .btn-arrow {
-  display: inline-block;
   flex-shrink: 0;
-  transition:
-    transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-    color     0.38s ease;
+  display: inline-block;
+  transform: translateX(-100px);
+  transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .btn-learn-more:hover .btn-arrow {
-  transform: translateX(7px);
+  transform: translateX(0);
 }
 
