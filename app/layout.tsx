@@ -5,6 +5,9 @@ import { AppContextProvider } from './contexts/AppContext';
 export const metadata: Metadata = {
   title: 'Lon Fanta FC',
   description: 'Đội bóng phong trào Hà Nội — #ĐamMêBấtTận',
+  icons: {
+    icon: '/images/fanta-logo.png',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
