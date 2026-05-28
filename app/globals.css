@@ -229,24 +229,30 @@ input, textarea, select, button {
   text-transform: uppercase;
   text-decoration: none;
   border-radius: 6px;
-  box-shadow: 0 4px 16px rgba(255, 107, 26, 0.35), 0 2px 4px rgba(0,0,0,0.18);
-  transition: background 0.28s ease, box-shadow 0.28s ease, transform 0.18s ease;
-  overflow: hidden;
+  /* Offset hard shadow — bottom + right = hiệu ứng nổi rõ */
+  box-shadow: 5px 5px 0px #1a1a1a;
+  transition:
+    background 0.38s ease,
+    color      0.38s ease,
+    transform  0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 }
 
+/* Hover: button trượt vào đúng vị trí bóng, bóng biến mất; đổi màu grey + chữ cyan */
 .btn-learn-more:hover {
-  background: #ff8c4a;
-  box-shadow: 0 8px 28px rgba(255, 107, 26, 0.55), 0 4px 8px rgba(0,0,0,0.22);
-  transform: translateY(-2px);
+  background: #555;
+  color: #00e5ff;
+  transform: translate(5px, 5px);
+  box-shadow: 0px 0px 0px #1a1a1a;
 }
 
 .btn-learn-more:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(255, 107, 26, 0.3);
+  transform: translate(5px, 5px);
+  box-shadow: 0px 0px 0px #1a1a1a;
 }
 
-/* Text wrapper: stacks two labels; shows one at a time */
+/* Text wrapper: chứa 2 label chồng nhau */
 .btn-learn-more .btn-text-wrap {
   position: relative;
   display: inline-block;
@@ -258,26 +264,43 @@ input, textarea, select, button {
 .btn-learn-more .btn-label-hover {
   display: block;
   white-space: nowrap;
-  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity  0.28s ease;
+  /* Chậm hơn + diagonal */
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity   0.45s ease;
 }
 
-/* Default: primary visible, hover label below */
-.btn-learn-more .btn-label-primary { transform: translateY(0);    opacity: 1; }
-.btn-learn-more .btn-label-hover   { transform: translateY(110%); opacity: 0;
-                                      position: absolute; top: 0; left: 0; }
+/* Mặc định: primary hiện, hover label ẩn ở góc trái-trên */
+.btn-learn-more .btn-label-primary {
+  transform: translate(0, 0);
+  opacity: 1;
+}
+.btn-learn-more .btn-label-hover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-14px, -110%);   /* bắt đầu từ góc trái-trên */
+  opacity: 0;
+}
 
-/* On hover: slide primary up and fade out; slide hover up and fade in */
-.btn-learn-more:hover .btn-label-primary { transform: translateY(-110%); opacity: 0; }
-.btn-learn-more:hover .btn-label-hover   { transform: translateY(0);      opacity: 1; }
+/* Hover: primary thoát góc phải-dưới; hover vào từ góc trái-trên */
+.btn-learn-more:hover .btn-label-primary {
+  transform: translate(14px, 110%);
+  opacity: 0;
+}
+.btn-learn-more:hover .btn-label-hover {
+  transform: translate(0, 0);
+  opacity: 1;
+}
 
-/* Arrow icon */
+/* Arrow — dịch sang phải và đổi màu cùng text */
 .btn-learn-more .btn-arrow {
   display: inline-block;
-  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
+  transition:
+    transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    color     0.38s ease;
 }
 .btn-learn-more:hover .btn-arrow {
-  transform: translateX(5px);
+  transform: translateX(7px);
 }
 
