@@ -44,8 +44,8 @@ export default function Footer() {
             <Image
               src={FANTA_LOGO_URL}
               alt="Lon Fanta FC Logo"
-              width={80}
-              height={80}
+              width={96}
+              height={96}
               style={{ objectFit: 'contain', flexShrink: 0 }}
             />
             <div className="mob-footer-title" style={{ fontFamily: 'Anton, sans-serif', fontSize: 64, lineHeight: 0.9, textTransform: 'uppercase', letterSpacing: '0.01em', color: 'var(--ink)' }}>
