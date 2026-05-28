@@ -212,3 +212,72 @@ input, textarea, select, button {
   .mob-gallery-hdr { padding: 32px 16px 24px !important; }
   .mob-gallery-main { padding: 16px !important; }
 }
+
+/* ── "Tìm hiểu thêm" button ─────────────────────────────────────────────── */
+.btn-learn-more {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 24px;
+  padding: 13px 28px;
+  background: var(--fanta);
+  color: #0a0a0a;
+  font-family: 'Anton', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(255, 107, 26, 0.35), 0 2px 4px rgba(0,0,0,0.18);
+  transition: background 0.28s ease, box-shadow 0.28s ease, transform 0.18s ease;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.btn-learn-more:hover {
+  background: #ff8c4a;
+  box-shadow: 0 8px 28px rgba(255, 107, 26, 0.55), 0 4px 8px rgba(0,0,0,0.22);
+  transform: translateY(-2px);
+}
+
+.btn-learn-more:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(255, 107, 26, 0.3);
+}
+
+/* Text wrapper: stacks two labels; shows one at a time */
+.btn-learn-more .btn-text-wrap {
+  position: relative;
+  display: inline-block;
+  height: 1.2em;
+  overflow: hidden;
+}
+
+.btn-learn-more .btn-label-primary,
+.btn-learn-more .btn-label-hover {
+  display: block;
+  white-space: nowrap;
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity  0.28s ease;
+}
+
+/* Default: primary visible, hover label below */
+.btn-learn-more .btn-label-primary { transform: translateY(0);    opacity: 1; }
+.btn-learn-more .btn-label-hover   { transform: translateY(110%); opacity: 0;
+                                      position: absolute; top: 0; left: 0; }
+
+/* On hover: slide primary up and fade out; slide hover up and fade in */
+.btn-learn-more:hover .btn-label-primary { transform: translateY(-110%); opacity: 0; }
+.btn-learn-more:hover .btn-label-hover   { transform: translateY(0);      opacity: 1; }
+
+/* Arrow icon */
+.btn-learn-more .btn-arrow {
+  display: inline-block;
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+.btn-learn-more:hover .btn-arrow {
+  transform: translateX(5px);
+}
+

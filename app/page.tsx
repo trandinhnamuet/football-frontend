@@ -510,8 +510,12 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-            <Link href="/about" style={{ display: 'inline-block', marginTop: 24, background: FANTA, color: '#0a0a0a', padding: '12px 28px', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase', textDecoration: 'none' }}>
-              {t('intro.learnMore')}
+            <Link href="/about" className="btn-learn-more">
+              <span className="btn-text-wrap">
+                <span className="btn-label-primary">{t('intro.learnMore')}</span>
+                <span className="btn-label-hover">Giới thiệu về Lon Fanta FC</span>
+              </span>
+              <span className="btn-arrow">→</span>
             </Link>
           </div>
         </div>
