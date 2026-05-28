@@ -42,6 +42,7 @@ const vi = {
     members: 'Thành viên',
     wins: 'Trận thắng',
     goals: 'Bàn ghi',    learnMore: 'Tìm hiểu thêm →',
+    learnMoreHover: 'Giới thiệu về Lon Fanta FC',
   },
   about: {
     title: 'Về chúng tôi',
@@ -71,6 +72,14 @@ const vi = {
     title1: 'MỞ DASHBOARD',
     title2: 'MỌI THÔNG SỐ',
     btn: '▶ Mở Dashboard',
+  },
+  footer: {
+    tagline: 'Đội bóng phong trào Hà Nội. Đá là vào trận, ra trận là cười.',
+    follow: 'Theo dõi',
+    ground: 'Sân nhà',
+    groundAddress: 'Sân Mỹ Đình A · Q. Nam Từ Liêm, Hà Nội',
+    groundTime: 'Thứ 7 · 17:30',
+    motto: 'ĐÁ THẬT · VUI THẬT',
   },
   roles: {
     GK: 'Thủ môn',
@@ -123,6 +132,7 @@ const en = {
     members: 'Members',
     wins: 'Wins',
     goals: 'Goals Scored',    learnMore: 'Learn More →',
+    learnMoreHover: 'About Lon Fanta FC',
   },
   about: {
     title: 'About Us',
@@ -152,6 +162,14 @@ const en = {
     title1: 'OPEN DASHBOARD',
     title2: 'ALL METRICS',
     btn: '▶ Open Dashboard',
+  },
+  footer: {
+    tagline: 'Hanoi amateur football club. Come for the game, stay for the laughs.',
+    follow: 'Follow Us',
+    ground: 'Home Ground',
+    groundAddress: 'Mỹ Đình A Pitch · Nam Từ Liêm, Hanoi',
+    groundTime: 'Saturday · 5:30 PM',
+    motto: 'PLAY HARD · HAVE FUN',
   },
   roles: {
     GK: 'Goalkeeper',

@@ -513,7 +513,7 @@ export default function HomePage() {
             <Link href="/about" className="btn-learn-more">
               <span className="btn-text-wrap">
                 <span className="btn-label-primary">{t('intro.learnMore')}</span>
-                <span className="btn-label-hover">Giới thiệu về Lon Fanta FC</span>
+                <span className="btn-label-hover">{t('intro.learnMoreHover')}</span>
               </span>
               <span className="btn-arrow">→</span>
             </Link>
