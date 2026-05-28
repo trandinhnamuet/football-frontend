@@ -102,6 +102,35 @@ input, textarea, select, button {
    ================================================ */
 
 /* Nav hamburger - hidden on desktop, shown on mobile */
+/* ── Header nav hover effects ────────────────────────────────────────────── */
+.nav-link {
+  padding: 4px 7px;
+  border-radius: 2px;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.nav-link:hover {
+  background: #FF6B1A;
+  color: #0a0a0a !important;
+}
+
+.nav-link-mobile {
+  transition: background 0.18s ease, color 0.18s ease, padding-left 0.15s ease;
+}
+.nav-link-mobile:hover {
+  background: #FF6B1A !important;
+  color: #0a0a0a !important;
+  padding-left: 14px !important;
+}
+
+.nav-btn {
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease !important;
+}
+.nav-btn:hover {
+  background: #FF6B1A !important;
+  color: #0a0a0a !important;
+  border-color: #FF6B1A !important;
+}
+
 .nav-mobile-btn { display: none !important; }
 
 @media (max-width: 768px) {
