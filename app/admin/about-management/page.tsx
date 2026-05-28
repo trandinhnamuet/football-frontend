@@ -173,7 +173,20 @@ export default function AboutManagementPage() {
           </div>
 
           {error && <p style={{ color: '#f55', fontSize: 14, marginBottom: 16 }}>{error}</p>}
-          {success && <p style={{ color: '#4f4', fontSize: 14, marginBottom: 16 }}>{success}</p>}
+
+          {/* Toast thông báo lưu thành công */}
+          {success && (
+            <div style={{
+              position: 'fixed', bottom: 32, right: 32, zIndex: 9999,
+              background: '#1a3a1a', border: '1px solid #4f4', borderLeft: `4px solid #4f4`,
+              color: '#4f4', padding: '16px 24px', fontSize: 15, fontWeight: 600,
+              boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
+              display: 'flex', alignItems: 'center', gap: 12, minWidth: 260,
+            }}>
+              <span style={{ fontSize: 20 }}>&#10003;</span>
+              {success}
+            </div>
+          )}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
             {/* Left: Form */}

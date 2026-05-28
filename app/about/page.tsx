@@ -61,7 +61,7 @@ export default function AboutPage() {
       </div>
 
       {/* Body */}
-      <main style={{ maxWidth: 860, margin: '0 auto', padding: '64px 32px' }}>
+      <main style={{ maxWidth: 1200, margin: '0 auto', padding: '64px 48px' }}>
         <Link href="/" style={{ fontSize: 13, color: FANTA, textDecoration: 'none', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700 }}>
           {t('about.backHome')}
         </Link>
