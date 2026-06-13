@@ -316,7 +316,7 @@ export default function HomePage() {
           const d = daysUntil(next.date);
           const countdown = d <= 0 ? t('schedule.countdownToday') : `${d} ${t('schedule.countdownDays')}`;
           return (
-            <div className="mob-nextmatch" style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 0, marginBottom: 28, background: 'var(--card)', borderLeft: `5px solid ${FANTA}`, overflow: 'hidden' }}>
+            <div className="mob-nextmatch" style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.8fr', gap: 0, marginBottom: 28, background: 'var(--card)', borderLeft: `5px solid ${FANTA}`, overflow: 'hidden' }}>
               {/* Image side */}
               <div className="mob-nextmatch-img" style={{ position: 'relative', minHeight: 380, background: '#0a0a0a', backgroundImage: next.image_url ? `url(${resolveImg(next.image_url)})` : 'repeating-linear-gradient(45deg, transparent 0 30px, rgba(255,107,26,0.06) 30px 31px)', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
                 <div style={{ position: 'absolute', top: 18, left: 18, background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 13, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '6px 14px' }}>
@@ -351,19 +351,21 @@ export default function HomePage() {
         })()}
 
         {/* Other upcoming + recent results */}
-        <div className="mob-schedule-cols" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+        <div className="mob-schedule-cols" style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 32 }}>
           <div>
             <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, color: FANTA, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 14 }}>▶ {t('schedule.otherUpcoming')}</div>
             {upcoming.length <= 1 ? (
               <div style={{ color: 'var(--muted)', fontSize: 14, padding: '20px 0' }}>{t('schedule.noUpcoming')}</div>
             ) : upcoming.slice(1).map(m => (
-              <div key={m.id} style={{ background: 'var(--card)', padding: '10px 14px', marginBottom: 8, display: 'grid', gridTemplateColumns: '40px 1fr auto', gap: 10, alignItems: 'center', borderLeft: `3px solid ${FANTA}` }}>
-                <JerseyNumber n={m.week} size={18} color={FANTA} />
-                <div>
-                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 15, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{m.opponent}</div>
-                  <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 1 }}>{fmtDate(m.date)}</div>
+              <div key={m.id} style={{ background: 'var(--card)', padding: '16px 14px', marginBottom: 12, display: 'grid', gridTemplateColumns: '80px 1fr auto', gap: 12, alignItems: 'center', borderLeft: `3px solid ${FANTA}`, minHeight: 80 }}>
+                <div style={{ width: 80, height: 64, background: '#0a0a0a', backgroundImage: m.image_url ? `url(${resolveImg(m.image_url)})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {!m.image_url && <JerseyNumber n={m.week} size={22} color={FANTA} />}
                 </div>
-                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 14, color: 'var(--ink)' }}>{m.time || '17:30'}</div>
+                <div>
+                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 17, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{m.opponent}</div>
+                  <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{fmtDate(m.date)} · {m.venue}</div>
+                </div>
+                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 16, color: 'var(--ink)' }}>{m.time || '17:30'}</div>
               </div>
             ))}
           </div>
@@ -374,11 +376,11 @@ export default function HomePage() {
             ) : [...played].reverse().slice(0, 6).map(m => (
               <div key={m.id} style={{ background: 'var(--card)', padding: '10px 12px', marginBottom: 8, display: 'grid', gridTemplateColumns: '1fr auto 1fr auto', gap: 8, alignItems: 'center', fontSize: 13 }}>
                 <div style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 14, textTransform: 'uppercase' }}>Lon Fanta</div>
-                </div>
-                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 16, color: 'var(--ink)', fontWeight: 600 }}>{m.score}</div>
-                <div style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'right' }}>
                   <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 14, textTransform: 'uppercase' }}>{m.opponent}</div>
+                </div>
+                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 15, color: 'var(--ink)', fontWeight: 600 }}>{m.score}</div>
+                <div style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 14, textTransform: 'uppercase' }}>Lon Fanta</div>
                 </div>
                 <div style={{ width: 26, height: 26, background: m.result === 'W' ? FANTA : m.result === 'D' ? 'var(--muted)' : '#aa2222', color: m.result === 'W' ? '#0a0a0a' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 12, flexShrink: 0 }}>{m.result}</div>
               </div>
