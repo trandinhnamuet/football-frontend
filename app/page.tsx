@@ -589,24 +589,24 @@ export default function HomePage() {
                         onClick={() => setActiveVideo({ url: v.url, title: v.title })}
                         className="video-rec-card"
                         style={{
-                          display: 'grid', gridTemplateColumns: '200px 1fr', gap: 14, alignItems: 'center',
+                          display: 'grid', gridTemplateColumns: '190px 1fr', gap: 13, alignItems: 'center',
                           background: isActive ? 'rgba(255,107,26,0.12)' : 'var(--card)',
                           border: isActive ? `1px solid ${FANTA}` : '1px solid transparent',
-                          padding: 10, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', overflow: 'hidden',
+                          padding: 9, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', overflow: 'hidden',
                         }}
                       >
                         {/* Full thumbnail — contain on black so nothing is cropped, scales down to fit */}
-                        <div style={{ position: 'relative', width: 200, aspectRatio: '16/9', background: '#000', flexShrink: 0 }}>
+                        <div style={{ position: 'relative', width: 190, aspectRatio: '16/9', background: '#000', flexShrink: 0 }}>
                           <img src={v.thumbnail} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
                           {isActive && <div style={{ position: 'absolute', top: 6, left: 6, background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 11, padding: '4px 8px', letterSpacing: '0.08em' }}>▶</div>}
                         </div>
                         {/* Info: title + publish date */}
                         <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                          <div style={{ fontSize: 15, lineHeight: 1.35, color: 'var(--ink)', fontWeight: 600, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                          <div style={{ fontSize: 14, lineHeight: 1.35, color: 'var(--ink)', fontWeight: 600, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                             {v.title}
                           </div>
                           {v.published && (
-                            <div style={{ fontSize: 12, color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <div style={{ fontSize: 11, color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
                               <span aria-hidden>📅</span>{fmtDate(v.published)}
                             </div>
                           )}
