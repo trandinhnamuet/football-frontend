@@ -110,6 +110,19 @@ const adminSections: AdminSection[] = [
       'Xem trước nội dung và banner ngay trong admin',
     ],
   },
+  {
+    title: 'Banner Ảnh Chạy',
+    description: 'Quản lý dải ảnh slide chạy dưới header trang chủ (Man of the week, khoảnh khắc đội bóng...)',
+    href: '/admin/banner-slides',
+    icon: '🖼️',
+    features: [
+      'Thêm / xóa ảnh tùy ý (tự kiểm soát số lượng)',
+      'Tải ảnh lên cho từng slide',
+      'Đặt chú thích tiếng Việt & tiếng Anh',
+      'Thêm link khi bấm vào ảnh (tuỳ chọn)',
+      'Bật/tắt hiển thị & sắp xếp thứ tự',
+    ],
+  },
 ];
 
 export default function AdminPage() {

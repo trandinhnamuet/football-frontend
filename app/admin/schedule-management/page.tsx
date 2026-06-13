@@ -12,6 +12,12 @@ const CARD = '#1a1a1a';
 const INK = '#f4f1ea';
 const MUTED = '#a09b94';
 const LINE = 'rgba(255,255,255,0.15)';
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
+
+function resolveImg(url: string): string {
+  if (!url) return '';
+  return url.startsWith('/uploads') ? `${API_BASE}${url}` : url;
+}
 
 function getPassword() {
   return typeof window !== 'undefined' ? (localStorage.getItem('lffc_admin_pw') || '') : '';
@@ -28,6 +34,7 @@ const emptyMatch = {
   goals_against: 0,
   is_upcoming: true,
   time: '17:30',
+  image_url: '',
 };
 
 type MatchForm = typeof emptyMatch;
@@ -43,6 +50,22 @@ function MatchModal({ initial, mode, onSave, onClose }: MatchModalProps) {
   const [form, setForm] = useState<MatchForm & { id?: number }>(initial);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [uploading, setUploading] = useState(false);
+
+  async function handleUploadImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError('');
+    try {
+      const { url } = await api.uploadMatchImage(file, getPassword());
+      setForm(f => ({ ...f, image_url: url }));
+    } catch (err: any) {
+      setError('Tải ảnh thất bại: ' + (err.message || ''));
+    } finally {
+      setUploading(false);
+    }
+  }
 
   const set = (k: keyof MatchForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const val = e.target.type === 'checkbox'
@@ -128,6 +151,30 @@ function MatchModal({ initial, mode, onSave, onClose }: MatchModalProps) {
                 style={{ width: 18, height: 18, cursor: 'pointer', accentColor: FANTA }}
               />
               <label htmlFor="is_upcoming" style={{ ...labelStyle, marginBottom: 0, cursor: 'pointer' }}>Trận sắp tới (chưa đá)</label>
+            </div>
+          </div>
+
+          {/* Match image */}
+          <div>
+            <label style={labelStyle}>Ảnh trận đấu (hiển thị trong lịch thi đấu)</label>
+            <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+              <div style={{ width: 140, height: 80, flexShrink: 0, background: 'rgba(255,255,255,0.06)', border: `1px solid ${LINE}`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                {form.image_url
+                  ? <img src={resolveImg(form.image_url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  : <span style={{ color: MUTED, fontSize: 11 }}>Chưa có ảnh</span>}
+              </div>
+              <div style={{ flex: 1 }}>
+                <input type="file" accept="image/*" onChange={handleUploadImage} style={{ display: 'none' }} id="match-image-file" />
+                <label htmlFor="match-image-file" style={{ display: 'inline-block', background: '#222', color: INK, padding: '9px 16px', cursor: 'pointer', fontSize: 13 }}>
+                  {uploading ? 'Đang tải lên...' : (form.image_url ? 'Đổi ảnh' : 'Tải ảnh lên')}
+                </label>
+                {form.image_url && (
+                  <button type="button" onClick={() => setForm(f => ({ ...f, image_url: '' }))} style={{ marginLeft: 10, background: 'none', border: `1px solid ${LINE}`, color: MUTED, padding: '9px 14px', fontSize: 13, cursor: 'pointer' }}>
+                    Xóa ảnh
+                  </button>
+                )}
+                <input style={{ ...inputStyle, marginTop: 8 }} value={form.image_url} onChange={set('image_url')} placeholder="/uploads/matches/... hoặc URL" />
+              </div>
             </div>
           </div>
 
@@ -240,6 +287,7 @@ function ScheduleManagementContent() {
         goals_against: m.goals_against || 0,
         is_upcoming: m.is_upcoming,
         time: m.time || '17:30',
+        image_url: m.image_url || '',
       },
     });
   }

@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import { Player, Article, Match, TeamStats, FANTA, ROLES, fmtDate } from './lib/types';
+import BannerSlider from './components/BannerSlider';
+import { Player, Article, Match, TeamStats, RecommendedVideo, FANTA, ROLES, fmtDate } from './lib/types';
 import { api } from './lib/api';
 import { useApp } from './contexts/AppContext';
 import { DEFAULT_PLAYER_AVATAR_URL } from './lib/assets';
@@ -13,6 +14,19 @@ import { DEFAULT_PLAYER_AVATAR_URL } from './lib/assets';
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const SQUAD_PAGE_SIZE = 5;
 const DEFAULT_AVATAR = DEFAULT_PLAYER_AVATAR_URL;
+
+function resolveImg(url: string | null | undefined): string {
+  if (!url) return '';
+  return url.startsWith('/uploads') ? `${BASE}${url}` : url;
+}
+
+function daysUntil(iso: string): number {
+  const target = new Date(iso);
+  const now = new Date();
+  target.setHours(0, 0, 0, 0);
+  now.setHours(0, 0, 0, 0);
+  return Math.round((target.getTime() - now.getTime()) / 86400000);
+}
 
 function toYoutubeEmbed(url: string): string {
   if (!url) return '';
@@ -56,8 +70,10 @@ export default function HomePage() {
   const [played, setPlayed] = useState<Match[]>([]);
   const [upcoming, setUpcoming] = useState<Match[]>([]);
   const [teamStats, setTeamStats] = useState<TeamStats>({ played: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0 });
-  const [videoHighlight, setVideoHighlight] = useState<{ youtube_url: string; title: string; title_en: string; is_active: boolean } | null>(null);
+  const [videoHighlight, setVideoHighlight] = useState<{ youtube_url: string; title: string; title_en: string; is_active: boolean; channel_url?: string } | null>(null);
   const [aboutData, setAboutData] = useState<{ banner_image_url: string } | null>(null);
+  const [recommendations, setRecommendations] = useState<RecommendedVideo[]>([]);
+  const [activeVideo, setActiveVideo] = useState<{ url: string; title: string } | null>(null);
 
   // Squad carousel
   const [squadPage, setSquadPage] = useState(0);
@@ -86,10 +102,19 @@ export default function HomePage() {
         setTeamStats(ts);
         setVideoHighlight(vh);
         setAboutData(ab);
+        if (vh && vh.is_active && vh.youtube_url) {
+          setActiveVideo(prev => prev ?? { url: vh.youtube_url, title: vh.title || '' });
+        }
       }).catch(() => {});
 
     // Load from DB immediately
     loadData();
+
+    // Recommended videos from the YouTube channel (RSS-backed, cached server-side)
+    api.getVideoRecommendations().then(recs => {
+      setRecommendations(recs);
+      setActiveVideo(prev => prev ?? (recs[0] ? { url: recs[0].url, title: recs[0].title } : null));
+    }).catch(() => {});
 
     // Sync in background; reload only if data changed
     api.triggerSync().then(({ synced }) => {
@@ -128,6 +153,9 @@ export default function HomePage() {
   return (
     <div style={{ background: 'var(--bg)', color: 'var(--ink)', fontFamily: '"Space Grotesk", system-ui, sans-serif' }}>
       <Header />
+
+      {/* BANNER SLIDER — admin-managed running images (e.g. Man of the week) */}
+      <BannerSlider />
 
       {/* HERO — Leaderboard */}
       <section className="mob-p-hero" style={{ position: 'relative', overflow: 'hidden', padding: '48px 48px 64px', backgroundImage: 'repeating-linear-gradient(45deg, transparent 0 60px, rgba(255,107,26,0.025) 60px 61px)' }}>
@@ -275,6 +303,93 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* SCHEDULE — moved above squad, next-match-focused layout */}
+      <section id="schedule" className="mob-p-section" style={{ padding: '80px 48px' }}>
+        <div style={{ marginBottom: 36 }}>
+          <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s04')}</div>
+          <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 12 }}>{t('schedule.title')}</h2>
+        </div>
+
+        {/* Featured next match */}
+        {upcoming.length > 0 && (() => {
+          const next = upcoming[0];
+          const d = daysUntil(next.date);
+          const countdown = d <= 0 ? t('schedule.countdownToday') : `${d} ${t('schedule.countdownDays')}`;
+          return (
+            <div className="mob-nextmatch" style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: 0, marginBottom: 28, background: 'var(--card)', borderLeft: `5px solid ${FANTA}`, overflow: 'hidden' }}>
+              {/* Image side */}
+              <div className="mob-nextmatch-img" style={{ position: 'relative', minHeight: 260, background: '#0a0a0a', backgroundImage: next.image_url ? `url(${resolveImg(next.image_url)})` : 'repeating-linear-gradient(45deg, transparent 0 30px, rgba(255,107,26,0.06) 30px 31px)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                <div style={{ position: 'absolute', top: 18, left: 18, background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 13, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '6px 14px' }}>
+                  ▶ {t('schedule.nextMatch')}
+                </div>
+                <div style={{ position: 'absolute', bottom: 18, right: 18, background: 'rgba(10,10,10,0.85)', color: FANTA, fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.02em', padding: '8px 16px', textTransform: 'uppercase' }}>
+                  ⏱ {countdown}
+                </div>
+              </div>
+              {/* Info side */}
+              <div style={{ padding: '32px 36px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={{ fontSize: 12, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>{t('hero.week')} {next.week}</div>
+                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 14, color: FANTA, letterSpacing: '0.06em', textTransform: 'uppercase', marginTop: 14 }}>Lon Fanta FC</div>
+                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, color: 'var(--muted)', margin: '4px 0', textTransform: 'uppercase' }}>{t('schedule.vs')}</div>
+                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(32px, 4vw, 52px)', lineHeight: 0.95, textTransform: 'uppercase', letterSpacing: '0.01em' }}>{next.opponent}</div>
+                <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', marginTop: 24 }}>
+                  <div>
+                    <div style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>{fmtDate(next.date)}</div>
+                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 28, color: FANTA, marginTop: 2 }}>{next.time || '17:30'}</div>
+                    <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{t('schedule.kickoff')}</div>
+                  </div>
+                  {next.venue && (
+                    <div style={{ borderLeft: '1px solid var(--line)', paddingLeft: 28 }}>
+                      <div style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>📍</div>
+                      <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, marginTop: 6, textTransform: 'uppercase' }}>{next.venue}</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Other upcoming + recent results */}
+        <div className="mob-schedule-cols" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+          <div>
+            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, color: FANTA, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 14 }}>▶ {t('schedule.otherUpcoming')}</div>
+            {upcoming.length <= 1 ? (
+              <div style={{ color: 'var(--muted)', fontSize: 14, padding: '20px 0' }}>{t('schedule.noUpcoming')}</div>
+            ) : upcoming.slice(1).map(m => (
+              <div key={m.id} style={{ background: 'var(--card)', padding: '12px 16px', marginBottom: 10, display: 'grid', gridTemplateColumns: '56px 1fr auto', gap: 14, alignItems: 'center', borderLeft: `3px solid ${FANTA}` }}>
+                <div style={{ width: 56, height: 42, background: '#0a0a0a', backgroundImage: m.image_url ? `url(${resolveImg(m.image_url)})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {!m.image_url && <JerseyNumber n={m.week} size={22} color={FANTA} />}
+                </div>
+                <div>
+                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{m.opponent}</div>
+                  <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 2 }}>{fmtDate(m.date)} · {m.venue}</div>
+                </div>
+                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, color: 'var(--ink)' }}>{m.time || '17:30'}</div>
+              </div>
+            ))}
+          </div>
+          <div>
+            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, color: FANTA, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 14 }}>◆ {t('schedule.recentResults')}</div>
+            {played.length === 0 ? (
+              <div style={{ color: 'var(--muted)', fontSize: 14, padding: '20px 0' }}>—</div>
+            ) : [...played].reverse().slice(0, 6).map(m => (
+              <div key={m.id} style={{ background: 'var(--card)', padding: '12px 16px', marginBottom: 8, display: 'grid', gridTemplateColumns: '56px 1fr auto 32px', gap: 14, alignItems: 'center' }}>
+                <div style={{ width: 56, height: 42, background: '#0a0a0a', backgroundImage: m.image_url ? `url(${resolveImg(m.image_url)})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {!m.image_url && <JerseyNumber n={m.week} size={20} color="var(--muted)" />}
+                </div>
+                <div>
+                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{m.opponent}</div>
+                  <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 1 }}>{fmtDate(m.date)}</div>
+                </div>
+                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, color: 'var(--ink)' }}>{m.score}</div>
+                <div style={{ width: 28, height: 28, background: m.result === 'W' ? FANTA : m.result === 'D' ? 'var(--muted)' : '#aa2222', color: m.result === 'W' ? '#0a0a0a' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 14 }}>{m.result}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* SQUAD */}
       <section id="squad" className="mob-p-section" style={{ padding: '80px 48px' }}>
         <div className="mob-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 36 }}>
@@ -404,62 +519,83 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* SCHEDULE */}
-      <section id="schedule" className="mob-p-section" style={{ padding: '80px 48px' }}>
-        <div style={{ marginBottom: 36 }}>
-          <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s04')}</div>
-          <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 12 }}>{t('schedule.title')}</h2>
-        </div>
-        <div className="mob-schedule-cols" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
-          <div>
-            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, color: FANTA, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 14 }}>▶ {t('schedule.upcoming')}</div>
-            {upcoming.length === 0 ? (
-              <div style={{ color: 'var(--muted)', fontSize: 14, padding: '20px 0' }}>{t('schedule.noUpcoming')}</div>
-            ) : upcoming.map(m => (
-              <div key={m.id} style={{ background: 'var(--card)', padding: '18px 22px', marginBottom: 10, display: 'grid', gridTemplateColumns: '64px 1fr auto', gap: 18, alignItems: 'center', borderLeft: `4px solid ${FANTA}` }}>
-                <JerseyNumber n={m.week} size={40} color={FANTA} />
-                <div>
-                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{m.opponent}</div>
-                  <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{fmtDate(m.date)} · {m.venue}</div>
-                </div>
-                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, color: 'var(--ink)' }}>{m.time || '17:30'}</div>
-              </div>
-            ))}
-          </div>
-          <div>
-            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, color: FANTA, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 14 }}>◆ {t('schedule.played')}</div>
-            {[...played].reverse().slice(0, 6).map(m => (
-              <div key={m.id} style={{ background: 'var(--card)', padding: '14px 22px', marginBottom: 8, display: 'grid', gridTemplateColumns: '44px 1fr auto 36px', gap: 14, alignItems: 'center' }}>
-                <JerseyNumber n={m.week} size={28} color="var(--muted)" />
-                <div>
-                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 17, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{m.opponent}</div>
-                  <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 1 }}>{fmtDate(m.date)}</div>
-                </div>
-                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, color: 'var(--ink)' }}>{m.score}</div>
-                <div style={{ width: 28, height: 28, background: m.result === 'W' ? FANTA : m.result === 'D' ? 'var(--muted)' : '#aa2222', color: m.result === 'W' ? '#0a0a0a' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 14 }}>{m.result}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* VIDEO HIGHLIGHT */}
-      {videoHighlight && videoHighlight.is_active && videoHighlight.youtube_url && (
+      {/* VIDEO — YouTube-style: big player left, recommended list right */}
+      {(activeVideo || recommendations.length > 0) && (
         <section id="video" className="mob-p-section" style={{ padding: '80px 48px', background: 'var(--bg)', borderTop: `1px solid ${FANTA}33` }}>
           <div style={{ marginBottom: 36 }}>
-            <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>■ VIDEO</div>
+            <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>■ {t('video.label')}</div>
             <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 72px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 12 }}>
-              {lang === 'en' && videoHighlight.title_en ? videoHighlight.title_en : videoHighlight.title || 'HIGHLIGHT'}
+              {lang === 'en' && videoHighlight?.title_en ? videoHighlight.title_en : (videoHighlight?.title || t('video.fallbackTitle'))}
             </h2>
           </div>
-          <div style={{ position: 'relative', width: '100%', maxWidth: 900, margin: '0 auto', aspectRatio: '16/9', background: '#0a0a0a', borderLeft: `4px solid ${FANTA}` }}>
-            <iframe
-              src={toYoutubeEmbed(videoHighlight.youtube_url)}
-              title={videoHighlight.title || 'Video Highlight'}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
-            />
+
+          <div className="mob-video-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 380px', gap: 28, alignItems: 'start' }}>
+            {/* Main player (left) */}
+            <div>
+              <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', background: '#0a0a0a', borderLeft: `4px solid ${FANTA}` }}>
+                {activeVideo && (
+                  <iframe
+                    src={toYoutubeEmbed(activeVideo.url)}
+                    title={activeVideo.title || 'Video'}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
+                  />
+                )}
+              </div>
+              {activeVideo?.title && (
+                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(18px, 2vw, 26px)', lineHeight: 1.1, textTransform: 'uppercase', letterSpacing: '0.01em', marginTop: 16 }}>
+                  {activeVideo.title}
+                </div>
+              )}
+            </div>
+
+            {/* Recommendations (right) */}
+            <div className="mob-video-recs" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+              <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, color: FANTA, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>
+                {t('video.recommended')}
+              </div>
+              {recommendations.length === 0 ? (
+                <div style={{ color: 'var(--muted)', fontSize: 14, padding: '12px 0' }}>{t('video.noVideos')}</div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 520, overflowY: 'auto', paddingRight: 4 }}>
+                  {recommendations.map(v => {
+                    const isActive = activeVideo?.url === v.url;
+                    return (
+                      <button
+                        key={v.videoId}
+                        onClick={() => setActiveVideo({ url: v.url, title: v.title })}
+                        style={{
+                          display: 'grid', gridTemplateColumns: '140px 1fr', gap: 12, alignItems: 'stretch',
+                          background: isActive ? 'rgba(255,107,26,0.12)' : 'var(--card)',
+                          border: isActive ? `1px solid ${FANTA}` : '1px solid transparent',
+                          padding: 0, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', overflow: 'hidden',
+                        }}
+                      >
+                        <div style={{ position: 'relative', width: 140, aspectRatio: '16/9', background: '#0a0a0a', flexShrink: 0 }}>
+                          <img src={v.thumbnail} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                          {isActive && <div style={{ position: 'absolute', top: 4, left: 4, background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 9, padding: '2px 6px', letterSpacing: '0.08em' }}>▶</div>}
+                        </div>
+                        <div style={{ padding: '8px 10px 8px 0', minWidth: 0 }}>
+                          <div style={{ fontSize: 13, lineHeight: 1.3, color: 'var(--ink)', fontWeight: 600, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                            {v.title}
+                          </div>
+                          <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4 }}>{v.published ? fmtDate(v.published) : ''}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+              <a
+                href={videoHighlight?.channel_url || 'https://www.youtube.com/@fclonfanta'}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ marginTop: 16, display: 'inline-block', color: FANTA, fontFamily: 'Anton, sans-serif', fontSize: 14, letterSpacing: '0.04em', textTransform: 'uppercase', textDecoration: 'none' }}
+              >
+                {t('video.watchChannel')}
+              </a>
+            </div>
           </div>
         </section>
       )}

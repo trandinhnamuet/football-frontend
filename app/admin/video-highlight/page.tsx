@@ -33,6 +33,7 @@ export default function VideoHighlightAdminPage() {
   const [title, setTitle] = useState('');
   const [titleEn, setTitleEn] = useState('');
   const [isActive, setIsActive] = useState(true);
+  const [channelUrl, setChannelUrl] = useState('');
 
   const [previewEmbed, setPreviewEmbed] = useState('');
 
@@ -54,6 +55,7 @@ export default function VideoHighlightAdminPage() {
       setTitle(data.title || '');
       setTitleEn(data.title_en || '');
       setIsActive(data.is_active ?? true);
+      setChannelUrl(data.channel_url || 'https://www.youtube.com/@fclonfanta');
       setPreviewEmbed(toYoutubeEmbed(data.youtube_url || ''));
       setAuthed(true);
       localStorage.setItem(KEY, pw);
@@ -77,7 +79,7 @@ export default function VideoHighlightAdminPage() {
     setSuccess('');
     try {
       await api.updateVideoHighlight(
-        { youtube_url: youtubeUrl, title, title_en: titleEn, is_active: isActive },
+        { youtube_url: youtubeUrl, title, title_en: titleEn, is_active: isActive, channel_url: channelUrl },
         password,
       );
       setPreviewEmbed(toYoutubeEmbed(youtubeUrl));
@@ -166,6 +168,20 @@ export default function VideoHighlightAdminPage() {
                     />
                     <div style={{ fontSize: 12, color: MUTED, marginTop: 6 }}>
                       Hỗ trợ: youtube.com/watch?v=... hoặc youtu.be/...
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom: 20 }}>
+                    <label style={labelStyle}>Kênh YouTube (video đề xuất)</label>
+                    <input
+                      type="url"
+                      value={channelUrl}
+                      onChange={e => setChannelUrl(e.target.value)}
+                      placeholder="https://www.youtube.com/@fclonfanta"
+                      style={inputStyle}
+                    />
+                    <div style={{ fontSize: 12, color: MUTED, marginTop: 6 }}>
+                      Danh sách video mới nhất từ kênh này sẽ hiện ở cột "Video đề xuất" trên trang chủ.
                     </div>
                   </div>
 

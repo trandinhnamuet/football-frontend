@@ -46,6 +46,7 @@ export interface Match {
   goals_against: number;
   is_upcoming: boolean;
   time: string;
+  image_url: string | null;
 }
 
 export interface TeamStats {
@@ -74,6 +75,27 @@ export interface VideoHighlight {
   title: string;
   title_en: string;
   is_active: boolean;
+  channel_url: string;
+  updated_at: string;
+}
+
+export interface RecommendedVideo {
+  videoId: string;
+  title: string;
+  published: string;
+  thumbnail: string;
+  url: string;
+}
+
+export interface BannerSlide {
+  id: number;
+  image_url: string;
+  caption: string;
+  caption_en: string;
+  link_url: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
   updated_at: string;
 }
 

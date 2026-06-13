@@ -1,4 +1,4 @@
-import { Player, Article, Match, TeamStats, DriveLink, VideoHighlight } from './types';
+import { Player, Article, Match, TeamStats, DriveLink, VideoHighlight, RecommendedVideo, BannerSlide } from './types';
 
 const BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 
@@ -102,6 +102,17 @@ export const api = {
       method: 'DELETE',
       headers: { 'x-admin-password': password },
     }),
+  uploadMatchImage: async (file: File, password: string) => {
+    const form = new FormData();
+    form.append('image', file);
+    const r = await fetch(`${BASE}/api/matches/upload-image`, {
+      method: 'POST',
+      headers: { 'x-admin-password': password },
+      body: form,
+    });
+    if (r.status === 401) { handleUnauthorized(); throw new Error('Unauthorized'); }
+    return r.json() as Promise<{ url: string }>;
+  },
 
   // Sync
   triggerSync: (force = false) =>
@@ -140,12 +151,45 @@ export const api = {
 
   // Video Highlight
   getVideoHighlight: () => fetchJSON<VideoHighlight>('/api/video-highlight'),
+  getVideoRecommendations: () => fetchJSON<RecommendedVideo[]>('/api/video-highlight/recommendations'),
   updateVideoHighlight: (data: Partial<VideoHighlight>, password: string) =>
     fetchJSON<VideoHighlight>('/api/video-highlight', {
       method: 'PUT',
       body: JSON.stringify(data),
       headers: { 'x-admin-password': password },
     }),
+
+  // Banner Slides
+  getBannerSlidesPublic: () => fetchJSON<BannerSlide[]>('/api/banner-slides/public'),
+  getBannerSlidesAdmin: () => fetchJSON<BannerSlide[]>('/api/banner-slides'),
+  createBannerSlide: (data: Partial<BannerSlide>, password: string) =>
+    fetchJSON<BannerSlide>('/api/banner-slides', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: { 'x-admin-password': password },
+    }),
+  updateBannerSlide: (id: number, data: Partial<BannerSlide>, password: string) =>
+    fetchJSON<BannerSlide>(`/api/banner-slides/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+      headers: { 'x-admin-password': password },
+    }),
+  deleteBannerSlide: (id: number, password: string) =>
+    fetchJSON(`/api/banner-slides/${id}`, {
+      method: 'DELETE',
+      headers: { 'x-admin-password': password },
+    }),
+  uploadBannerImage: async (file: File, password: string) => {
+    const form = new FormData();
+    form.append('image', file);
+    const r = await fetch(`${BASE}/api/banner-slides/upload-image`, {
+      method: 'POST',
+      headers: { 'x-admin-password': password },
+      body: form,
+    });
+    if (r.status === 401) { handleUnauthorized(); throw new Error('Unauthorized'); }
+    return r.json() as Promise<{ url: string }>;
+  },
 
   // About Page
   getAboutPage: () => fetchJSON<{ id: number; banner_image_url: string; content_vi: string; content_en: string; updated_at: string }>('/api/about'),

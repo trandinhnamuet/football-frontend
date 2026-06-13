@@ -40,6 +40,12 @@ html, body {
   color: var(--ink);
   font-family: 'Space Grotesk', system-ui, sans-serif;
   transition: background 0.25s, color 0.25s;
+  /* Prevent any section that overflows its width from creating a horizontal
+     scrollbar / phantom dark column on the right (notably the squad carousel
+     whose player photos intentionally overflow their cards). `clip` is used
+     instead of `hidden` so it does not break the sticky header. */
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 a { color: inherit; }
@@ -149,6 +155,31 @@ input, textarea, select, button {
   border-color: #FF6B1A;
 }
 
+/* ── Banner slider arrows ────────────────────────────────────────────────── */
+.banner-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 10, 0.55);
+  border: 1px solid rgba(255, 107, 26, 0.5);
+  color: #FF6B1A;
+  font-family: Anton, sans-serif;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.banner-arrow:hover {
+  background: #FF6B1A;
+  color: #0a0a0a;
+}
+
 /* Nav hamburger - hidden on desktop, shown on mobile */
 .nav-mobile-btn { display: none !important; }
 
@@ -211,6 +242,23 @@ input, textarea, select, button {
 
   /* --- Squad carousel --- */
   .mob-squad-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  /* Scale down the overflowing player photo (240px) so it fits a 2-up mobile
+     grid and no longer spills past the viewport edge (the dark-column bug). */
+  .mob-squad-grid > div { padding-top: 104px !important; }
+  .mob-squad-grid > div > div:first-child { top: -84px !important; left: 8px !important; }
+  .mob-squad-grid > div > div:first-child img { width: 140px !important; height: 140px !important; }
+
+  /* --- Banner slider --- */
+  .banner-arrow { width: 34px !important; height: 34px !important; font-size: 20px !important; }
+  .banner-caption { padding: 0 16px 22px !important; }
+
+  /* --- Schedule: featured next match stacks --- */
+  .mob-nextmatch { grid-template-columns: 1fr !important; }
+  .mob-nextmatch-img { min-height: 200px !important; }
+
+  /* --- Video: YouTube-style layout stacks, recs go full width --- */
+  .mob-video-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
+  .mob-video-recs > div:nth-child(2) { max-height: none !important; }
 
   /* --- Section header (title + view-all button row) --- */
   .mob-section-hdr { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
