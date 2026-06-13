@@ -47,6 +47,22 @@ export const api = {
     if (r.status === 401) { handleUnauthorized(); throw new Error('Unauthorized'); }
     return r.json();
   },
+  createPlayer: (data: Partial<Player>, password: string) =>
+    fetchJSON<Player>('/api/players', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: { 'x-admin-password': password },
+    }),
+  deletePlayer: (id: number, password: string) =>
+    fetchJSON<{ deleted: boolean; id: number }>(`/api/players/${id}`, {
+      method: 'DELETE',
+      headers: { 'x-admin-password': password },
+    }),
+  importPlayers: (password: string) =>
+    fetchJSON<{ message: string; added: number; skipped: number }>('/api/sync/import-players', {
+      method: 'POST',
+      headers: { 'x-admin-password': password },
+    }),
 
   // Articles
   getArticles: () => fetchJSON<Article[]>('/api/articles'),

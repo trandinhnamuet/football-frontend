@@ -26,11 +26,13 @@ const ALL_ROLES = ['Tự do', 'GK', 'DEF', 'MID', 'FWD'];
 
 interface EditModalProps {
   player: Player;
+  isNew?: boolean;
   onSave: (id: number, data: Partial<Player>, file: File | null) => Promise<void>;
+  onDelete?: (id: number) => Promise<void>;
   onClose: () => void;
 }
 
-function EditModal({ player, onSave, onClose }: EditModalProps) {
+function EditModal({ player, isNew, onSave, onDelete, onClose }: EditModalProps) {
   const [form, setForm] = useState({
     first_name: player.first_name || '',
     last_name: player.last_name || '',
@@ -38,10 +40,12 @@ function EditModal({ player, onSave, onClose }: EditModalProps) {
     role: player.role || 'Tự do',
     boots: player.boots || 'Phải',
     joined: player.joined || new Date().getFullYear().toString(),
+    num: player.num ? String(player.num) : '',
   });
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
@@ -58,10 +62,30 @@ function EditModal({ player, onSave, onClose }: EditModalProps) {
     setSaving(true);
     setError('');
     try {
-      await onSave(player.id, form, file);
+      const payload: Partial<Player> = {
+        first_name: form.first_name,
+        last_name: form.last_name,
+        nick: form.nick,
+        role: form.role,
+        boots: form.boots,
+        joined: form.joined,
+      };
+      if (form.num.trim()) payload.num = parseInt(form.num, 10);
+      await onSave(player.id, payload, file);
       onClose();
     } catch (e: any) { setError(e.message || 'Lỗi lưu'); }
     finally { setSaving(false); }
+  }
+
+  async function handleDelete() {
+    if (!onDelete) return;
+    if (!confirm(`Xác nhận xóa cầu thủ "${player.first_name} ${player.last_name}"?`)) return;
+    setDeleting(true);
+    setError('');
+    try {
+      await onDelete(player.id);
+      onClose();
+    } catch (e: any) { setError(e.message || 'Lỗi xóa'); setDeleting(false); }
   }
 
   const inputStyle: React.CSSProperties = {
@@ -82,9 +106,9 @@ function EditModal({ player, onSave, onClose }: EditModalProps) {
         <div style={{ padding: '20px 28px', borderBottom: `1px solid ${LINE}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-              #{player.num} — {player.first_name} {player.last_name}
+              {isNew ? 'Thêm cầu thủ mới' : `#${player.num} — ${player.first_name} ${player.last_name}`}
             </div>
-            <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>Chỉnh sửa thông tin cầu thủ</div>
+            <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>{isNew ? 'Nhập thông tin cầu thủ' : 'Chỉnh sửa thông tin cầu thủ'}</div>
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: MUTED, cursor: 'pointer', fontSize: 24, lineHeight: 1, padding: 4 }}>✕</button>
         </div>
@@ -150,8 +174,8 @@ function EditModal({ player, onSave, onClose }: EditModalProps) {
             </div>
           </div>
 
-          {/* Boots + Joined */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+          {/* Boots + Joined + Number */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 20 }}>
             <div>
               <label style={labelStyle}>Chân thuận</label>
               <select style={inputStyle} value={form.boots} onChange={set('boots')}>
@@ -163,11 +187,16 @@ function EditModal({ player, onSave, onClose }: EditModalProps) {
               <label style={labelStyle}>Gia nhập năm</label>
               <input style={inputStyle} type="number" min="2019" max="2030" value={form.joined} onChange={set('joined')} />
             </div>
+            <div>
+              <label style={labelStyle}>Số áo {isNew && '(tự động nếu trống)'}</label>
+              <input style={inputStyle} type="number" min="0" max="999" value={form.num} onChange={set('num')} placeholder="Tự động" />
+            </div>
           </div>
 
           {/* Stats (read-only) */}
+          {!isNew && (
           <div style={{ borderTop: `1px solid ${LINE}`, paddingTop: 16, marginBottom: 20 }}>
-            <div style={{ fontSize: 10, color: MUTED, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 700, marginBottom: 12 }}>Thống kê (đồng bộ từ Excel)</div>
+            <div style={{ fontSize: 10, color: MUTED, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 700, marginBottom: 12 }}>Thống kê (đồng bộ từ STATS_DATA_URL)</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8 }}>
               {[
                 { label: 'Điểm', value: Math.round(player.stat_points), accent: true },
@@ -183,6 +212,7 @@ function EditModal({ player, onSave, onClose }: EditModalProps) {
               ))}
             </div>
           </div>
+          )}
 
           {error && <div style={{ color: '#cc4444', fontSize: 13, marginBottom: 12 }}>{error}</div>}
 
@@ -190,11 +220,20 @@ function EditModal({ player, onSave, onClose }: EditModalProps) {
           <div style={{ display: 'flex', gap: 10 }}>
             <button
               onClick={handleSave}
-              disabled={saving}
+              disabled={saving || deleting}
               style={{ flex: 1, background: FANTA, color: BLACK, border: 'none', padding: '13px', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.7 : 1 }}
             >
-              {saving ? '...' : 'Lưu thay đổi'}
+              {saving ? '...' : (isNew ? 'Thêm cầu thủ' : 'Lưu thay đổi')}
             </button>
+            {!isNew && onDelete && (
+              <button
+                onClick={handleDelete}
+                disabled={saving || deleting}
+                style={{ flex: 0.5, background: 'rgba(204,68,68,0.12)', color: '#cc4444', border: '1px solid rgba(204,68,68,0.3)', padding: '13px', fontFamily: 'Anton, sans-serif', fontSize: 14, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer' }}
+              >
+                {deleting ? '...' : 'Xóa'}
+              </button>
+            )}
             <button
               onClick={onClose}
               style={{ flex: 0.5, background: 'transparent', color: MUTED, border: `1px solid ${LINE}`, padding: '13px', fontFamily: 'inherit', fontSize: 14, cursor: 'pointer' }}
@@ -254,9 +293,11 @@ function PlayerManagementContent() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [importing, setImporting] = useState(false);
   const [syncMsg, setSyncMsg] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
   const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
+  const [addingPlayer, setAddingPlayer] = useState(false);
 
   useEffect(() => { loadPlayers(); }, []);
 
@@ -272,18 +313,46 @@ function PlayerManagementContent() {
     setSyncMsg('');
     try {
       const res = await api.triggerSync(true);
-      setSyncMsg(res.synced ? `✓ Đã đồng bộ ${res.message}` : `→ ${res.message}`);
+      setSyncMsg(res.synced ? `✓ ${res.message}` : `→ ${res.message}`);
       if (res.synced) await loadPlayers();
     } catch (e: any) { setSyncMsg('Lỗi: ' + e.message); }
     finally { setSyncing(false); }
   }
 
+  async function handleImport() {
+    setImporting(true);
+    setSyncMsg('');
+    try {
+      const res = await api.importPlayers(getPassword());
+      setSyncMsg(`✓ ${res.message}`);
+      if (res.added > 0) await loadPlayers();
+    } catch (e: any) { setSyncMsg('Lỗi: ' + e.message); }
+    finally { setImporting(false); }
+  }
+
   async function handleSavePlayer(id: number, data: Partial<Player>, file: File | null) {
     const pw = getPassword();
-    await api.updatePlayer(id, data, pw);
-    if (file) await api.uploadPlayerImage(id, file, pw);
+    if (addingPlayer) {
+      const created = await api.createPlayer(data, pw);
+      if (file) await api.uploadPlayerImage(created.id, file, pw);
+    } else {
+      await api.updatePlayer(id, data, pw);
+      if (file) await api.uploadPlayerImage(id, file, pw);
+    }
     await loadPlayers();
   }
+
+  async function handleDeletePlayer(id: number) {
+    await api.deletePlayer(id, getPassword());
+    await loadPlayers();
+  }
+
+  const blankPlayer = {
+    id: 0, num: 0, first_name: '', last_name: '', role: 'Tự do', joined: new Date().getFullYear().toString(),
+    boots: 'Phải', nick: '', image_url: '', is_active: true,
+    stat_goals: 0, stat_assists: 0, stat_saves: 0, stat_tackles: 0, stat_passes: 0,
+    stat_attendance: 0, stat_minutes: 0, stat_points: 0, stat_matches: 0,
+  } as unknown as Player;
 
   const filtered = roleFilter === 'ALL' ? players : players.filter(p => p.role === roleFilter);
 
@@ -293,24 +362,41 @@ function PlayerManagementContent() {
         <EditModal
           player={editingPlayer}
           onSave={handleSavePlayer}
+          onDelete={handleDeletePlayer}
           onClose={() => setEditingPlayer(null)}
+        />
+      )}
+      {addingPlayer && (
+        <EditModal
+          player={blankPlayer}
+          isNew
+          onSave={handleSavePlayer}
+          onClose={() => setAddingPlayer(false)}
         />
       )}
 
       <AdminHeader />
 
       <main style={{ padding: '40px 48px 80px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 36 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 36, flexWrap: 'wrap', gap: 16 }}>
           <div>
             <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>Quản trị đội hình</div>
             <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 56, lineHeight: 0.92, letterSpacing: '0.01em', textTransform: 'uppercase', margin: 0 }}>
               QUẢN LÝ <span style={{ color: FANTA }}>CẦU THỦ</span>
             </h1>
-            <p style={{ color: MUTED, fontSize: 14, marginTop: 8 }}>Dữ liệu đồng bộ từ Excel · Ảnh và thông tin chỉnh sửa trực tiếp</p>
+            <p style={{ color: MUTED, fontSize: 14, marginTop: 8 }}>Thêm/sửa/xóa thủ công · Import từ Sheet thông tin · Điểm đồng bộ từ Sheet thống kê</p>
           </div>
-          <button onClick={handleSync} disabled={syncing} style={{ background: FANTA, color: BLACK, border: 'none', padding: '14px 28px', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer', opacity: syncing ? 0.7 : 1 }}>
-            {syncing ? 'Đang đồng bộ...' : '↻ ĐỒNG BỘ EXCEL'}
-          </button>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <button onClick={() => setAddingPlayer(true)} style={{ background: 'rgba(255,255,255,0.06)', color: INK, border: `1px solid ${LINE}`, padding: '14px 22px', fontFamily: 'Anton, sans-serif', fontSize: 15, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer' }}>
+              + Thêm cầu thủ
+            </button>
+            <button onClick={handleImport} disabled={importing} style={{ background: 'rgba(255,107,26,0.12)', color: FANTA, border: `1px solid ${FANTA}66`, padding: '14px 22px', fontFamily: 'Anton, sans-serif', fontSize: 15, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer', opacity: importing ? 0.7 : 1 }}>
+              {importing ? 'Đang import...' : '⬇ Import cầu thủ'}
+            </button>
+            <button onClick={handleSync} disabled={syncing} style={{ background: FANTA, color: BLACK, border: 'none', padding: '14px 22px', fontFamily: 'Anton, sans-serif', fontSize: 15, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer', opacity: syncing ? 0.7 : 1 }}>
+              {syncing ? 'Đang đồng bộ...' : '↻ Đồng bộ điểm'}
+            </button>
+          </div>
         </div>
 
         {syncMsg && (
@@ -337,7 +423,7 @@ function PlayerManagementContent() {
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: 60, background: CARD, borderLeft: `4px solid ${FANTA}` }}>
             <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, color: MUTED, textTransform: 'uppercase' }}>
-              Chưa có dữ liệu. Nhấn "Đồng bộ Excel" để tải dữ liệu.
+              Chưa có cầu thủ. Nhấn "Import cầu thủ" hoặc "Thêm cầu thủ".
             </div>
           </div>
         ) : (
