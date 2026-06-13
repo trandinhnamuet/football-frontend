@@ -49,13 +49,13 @@ function JerseyNumber({ n, size = 80, color = 'var(--ink)' }: { n: number | stri
   );
 }
 
-function Avatar({ p, size = 56, width }: { p: Player; size?: number; width?: number }) {
+function Avatar({ p, size = 56 }: { p: Player; size?: number }) {
   const imgSrc = p.image_url ? `${BASE}${p.image_url}` : DEFAULT_AVATAR;
   return (
     <img
       src={imgSrc}
       alt={`${p.first_name} ${p.last_name}`}
-      width={width ?? size} height={size}
+      width={size} height={size}
       style={{ objectFit: 'cover', flexShrink: 0, clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)' }}
     />
   );
@@ -231,7 +231,7 @@ export default function HomePage() {
             <div className="mob-hero-top1" style={{ marginTop: 32, background: FANTA, color: '#0a0a0a', padding: '40px 48px', display: 'grid', gridTemplateColumns: 'auto auto 1fr auto', gap: 40, alignItems: 'center', clipPath: 'polygon(0 0, 100% 0, 98% 100%, 2% 100%)' }}>
               <JerseyNumber n={1} size={180} color="#0a0a0a" />
               <div>
-                <Avatar p={top1} size={140} width={182} />
+                <Avatar p={top1} size={140} />
               </div>
               <div>
                 <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>{t('hero.mvp')}</div>
@@ -256,7 +256,7 @@ export default function HomePage() {
               {[top2, top3].filter(Boolean).map((p, i) => p && (
                 <div key={p.id} className="mob-hero-top2-3-card" style={{ background: 'var(--card)', padding: '28px 32px', display: 'grid', gridTemplateColumns: 'auto auto 1fr auto', gap: 20, alignItems: 'center', borderLeft: `4px solid ${FANTA}` }}>
                   <JerseyNumber n={i + 2} size={80} color={FANTA} />
-                  <Avatar p={p} size={80} width={104} />
+                  <Avatar p={p} size={80} />
                   <div>
                     <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>#{p.num} {roleLabel(p.role)}</div>
                     <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 32, lineHeight: 0.95, textTransform: 'uppercase', marginTop: 4 }}>{p.first_name} {p.last_name}</div>
@@ -279,7 +279,7 @@ export default function HomePage() {
                   <div key={p.id} className="mob-hero-rest-row" style={{ display: 'grid', gridTemplateColumns: '64px 1fr 1fr 70px', alignItems: 'center', gap: 20, padding: '10px 28px', borderBottom: i < rest.length - 1 ? '1px solid var(--line)' : 'none' }}>
                     <JerseyNumber n={i + 4} size={22} color="var(--muted)" />
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <Avatar p={p} size={32} width={42} />
+                      <Avatar p={p} size={32} />
                       <div>
                         <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{p.first_name} {p.last_name}</div>
                         <div style={{ fontSize: 11, color: 'var(--muted)' }}>#{p.num} · {roleLabel(p.role)}</div>
@@ -452,7 +452,7 @@ export default function HomePage() {
                         <img
                           src={p.image_url ? `${BASE}${p.image_url}` : DEFAULT_AVATAR}
                           alt={p.first_name}
-                          width={288} height={240}
+                          width={240} height={240}
                           style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'block' }}
                         />
                       </div>
