@@ -542,10 +542,10 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <div className="mob-video-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 380px', gap: 24, alignItems: 'start' }}>
-            {/* Main player (left) — 40% larger */}
+          <div className="mob-video-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 1fr', gap: 24, alignItems: 'start' }}>
+            {/* Main player (left) — larger */}
             <div>
-              <div style={{ position: 'relative', width: '100%', maxWidth: 1600, aspectRatio: '16/9', background: '#0a0a0a', borderLeft: `4px solid ${FANTA}` }}>
+              <div style={{ position: 'relative', width: '100%', maxWidth: 1152, aspectRatio: '16/9', background: '#0a0a0a', borderLeft: `4px solid ${FANTA}` }}>
                 {activeVideo && (
                   <iframe
                     src={toYoutubeEmbed(activeVideo.url)}
@@ -563,7 +563,7 @@ export default function HomePage() {
               )}
             </div>
 
-            {/* Recommendations (right) — narrower, 5 items max */}
+            {/* Recommendations (right) — larger */}
             <div className="mob-video-recs" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
               <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, color: FANTA, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>
                 {t('video.recommended')}
@@ -571,33 +571,29 @@ export default function HomePage() {
               {recommendations.length === 0 ? (
                 <div style={{ color: 'var(--muted)', fontSize: 14, padding: '12px 0' }}>{t('video.noVideos')}</div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxHeight: 1400, overflowY: 'auto', paddingRight: 6 }}>
-                  {recommendations.slice(0, 5).map(v => {
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxHeight: 960, overflowY: 'auto', paddingRight: 6 }}>
+                  {recommendations.map(v => {
                     const isActive = activeVideo?.url === v.url;
                     return (
                       <button
                         key={v.videoId}
                         onClick={() => setActiveVideo({ url: v.url, title: v.title })}
                         style={{
-                          display: 'flex', flexDirection: 'column',
+                          display: 'grid', gridTemplateColumns: '320px 1fr', gap: 16, alignItems: 'stretch',
                           background: isActive ? 'rgba(255,107,26,0.12)' : 'var(--card)',
                           border: isActive ? `1px solid ${FANTA}` : '1px solid transparent',
-                          padding: 10, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', overflow: 'hidden',
+                          padding: 12, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', overflow: 'hidden',
                         }}
                       >
-                        <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', background: '#0a0a0a', marginBottom: 10, overflow: 'hidden' }}>
+                        <div style={{ position: 'relative', width: 320, aspectRatio: '16/9', background: '#0a0a0a', flexShrink: 0 }}>
                           <img src={v.thumbnail} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                          {isActive && <div style={{ position: 'absolute', top: 6, left: 6, background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 11, padding: '4px 8px', letterSpacing: '0.08em' }}>▶</div>}
+                          {isActive && <div style={{ position: 'absolute', top: 8, left: 8, background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 12, padding: '5px 10px', letterSpacing: '0.08em' }}>▶</div>}
                         </div>
-                        <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                          <div style={{ fontSize: 14, lineHeight: 1.3, color: 'var(--ink)', fontWeight: 600, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        <div style={{ padding: '8px 12px', minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                          <div style={{ fontSize: 16, lineHeight: 1.35, color: 'var(--ink)', fontWeight: 600, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                             {v.title}
                           </div>
-                          {v.published && (
-                            <div style={{ fontSize: 12, color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                              <span>📅</span> {fmtDate(v.published)}
-                            </div>
-                          )}
+                          <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 8 }}>{v.published ? fmtDate(v.published) : ''}</div>
                         </div>
                       </button>
                     );
