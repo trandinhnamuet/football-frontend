@@ -240,13 +240,25 @@ input, textarea, select, button {
   /* Hide the progress bar column on very small screens */
   .mob-hero-rest-row > *:nth-child(3) { display: none !important; }
 
-  /* --- Squad carousel --- */
-  .mob-squad-grid { grid-template-columns: repeat(2, 1fr) !important; }
-  /* Scale down the overflowing player photo (240px) so it fits a 2-up mobile
-     grid and no longer spills past the viewport edge (the dark-column bug). */
-  .mob-squad-grid > div { padding-top: 104px !important; }
-  .mob-squad-grid > div > div:first-child { top: -84px !important; left: 8px !important; }
-  .mob-squad-grid > div > div:first-child img { width: 140px !important; height: 140px !important; }
+  /* --- Squad carousel ---
+     On mobile the overflowing-photo design (absolute, negative top) caused
+     photos in lower rows to overlap the cards above. Switch to an in-flow
+     layout: photo sits at the top of its own card, text below, so 2×2 rows
+     stack cleanly with no overlap. */
+  .mob-squad-wrap { padding-top: 0 !important; }
+  .mob-squad-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+  .mob-squad-grid > div { padding-top: 14px !important; }
+  .mob-squad-grid > div > div:first-child {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    margin-bottom: 12px !important;
+  }
+  .mob-squad-grid > div > div:first-child img {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+  }
 
   /* --- Banner slider --- */
   .banner-slide { height: 63vh !important; min-height: 63vh !important; }

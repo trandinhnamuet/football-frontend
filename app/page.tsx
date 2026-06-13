@@ -81,6 +81,17 @@ export default function HomePage() {
   const [squadPage, setSquadPage] = useState(0);
   const [slideClass, setSlideClass] = useState('slide-from-right');
   const [animKey, setAnimKey] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Fewer players per page on mobile (2×2) so rows stay even and photos don't
+  // overlap; full 5-up on desktop.
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const update = () => { setIsMobile(mq.matches); setSquadPage(0); };
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
 
   // Scoring tooltip
   const [showTooltip, setShowTooltip] = useState(false);
@@ -124,7 +135,8 @@ export default function HomePage() {
     }).catch(() => {});
   }, []);
 
-  const totalSquadPages = Math.max(1, Math.ceil(players.length / SQUAD_PAGE_SIZE));
+  const squadPageSize = isMobile ? 4 : SQUAD_PAGE_SIZE;
+  const totalSquadPages = Math.max(1, Math.ceil(players.length / squadPageSize));
 
   // Auto-slide squad every 5s
   useEffect(() => {
@@ -148,7 +160,8 @@ export default function HomePage() {
   const top2 = board[1];
   const top3 = board[2];
   const rest = board.slice(3, 12);
-  const squadVisible = players.slice(squadPage * SQUAD_PAGE_SIZE, (squadPage + 1) * SQUAD_PAGE_SIZE);
+  const safeSquadPage = Math.min(squadPage, totalSquadPages - 1);
+  const squadVisible = players.slice(safeSquadPage * squadPageSize, (safeSquadPage + 1) * squadPageSize);
 
   const roleLabel = (role: string) => ROLES[role]?.[lang] || role;
 
@@ -431,7 +444,7 @@ export default function HomePage() {
                 style={{ background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}44`, color: FANTA, width: 44, height: 44, fontFamily: 'Anton, sans-serif', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >‹</button>
               <div style={{ fontSize: 12, color: 'var(--muted)', letterSpacing: '0.1em' }}>
-                {squadPage + 1} / {totalSquadPages}
+                {safeSquadPage + 1} / {totalSquadPages}
               </div>
               <button
                 onClick={() => goSquad('next')}
@@ -440,7 +453,7 @@ export default function HomePage() {
             </div>
 
             {/* Carousel */}
-            <div style={{ paddingTop: 110, overflow: 'visible' }}>
+            <div className="mob-squad-wrap" style={{ paddingTop: 110, overflow: 'visible' }}>
               <div
                 key={animKey}
                 className={`${slideClass} mob-squad-grid`}
