@@ -316,7 +316,7 @@ export default function HomePage() {
           const d = daysUntil(next.date);
           const countdown = d <= 0 ? t('schedule.countdownToday') : `${d} ${t('schedule.countdownDays')}`;
           return (
-            <div className="mob-nextmatch" style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.8fr', gap: 0, marginBottom: 28, background: 'var(--card)', borderLeft: `5px solid ${FANTA}`, overflow: 'hidden' }}>
+            <div className="mob-nextmatch next-match-card" style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.8fr', gap: 0, marginBottom: 28, background: 'var(--card)', borderLeft: `5px solid ${FANTA}`, overflow: 'hidden' }}>
               {/* Image side */}
               <div className="mob-nextmatch-img" style={{ position: 'relative', minHeight: 380, background: '#0a0a0a', backgroundImage: next.image_url ? `url(${resolveImg(next.image_url)})` : 'repeating-linear-gradient(45deg, transparent 0 30px, rgba(255,107,26,0.06) 30px 31px)', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
                 <div style={{ position: 'absolute', top: 18, left: 18, background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 13, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '6px 14px' }}>
@@ -367,7 +367,7 @@ export default function HomePage() {
             {upcoming.length <= 1 ? (
               <div style={{ color: 'var(--muted)', fontSize: 14, padding: '20px 0' }}>{t('schedule.noUpcoming')}</div>
             ) : upcoming.slice(1).map(m => (
-              <div key={m.id} style={{ background: 'var(--card)', padding: '16px 18px', marginBottom: 16, display: 'grid', gridTemplateColumns: '160px 1fr', gap: 18, alignItems: 'stretch', borderLeft: `3px solid ${FANTA}`, minHeight: 160 }}>
+              <div key={m.id} className="schedule-row" style={{ background: 'var(--card)', padding: '16px 18px', marginBottom: 16, display: 'grid', gridTemplateColumns: '160px 1fr', gap: 18, alignItems: 'stretch', borderLeft: `3px solid ${FANTA}`, minHeight: 160 }}>
                 <div style={{ width: 160, height: 160, background: '#0a0a0a', backgroundImage: m.image_url ? `url(${resolveImg(m.image_url)})` : 'none', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   {!m.image_url && <JerseyNumber n={m.week} size={36} color={FANTA} />}
                 </div>
@@ -385,7 +385,7 @@ export default function HomePage() {
             {played.length === 0 ? (
               <div style={{ color: 'var(--muted)', fontSize: 14, padding: '20px 0' }}>—</div>
             ) : [...played].reverse().slice(0, 6).map(m => (
-              <div key={m.id} style={{ background: 'var(--card)', padding: '10px 12px', marginBottom: 8, display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, alignItems: 'center', fontSize: 12 }}>
+              <div key={m.id} className="schedule-row" style={{ background: 'var(--card)', padding: '10px 12px', marginBottom: 8, display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, alignItems: 'center', fontSize: 12 }}>
                 <div style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}>
                   <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 13, textTransform: 'uppercase' }}>{m.opponent}</div>
                   <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 1 }}>{fmtDate(m.date)}</div>
@@ -503,20 +503,29 @@ export default function HomePage() {
         ) : (
           <div className="mob-news-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
             {articles.slice(0, 6).map((article, i) => (
-              <Link key={article.id} href={`/news/${article.id}`} style={{
+              <Link key={article.id} href={`/news/${article.id}`} className="news-card" style={{
                 textDecoration: 'none', color: 'inherit', background: 'var(--card)', overflow: 'hidden', display: 'block',
                 gridRow: i === 0 ? 'span 2' : 'auto',
                 gridColumn: i === 0 ? 'span 2' : 'auto',
               }}>
                 <div style={{
                   aspectRatio: i === 0 ? '16/9' : '3/2',
-                  background: 'var(--alt-bg)',
-                  backgroundImage: article.image_url ? `url(${BASE}${article.image_url})` : 'repeating-linear-gradient(135deg, transparent 0 14px, rgba(0,0,0,0.08) 14px 15px)',
-                  backgroundSize: 'cover', backgroundPosition: 'center',
+                  background: '#0a0a0a',
                   position: 'relative',
+                  overflow: 'hidden',
                 }}>
+                  {article.image_url ? (
+                    <>
+                      {/* Blurred fill behind, using the same image */}
+                      <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${BASE}${article.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'blur(18px)', transform: 'scale(1.12)' }} />
+                      {/* Full image, never cropped */}
+                      <div className="news-card-img" style={{ position: 'absolute', inset: 0, backgroundImage: `url(${BASE}${article.image_url})`, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
+                    </>
+                  ) : (
+                    <div style={{ position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(135deg, transparent 0 14px, rgba(0,0,0,0.08) 14px 15px)' }} />
+                  )}
                   {article.tag && (
-                    <div style={{ position: 'absolute', top: 14, left: 14, background: FANTA, color: '#0a0a0a', padding: '4px 10px', fontFamily: 'Anton, sans-serif', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                    <div style={{ position: 'absolute', top: 14, left: 14, zIndex: 2, background: FANTA, color: '#0a0a0a', padding: '4px 10px', fontFamily: 'Anton, sans-serif', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                       {article.tag}
                     </div>
                   )}
