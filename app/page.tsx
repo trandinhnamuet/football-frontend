@@ -573,7 +573,7 @@ export default function HomePage() {
             </div>
 
             {/* Recommendations (right) — 5 items, vertical cards, full thumbnail always visible */}
-            <div className="mob-video-recs" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <div className="mob-video-recs" style={{ display: 'flex', flexDirection: 'column', minWidth: 0, marginTop: -35 }}>
               <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, color: FANTA, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>
                 {t('video.recommended')}
               </div>
@@ -587,6 +587,7 @@ export default function HomePage() {
                       <button
                         key={v.videoId}
                         onClick={() => setActiveVideo({ url: v.url, title: v.title })}
+                        className="video-rec-card"
                         style={{
                           display: 'grid', gridTemplateColumns: '200px 1fr', gap: 14, alignItems: 'center',
                           background: isActive ? 'rgba(255,107,26,0.12)' : 'var(--card)',

@@ -21,11 +21,15 @@ function getPassword() {
   return typeof window !== 'undefined' ? (localStorage.getItem(KEY) || '') : '';
 }
 
-function SlideCard({ slide, onChange, onDelete, onSave, busy }: {
+function SlideCard({ slide, onChange, onDelete, onSave, onMoveUp, onMoveDown, isFirst, isLast, busy }: {
   slide: BannerSlide;
   onChange: (patch: Partial<BannerSlide>) => void;
   onDelete: () => void;
   onSave: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  isFirst: boolean;
+  isLast: boolean;
   busy: boolean;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -67,6 +71,17 @@ function SlideCard({ slide, onChange, onDelete, onSave, busy }: {
         <label htmlFor={`f-${slide.id}`} style={{ display: 'block', textAlign: 'center', marginTop: 8, background: '#222', color: INK, padding: '8px', cursor: 'pointer', fontSize: 13 }}>
           {uploading ? 'Đang tải...' : (slide.image_url ? 'Đổi ảnh' : 'Tải ảnh lên')}
         </label>
+        {/* Reorder controls */}
+        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+          <button onClick={onMoveUp} disabled={busy || isFirst} title="Di chuyển lên"
+            style={{ flex: 1, background: isFirst ? 'rgba(255,255,255,0.04)' : 'rgba(255,107,26,0.12)', color: isFirst ? MUTED : FANTA, border: `1px solid ${isFirst ? 'rgba(255,255,255,0.08)' : FANTA + '55'}`, padding: '7px', cursor: isFirst ? 'default' : 'pointer', fontFamily: 'Anton, sans-serif', fontSize: 14, opacity: isFirst ? 0.5 : 1 }}>
+            ↑ Lên
+          </button>
+          <button onClick={onMoveDown} disabled={busy || isLast} title="Di chuyển xuống"
+            style={{ flex: 1, background: isLast ? 'rgba(255,255,255,0.04)' : 'rgba(255,107,26,0.12)', color: isLast ? MUTED : FANTA, border: `1px solid ${isLast ? 'rgba(255,255,255,0.08)' : FANTA + '55'}`, padding: '7px', cursor: isLast ? 'default' : 'pointer', fontFamily: 'Anton, sans-serif', fontSize: 14, opacity: isLast ? 0.5 : 1 }}>
+            ↓ Xuống
+          </button>
+        </div>
       </div>
 
       {/* Fields */}
@@ -158,6 +173,28 @@ function BannerSlidesContent() {
     finally { setBusy(false); }
   }
 
+  // Move a slide up/down: swap array order, normalize sort_order, persist all
+  async function moveSlide(index: number, dir: 'up' | 'down') {
+    const target = dir === 'up' ? index - 1 : index + 1;
+    if (target < 0 || target >= slides.length) return;
+
+    const reordered = [...slides];
+    [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
+    // Normalize sort_order to match the new array positions
+    const normalized = reordered.map((s, i) => ({ ...s, sort_order: i }));
+    setSlides(normalized);
+
+    setBusy(true);
+    try {
+      const pw = getPassword();
+      await Promise.all(
+        normalized.map(s => api.updateBannerSlide(s.id, { sort_order: s.sort_order }, pw)),
+      );
+      flash('✓ Đã đổi thứ tự');
+    } catch (e: any) { flash('Lỗi: ' + e.message); await load(); }
+    finally { setBusy(false); }
+  }
+
   async function addSlide() {
     setBusy(true);
     try {
@@ -221,14 +258,18 @@ function BannerSlidesContent() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {slides.map(s => (
+            {slides.map((s, i) => (
               <SlideCard
                 key={s.id}
                 slide={s}
                 busy={busy}
+                isFirst={i === 0}
+                isLast={i === slides.length - 1}
                 onChange={patch => patchLocal(s.id, patch)}
                 onSave={() => saveSlide(s)}
                 onDelete={() => removeSlide(s.id)}
+                onMoveUp={() => moveSlide(i, 'up')}
+                onMoveDown={() => moveSlide(i, 'down')}
               />
             ))}
           </div>
