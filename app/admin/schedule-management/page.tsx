@@ -353,7 +353,8 @@ function ScheduleManagementContent() {
         ) : (
           <div style={{ background: CARD, border: `1px solid rgba(255,255,255,0.06)` }}>
             {/* Table header */}
-            <div style={{ display: 'grid', gridTemplateColumns: '60px 80px 100px 1fr 1fr 80px 80px 120px', gap: 12, padding: '12px 20px', borderBottom: `1px solid ${LINE}`, fontSize: 10, color: MUTED, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 700 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '50px 60px 80px 100px 1fr 1fr 80px 80px 120px', gap: 12, padding: '12px 20px', borderBottom: `1px solid ${LINE}`, fontSize: 10, color: MUTED, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 700 }}>
+              <div>Ảnh</div>
               <div>Tuần</div>
               <div>Ngày</div>
               <div>Giờ</div>
@@ -373,16 +374,21 @@ function ScheduleManagementContent() {
                 key={m.id}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '60px 80px 100px 1fr 1fr 80px 80px 120px',
+                  gridTemplateColumns: '50px 60px 80px 100px 1fr 1fr 80px 80px 120px',
                   gap: 12,
-                  padding: '14px 20px',
+                  padding: '8px 20px',
                   borderBottom: i < filtered.length - 1 ? `1px solid rgba(255,255,255,0.05)` : 'none',
                   alignItems: 'center',
                   borderLeft: `3px solid ${m.is_upcoming ? FANTA : (resultColor[m.result] || 'transparent')}`,
                   background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)',
                 }}
               >
-                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, color: FANTA }}>W{m.week}</div>
+                <div style={{ width: 50, height: 36, background: '#0a0a0a', border: `1px solid ${FANTA}33`, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {m.image_url
+                    ? <img src={resolveImg(m.image_url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : <div style={{ fontSize: 10, color: MUTED, textAlign: 'center' }}>—</div>}
+                </div>
+                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, color: FANTA }}>W{m.week}</div>
                 <div style={{ fontSize: 12, color: MUTED }}>{fmtDate(m.date)}</div>
                 <div style={{ fontSize: 13 }}>{m.time || '17:30'}</div>
                 <div>

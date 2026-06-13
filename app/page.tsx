@@ -529,10 +529,10 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <div className="mob-video-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 380px', gap: 28, alignItems: 'start' }}>
-            {/* Main player (left) */}
+          <div className="mob-video-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 520px', gap: 24, alignItems: 'start' }}>
+            {/* Main player (left) — smaller */}
             <div>
-              <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', background: '#0a0a0a', borderLeft: `4px solid ${FANTA}` }}>
+              <div style={{ position: 'relative', width: '100%', maxWidth: 640, aspectRatio: '16/9', background: '#0a0a0a', borderLeft: `4px solid ${FANTA}` }}>
                 {activeVideo && (
                   <iframe
                     src={toYoutubeEmbed(activeVideo.url)}
@@ -544,13 +544,13 @@ export default function HomePage() {
                 )}
               </div>
               {activeVideo?.title && (
-                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(18px, 2vw, 26px)', lineHeight: 1.1, textTransform: 'uppercase', letterSpacing: '0.01em', marginTop: 16 }}>
+                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(16px, 1.8vw, 22px)', lineHeight: 1.2, textTransform: 'uppercase', letterSpacing: '0.01em', marginTop: 16 }}>
                   {activeVideo.title}
                 </div>
               )}
             </div>
 
-            {/* Recommendations (right) */}
+            {/* Recommendations (right) — larger */}
             <div className="mob-video-recs" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
               <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, color: FANTA, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>
                 {t('video.recommended')}
@@ -558,7 +558,7 @@ export default function HomePage() {
               {recommendations.length === 0 ? (
                 <div style={{ color: 'var(--muted)', fontSize: 14, padding: '12px 0' }}>{t('video.noVideos')}</div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 520, overflowY: 'auto', paddingRight: 4 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxHeight: 580, overflowY: 'auto', paddingRight: 6 }}>
                   {recommendations.map(v => {
                     const isActive = activeVideo?.url === v.url;
                     return (
@@ -566,21 +566,21 @@ export default function HomePage() {
                         key={v.videoId}
                         onClick={() => setActiveVideo({ url: v.url, title: v.title })}
                         style={{
-                          display: 'grid', gridTemplateColumns: '140px 1fr', gap: 12, alignItems: 'stretch',
+                          display: 'grid', gridTemplateColumns: '180px 1fr', gap: 14, alignItems: 'stretch',
                           background: isActive ? 'rgba(255,107,26,0.12)' : 'var(--card)',
                           border: isActive ? `1px solid ${FANTA}` : '1px solid transparent',
-                          padding: 0, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', overflow: 'hidden',
+                          padding: 10, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', overflow: 'hidden',
                         }}
                       >
-                        <div style={{ position: 'relative', width: 140, aspectRatio: '16/9', background: '#0a0a0a', flexShrink: 0 }}>
+                        <div style={{ position: 'relative', width: 180, aspectRatio: '16/9', background: '#0a0a0a', flexShrink: 0 }}>
                           <img src={v.thumbnail} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                          {isActive && <div style={{ position: 'absolute', top: 4, left: 4, background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 9, padding: '2px 6px', letterSpacing: '0.08em' }}>▶</div>}
+                          {isActive && <div style={{ position: 'absolute', top: 6, left: 6, background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 10, padding: '3px 7px', letterSpacing: '0.08em' }}>▶</div>}
                         </div>
-                        <div style={{ padding: '8px 10px 8px 0', minWidth: 0 }}>
-                          <div style={{ fontSize: 13, lineHeight: 1.3, color: 'var(--ink)', fontWeight: 600, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        <div style={{ padding: '4px 6px', minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                          <div style={{ fontSize: 14, lineHeight: 1.35, color: 'var(--ink)', fontWeight: 600, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                             {v.title}
                           </div>
-                          <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4 }}>{v.published ? fmtDate(v.published) : ''}</div>
+                          <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 6 }}>{v.published ? fmtDate(v.published) : ''}</div>
                         </div>
                       </button>
                     );
@@ -591,7 +591,7 @@ export default function HomePage() {
                 href={videoHighlight?.channel_url || 'https://www.youtube.com/@fclonfanta'}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ marginTop: 16, display: 'inline-block', color: FANTA, fontFamily: 'Anton, sans-serif', fontSize: 14, letterSpacing: '0.04em', textTransform: 'uppercase', textDecoration: 'none' }}
+                style={{ marginTop: 18, display: 'inline-block', color: FANTA, fontFamily: 'Anton, sans-serif', fontSize: 14, letterSpacing: '0.04em', textTransform: 'uppercase', textDecoration: 'none' }}
               >
                 {t('video.watchChannel')}
               </a>

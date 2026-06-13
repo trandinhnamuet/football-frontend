@@ -257,8 +257,17 @@ input, textarea, select, button {
   .mob-nextmatch-img { min-height: 200px !important; }
 
   /* --- Video: YouTube-style layout stacks, recs go full width --- */
-  .mob-video-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
+  .mob-video-grid { grid-template-columns: 1fr !important; gap: 18px !important; }
   .mob-video-recs > div:nth-child(2) { max-height: none !important; }
+
+  /* --- Schedule admin: table stacks on mobile --- */
+  .admin-schedule-table > div:first-child,
+  .admin-schedule-table > div:not(:first-child) {
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)) !important;
+    font-size: 11px !important;
+  }
+  .admin-schedule-table div:first-child > div { gap: 8px !important; padding: 10px 14px !important; }
+  .admin-schedule-table div:not(:first-child) > div { gap: 8px !important; padding: 10px 14px !important; }
 
   /* --- Section header (title + view-all button row) --- */
   .mob-section-hdr { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
