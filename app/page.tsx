@@ -543,10 +543,10 @@ export default function HomePage() {
 
       {/* VIDEO — YouTube-style: big player left, recommended list right */}
       {(activeVideo || recommendations.length > 0) && (
-        <section id="video" className="mob-p-section" style={{ padding: '80px 48px', background: 'var(--bg)', borderTop: `1px solid ${FANTA}33` }}>
-          <div style={{ marginBottom: 36 }}>
+        <section id="video" className="mob-p-section" style={{ padding: '74px 48px', background: 'var(--bg)', borderTop: `1px solid ${FANTA}33` }}>
+          <div style={{ marginBottom: 33 }}>
             <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>■ {t('video.label')}</div>
-            <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 72px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 12 }}>
+            <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(37px, 4.6vw, 66px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 11 }}>
               {lang === 'en' && videoHighlight?.title_en ? videoHighlight.title_en : (videoHighlight?.title || t('video.fallbackTitle'))}
             </h2>
           </div>
@@ -554,7 +554,7 @@ export default function HomePage() {
           <div className="mob-video-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 460px', gap: 28, alignItems: 'start' }}>
             {/* Main player (left) — -20% smaller to give the recs column more room */}
             <div>
-              <div style={{ position: 'relative', width: '100%', maxWidth: 1280, aspectRatio: '16/9', background: '#0a0a0a', borderLeft: `4px solid ${FANTA}` }}>
+              <div style={{ position: 'relative', width: '100%', maxWidth: 1178, aspectRatio: '16/9', background: '#0a0a0a', borderLeft: `4px solid ${FANTA}` }}>
                 {activeVideo && (
                   <iframe
                     src={toYoutubeEmbed(activeVideo.url)}
@@ -566,7 +566,7 @@ export default function HomePage() {
                 )}
               </div>
               {activeVideo?.title && (
-                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(18px, 2vw, 26px)', lineHeight: 1.2, textTransform: 'uppercase', letterSpacing: '0.01em', marginTop: 18 }}>
+                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(17px, 1.85vw, 24px)', lineHeight: 1.2, textTransform: 'uppercase', letterSpacing: '0.01em', marginTop: 16 }}>
                   {activeVideo.title}
                 </div>
               )}
@@ -580,7 +580,7 @@ export default function HomePage() {
               {recommendations.length === 0 ? (
                 <div style={{ color: 'var(--muted)', fontSize: 14, padding: '12px 0' }}>{t('video.noVideos')}</div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 13 }}>
                   {recommendations.slice(0, 5).map(v => {
                     const isActive = activeVideo?.url === v.url;
                     return (
