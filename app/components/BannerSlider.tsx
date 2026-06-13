@@ -65,11 +65,11 @@ export default function BannerSlider() {
               {caption(s) && (
                 <>
                   <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 45%)', pointerEvents: 'none' }} />
-                  <div className="banner-caption" style={{ position: 'absolute', left: 0, bottom: 0, padding: '0 48px 28px', maxWidth: '90%' }}>
-                    <span style={{ display: 'inline-block', background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', padding: '4px 12px', marginBottom: 12 }}>
+                  <div className="banner-caption" style={{ position: 'absolute', left: 0, bottom: 0, padding: '0 48px 64px', maxWidth: '90%' }}>
+                    <span style={{ display: 'inline-block', background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 12, letterSpacing: '0.16em', textTransform: 'uppercase', padding: '6px 14px', marginBottom: 16 }}>
                       {t('banner.moments')}
                     </span>
-                    <div style={{ fontFamily: 'Anton, sans-serif', color: '#fff', fontSize: 'clamp(22px, 3.4vw, 44px)', lineHeight: 1.0, textTransform: 'uppercase', letterSpacing: '0.01em', textShadow: '0 2px 16px rgba(0,0,0,0.6)' }}>
+                    <div style={{ fontFamily: 'Anton, sans-serif', color: '#fff', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 0.95, textTransform: 'uppercase', letterSpacing: '0.01em', textShadow: '0 4px 24px rgba(0,0,0,0.8)' }}>
                       {caption(s)}
                     </div>
                   </div>
@@ -81,7 +81,7 @@ export default function BannerSlider() {
             <div
               key={s.id}
               className="banner-slide"
-              style={{ flex: '0 0 100%', width: '100%', height: 'clamp(220px, 38vw, 460px)', background: '#0a0a0a' }}
+              style={{ flex: '0 0 100%', width: '100%', height: '100vh', background: '#0a0a0a' }}
             >
               {s.link_url
                 ? <a href={s.link_url} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100%', height: '100%' }}>{inner}</a>
