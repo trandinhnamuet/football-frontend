@@ -45,6 +45,21 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     setThemeState(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
 
+    // Apply the admin-set default theme exactly once per version. If the admin
+    // bumped the default since this client last applied it, force that theme
+    // and save it locally; otherwise keep the user's own saved choice.
+    api.getThemeSetting().then(({ theme, version }) => {
+      const appliedVersion = localStorage.getItem('lffc_theme_force_version');
+      if (appliedVersion !== String(version)) {
+        setThemeState(theme);
+        localStorage.setItem('lffc_theme', theme);
+        localStorage.setItem('lffc_theme_force_version', String(version));
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+    }).catch(() => {
+      // Backend unavailable — keep the locally saved theme
+    });
+
     // Fetch global i18n overrides from backend
     api.getI18n().then(overrides => {
       setI18nData({

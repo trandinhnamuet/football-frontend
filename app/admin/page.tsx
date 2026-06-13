@@ -1,13 +1,97 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import AdminGuard from '../components/AdminGuard';
 import { FANTA } from '../lib/types';
+import { api } from '../lib/api';
+import { useApp } from '../contexts/AppContext';
 
 const BLACK = 'var(--bg)';
 const CARD = 'var(--card)';
 const INK = 'var(--ink)';
 const MUTED = 'var(--muted)';
+
+function getPassword() {
+  return typeof window !== 'undefined' ? (localStorage.getItem('lffc_admin_pw') || '') : '';
+}
+
+// Sets the site-wide default theme. Bumps a version on the server so every
+// visitor gets this theme once on their next visit (overriding their saved
+// localStorage choice that one time only).
+function ThemeDefaultControl() {
+  const { setTheme } = useApp();
+  const [theme, setThemeLocal] = useState<'dark' | 'light' | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState('');
+
+  useEffect(() => {
+    api.getThemeSetting().then(({ theme }) => setThemeLocal(theme)).catch(() => {});
+  }, []);
+
+  async function apply(next: 'dark' | 'light') {
+    setSaving(true);
+    setMsg('');
+    try {
+      const res = await api.setThemeSetting(next, getPassword());
+      setThemeLocal(res.theme);
+      // Reflect on the admin's own screen immediately and mark this version as
+      // already applied so they aren't re-forced on the next reload.
+      setTheme(res.theme);
+      localStorage.setItem('lffc_theme_force_version', String(res.version));
+      setMsg(`✓ Mặc định toàn site: ${res.theme === 'dark' ? 'Tối' : 'Sáng'} (sẽ áp dụng cho mọi người ở lần truy cập tới)`);
+      setTimeout(() => setMsg(''), 5000);
+    } catch (e: any) {
+      setMsg('Lỗi: ' + (e.message || 'không lưu được'));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const btn = (mode: 'dark' | 'light', label: string, icon: string) => {
+    const active = theme === mode;
+    return (
+      <button
+        onClick={() => apply(mode)}
+        disabled={saving || active}
+        style={{
+          background: active ? FANTA : 'transparent',
+          color: active ? '#0a0a0a' : INK,
+          border: `1px solid ${active ? FANTA : 'rgba(255,255,255,0.2)'}`,
+          padding: '8px 18px', fontFamily: 'Anton, sans-serif', fontSize: 14,
+          letterSpacing: '0.04em', textTransform: 'uppercase',
+          cursor: active ? 'default' : 'pointer', opacity: saving && !active ? 0.6 : 1,
+        }}
+      >
+        {icon} {label}
+      </button>
+    );
+  };
+
+  return (
+    <div style={{ background: CARD, border: `1px solid ${FANTA}33`, borderLeft: `4px solid ${FANTA}`, padding: '18px 22px', marginBottom: 40 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+        <div>
+          <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, color: FANTA, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            🌓 Giao diện mặc định
+          </div>
+          <p style={{ color: MUTED, fontSize: 13, margin: '6px 0 0', maxWidth: 560 }}>
+            Đặt chế độ Tối/Sáng mặc định cho toàn bộ người dùng. Mỗi lần đổi sẽ áp dụng một lần cho mọi người ở lần truy cập kế tiếp; sau đó họ vẫn tự đổi và lưu lựa chọn riêng.
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
+          {btn('dark', 'Tối', '🌙')}
+          {btn('light', 'Sáng', '☀️')}
+        </div>
+      </div>
+      {msg && (
+        <div style={{ marginTop: 14, padding: '10px 14px', background: msg.startsWith('✓') ? 'rgba(31,138,91,0.15)' : 'rgba(255,50,50,0.1)', border: `1px solid ${msg.startsWith('✓') ? '#1f8a5b' : '#cc4444'}44`, fontSize: 13, color: INK }}>
+          {msg}
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface AdminSection {
   title: string;
@@ -139,6 +223,7 @@ export default function AdminPage() {
         </header>
 
         <main style={{ padding: '48px' }}>
+          <ThemeDefaultControl />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 24 }}>
             {adminSections.map((section) => (
               <Link

@@ -156,6 +156,15 @@ export const api = {
       headers: { 'x-admin-password': password },
     }),
 
+  // Site settings — global default theme
+  getThemeSetting: () => fetchJSON<{ theme: 'dark' | 'light'; version: number }>('/api/settings/theme'),
+  setThemeSetting: (theme: 'dark' | 'light', password: string) =>
+    fetchJSON<{ theme: 'dark' | 'light'; version: number }>('/api/settings/theme', {
+      method: 'PUT',
+      body: JSON.stringify({ theme }),
+      headers: { 'x-admin-password': password },
+    }),
+
   // i18n global overrides
   getI18n: () => fetchJSON<{ vi: Record<string, any>; en: Record<string, any> }>('/api/i18n'),
   updateI18n: (data: { vi?: Record<string, any>; en?: Record<string, any> }, password: string) =>
