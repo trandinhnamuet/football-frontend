@@ -553,7 +553,7 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <div className="mob-video-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 460px', gap: 28, alignItems: 'start' }}>
+          <div className="mob-video-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 620px', gap: 28, alignItems: 'start' }}>
             {/* Main player (left) — -20% smaller to give the recs column more room */}
             <div>
               <div style={{ position: 'relative', width: '100%', maxWidth: 1178, aspectRatio: '16/9', background: '#0a0a0a', borderLeft: `4px solid ${FANTA}` }}>
@@ -591,14 +591,14 @@ export default function HomePage() {
                         onClick={() => setActiveVideo({ url: v.url, title: v.title })}
                         className="video-rec-card"
                         style={{
-                          display: 'grid', gridTemplateColumns: '190px 1fr', gap: 13, alignItems: 'center',
+                          display: 'grid', gridTemplateColumns: '300px 1fr', gap: 16, alignItems: 'center',
                           background: isActive ? 'rgba(255,107,26,0.12)' : 'var(--card)',
                           border: isActive ? `1px solid ${FANTA}` : '1px solid transparent',
-                          padding: 9, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', overflow: 'hidden',
+                          padding: 12, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', overflow: 'hidden',
                         }}
                       >
                         {/* Full thumbnail — contain on black so nothing is cropped, scales down to fit */}
-                        <div style={{ position: 'relative', width: 190, aspectRatio: '16/9', background: '#000', flexShrink: 0 }}>
+                        <div style={{ position: 'relative', width: 300, aspectRatio: '16/9', background: '#000', flexShrink: 0 }}>
                           <img src={v.thumbnail} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
                           {isActive && <div style={{ position: 'absolute', top: 6, left: 6, background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 11, padding: '4px 8px', letterSpacing: '0.08em' }}>▶</div>}
                         </div>

@@ -20,15 +20,22 @@ async function getPlayers(): Promise<Player[]> {
   } catch { return []; }
 }
 
-function Avatar({ p, size = 56 }: { p: Player; size?: number }) {
-  const imgSrc = p.image_url ? `${BASE}${p.image_url}` : DEFAULT_AVATAR;
+// Large player photo — shows the full image (contain), filling empty space
+// with a blurred copy so nothing is ever cropped.
+function PlayerPhoto({ p }: { p: Player }) {
+  const src = p.zoom_image_url || p.image_url;
+  const url = src ? `${BASE}${src}` : DEFAULT_AVATAR;
   return (
-    <img
-      src={imgSrc}
-      alt={`${p.first_name} ${p.last_name}`}
-      width={size} height={size}
-      style={{ objectFit: 'cover', flexShrink: 0, clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)' }}
-    />
+    <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4', background: '#0a0a0a', overflow: 'hidden' }}>
+      {src && (
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${url})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'blur(22px)', transform: 'scale(1.15)' }} />
+      )}
+      <img
+        src={url}
+        alt={`${p.first_name} ${p.last_name}`}
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+      />
+    </div>
   );
 }
 
@@ -75,27 +82,29 @@ export default async function PlayersPage() {
                     <div style={{ fontSize: 12, color: MUTED, letterSpacing: '0.1em', textTransform: 'uppercase' }}>{group.length} cầu thủ</div>
                   </div>
                 </div>
-                <div className="mob-players-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16 }}>
+                <div className="mob-players-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 18 }}>
                   {group.map(p => (
-                    <div key={p.id} style={{ background: CARD, padding: 20, position: 'relative', overflow: 'hidden', borderLeft: `4px solid ${roleColors[role]}` }}>
-                      <div style={{ position: 'absolute', top: 8, right: 10, fontFamily: 'Anton, sans-serif', fontSize: 80, lineHeight: 0.85, color: 'rgba(255,255,255,0.04)', letterSpacing: '-0.02em' }}>{p.num}</div>
-                      <Avatar p={p} size={64} />
-                      <div style={{ marginTop: 14, fontFamily: 'Anton, sans-serif', fontSize: 20, letterSpacing: '0.02em', textTransform: 'uppercase', position: 'relative' }}>{p.first_name} {p.last_name}</div>
-                      <div style={{ fontSize: 11, color: roleColors[role], letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: 4, fontWeight: 700 }}>#{p.num} · {role}</div>
-                      <div style={{ fontSize: 12, color: MUTED, marginTop: 4, fontStyle: 'italic' }}>"{p.nick}"</div>
-                      <div style={{ marginTop: 12, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, paddingTop: 12, borderTop: `1px solid ${LINE}` }}>
-                        {role === 'GK' ? (
-                          <><StatChip label="Cứu" value={p.stat_saves} /><StatChip label="Đ.chuyền" value={p.stat_passes} /><StatChip label="Trận" value={p.stat_attendance} /></>
-                        ) : (
-                          <><StatChip label="Bàn" value={p.stat_goals} /><StatChip label="Kiến tạo" value={p.stat_assists} /><StatChip label="Tắc" value={p.stat_tackles} /></>
+                    <div key={p.id} style={{ background: CARD, position: 'relative', overflow: 'hidden', borderLeft: `4px solid ${roleColors[role]}` }}>
+                      <PlayerPhoto p={p} />
+                      <div style={{ padding: 20, position: 'relative' }}>
+                        <div style={{ position: 'absolute', top: -4, right: 12, fontFamily: 'Anton, sans-serif', fontSize: 64, lineHeight: 0.85, color: 'rgba(128,128,128,0.10)', letterSpacing: '-0.02em', pointerEvents: 'none' }}>{p.num}</div>
+                        <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.02em', textTransform: 'uppercase', position: 'relative' }}>{p.first_name} {p.last_name}</div>
+                        <div style={{ fontSize: 11, color: roleColors[role], letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: 4, fontWeight: 700 }}>#{p.num} · {role}</div>
+                        <div style={{ fontSize: 12, color: MUTED, marginTop: 4, fontStyle: 'italic' }}>"{p.nick}"</div>
+                        <div style={{ marginTop: 12, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, paddingTop: 12, borderTop: `1px solid ${LINE}` }}>
+                          {role === 'GK' ? (
+                            <><StatChip label="Cứu" value={p.stat_saves} /><StatChip label="Đ.chuyền" value={p.stat_passes} /><StatChip label="Trận" value={p.stat_attendance} /></>
+                          ) : (
+                            <><StatChip label="Bàn" value={p.stat_goals} /><StatChip label="Kiến tạo" value={p.stat_assists} /><StatChip label="Tắc" value={p.stat_tackles} /></>
+                          )}
+                        </div>
+                        {p.stat_points > 0 && (
+                          <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: 10, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Điểm</span>
+                            <span style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, color: FANTA }}>{Math.round(p.stat_points)}</span>
+                          </div>
                         )}
                       </div>
-                      {p.stat_points > 0 && (
-                        <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: 10, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Điểm</span>
-                          <span style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, color: FANTA }}>{Math.round(p.stat_points)}</span>
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>
