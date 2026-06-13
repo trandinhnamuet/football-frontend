@@ -48,7 +48,7 @@ export default function Footer() {
               height={96}
               style={{ objectFit: 'contain', flexShrink: 0 }}
             />
-            <div className="mob-footer-title" style={{ fontFamily: 'Anton, sans-serif', fontSize: 64, lineHeight: 0.9, textTransform: 'uppercase', letterSpacing: '0.01em', color: 'var(--ink)' }}>
+            <div className="mob-footer-title" style={{ fontFamily: 'Anton, sans-serif', fontSize: 64, lineHeight: 0.9, textTransform: 'uppercase', letterSpacing: '0.01em', color: 'var(--ink)', marginTop: 15 }}>
               LON FANTA <span style={{ color: FANTA }}>FC</span>
             </div>
           </div>
