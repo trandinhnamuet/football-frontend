@@ -61,14 +61,14 @@ export default function BannerSlider() {
                 <img
                   src={resolveSrc(s.image_url)}
                   alt=""
-                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'blur(8px)', opacity: 0.4, zIndex: 0 }}
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'blur(10px)', zIndex: 0 }}
                 />
               )}
-              {/* Main image with contain */}
+              {/* Main image with contain — sits on top, allows blurred bg to show through empty space */}
               <img
                 src={resolveSrc(s.image_url)}
                 alt={caption(s) || 'Banner'}
-                style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', objectFit: 'contain', display: 'block', backgroundColor: '#1a1a1a' }}
+                style={{ position: 'absolute', inset: 0, zIndex: 1, width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
               />
               {/* gradient + caption */}
               {caption(s) && (
