@@ -115,15 +115,14 @@ export default function HomePage() {
         setTeamStats(ts);
         setVideoHighlight(vh);
         setAboutData(ab);
-        if (vh && vh.is_active && vh.youtube_url) {
-          setActiveVideo(prev => prev ?? { url: vh.youtube_url, title: vh.title || '' });
-        }
       }).catch(() => {});
 
     // Load from DB immediately
     loadData();
 
-    // Recommended videos from the YouTube channel (RSS-backed, cached server-side)
+    // Recommended videos from the YouTube channel (RSS-backed, cached server-side).
+    // The main player always shows the latest channel video (recs[0]); the rest
+    // (2nd–6th) appear in the recommendations column.
     api.getVideoRecommendations().then(recs => {
       setRecommendations(recs);
       setActiveVideo(prev => prev ?? (recs[0] ? { url: recs[0].url, title: recs[0].title } : null));
@@ -596,7 +595,7 @@ export default function HomePage() {
                 <div style={{ color: 'var(--muted)', fontSize: 14, padding: '12px 0' }}>{t('video.noVideos')}</div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 13 }}>
-                  {recommendations.slice(0, 5).map(v => {
+                  {recommendations.slice(1, 6).map(v => {
                     const isActive = activeVideo?.url === v.url;
                     return (
                       <button
@@ -650,7 +649,8 @@ export default function HomePage() {
           <div>
             <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>{t('cta.label')}</div>
             <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 8 }}>
-              {t('cta.title1')}<br />{t('cta.title2')}
+              <div>{t('cta.title1')}</div>
+              <div style={{ marginTop: 20 }}>{t('cta.title2')}</div>
             </div>
           </div>
           <Link href="/dashboard" style={{ background: '#0a0a0a', color: FANTA, padding: '24px 40px', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.04em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
