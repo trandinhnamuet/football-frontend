@@ -327,14 +327,14 @@ export default function HomePage() {
                 </div>
               </div>
               {/* Info side */}
-              <div style={{ padding: '28px 32px', display: 'grid', gridTemplateRows: 'auto 1fr auto', height: '100%' }}>
+              <div style={{ padding: '40px 48px', display: 'grid', gridTemplateRows: 'auto 1fr auto', height: '100%' }}>
                 {/* Top: Week & teams */}
                 <div>
-                  <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 8 }}>{t('hero.week')} {next.week}</div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(20px, 2.5vw, 28px)', color: FANTA, textTransform: 'uppercase' }}>Lon Fanta FC</div>
-                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 16, color: 'var(--muted)', textTransform: 'uppercase' }}>{t('schedule.vs')}</div>
-                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(20px, 2.5vw, 28px)', textTransform: 'uppercase' }}>{next.opponent}</div>
+                  <div style={{ fontSize: 12, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 12 }}>{t('hero.week')} {next.week}</div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
+                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 56px)', color: FANTA, textTransform: 'uppercase' }}>Lon Fanta FC</div>
+                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, color: 'var(--muted)', textTransform: 'uppercase' }}>{t('schedule.vs')}</div>
+                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 56px)', textTransform: 'uppercase' }}>{next.opponent}</div>
                   </div>
                 </div>
 
@@ -342,16 +342,16 @@ export default function HomePage() {
                 <div />
 
                 {/* Bottom: Date & time & venue */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
                   <div>
-                    <div style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>{fmtDate(next.date)}</div>
-                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(24px, 3vw, 36px)', color: FANTA, marginTop: 4 }}>{next.time || '17:30'}</div>
-                    <div style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 2 }}>{t('schedule.kickoff')}</div>
+                    <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>{fmtDate(next.date)}</div>
+                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 72px)', color: FANTA, marginTop: 6 }}>{next.time || '17:30'}</div>
+                    <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 4 }}>{t('schedule.kickoff')}</div>
                   </div>
                   {next.venue && (
                     <div>
-                      <div style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>📍 {t('schedule.venue')}</div>
-                      <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(18px, 2.5vw, 26px)', marginTop: 4, textTransform: 'uppercase' }}>{next.venue}</div>
+                      <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>📍 {t('schedule.venue')}</div>
+                      <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(36px, 5vw, 52px)', marginTop: 6, textTransform: 'uppercase' }}>{next.venue}</div>
                     </div>
                   )}
                 </div>
@@ -540,10 +540,10 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <div className="mob-video-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 520px', gap: 24, alignItems: 'start' }}>
-            {/* Main player (left) — smaller */}
+          <div className="mob-video-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 1fr', gap: 24, alignItems: 'start' }}>
+            {/* Main player (left) — larger */}
             <div>
-              <div style={{ position: 'relative', width: '100%', maxWidth: 640, aspectRatio: '16/9', background: '#0a0a0a', borderLeft: `4px solid ${FANTA}` }}>
+              <div style={{ position: 'relative', width: '100%', maxWidth: 1152, aspectRatio: '16/9', background: '#0a0a0a', borderLeft: `4px solid ${FANTA}` }}>
                 {activeVideo && (
                   <iframe
                     src={toYoutubeEmbed(activeVideo.url)}
@@ -569,7 +569,7 @@ export default function HomePage() {
               {recommendations.length === 0 ? (
                 <div style={{ color: 'var(--muted)', fontSize: 14, padding: '12px 0' }}>{t('video.noVideos')}</div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxHeight: 580, overflowY: 'auto', paddingRight: 6 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxHeight: 960, overflowY: 'auto', paddingRight: 6 }}>
                   {recommendations.map(v => {
                     const isActive = activeVideo?.url === v.url;
                     return (
@@ -577,21 +577,21 @@ export default function HomePage() {
                         key={v.videoId}
                         onClick={() => setActiveVideo({ url: v.url, title: v.title })}
                         style={{
-                          display: 'grid', gridTemplateColumns: '180px 1fr', gap: 14, alignItems: 'stretch',
+                          display: 'grid', gridTemplateColumns: '320px 1fr', gap: 16, alignItems: 'stretch',
                           background: isActive ? 'rgba(255,107,26,0.12)' : 'var(--card)',
                           border: isActive ? `1px solid ${FANTA}` : '1px solid transparent',
-                          padding: 10, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', overflow: 'hidden',
+                          padding: 12, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', overflow: 'hidden',
                         }}
                       >
-                        <div style={{ position: 'relative', width: 180, aspectRatio: '16/9', background: '#0a0a0a', flexShrink: 0 }}>
+                        <div style={{ position: 'relative', width: 320, aspectRatio: '16/9', background: '#0a0a0a', flexShrink: 0 }}>
                           <img src={v.thumbnail} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                          {isActive && <div style={{ position: 'absolute', top: 6, left: 6, background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 10, padding: '3px 7px', letterSpacing: '0.08em' }}>▶</div>}
+                          {isActive && <div style={{ position: 'absolute', top: 8, left: 8, background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 12, padding: '5px 10px', letterSpacing: '0.08em' }}>▶</div>}
                         </div>
-                        <div style={{ padding: '4px 6px', minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                          <div style={{ fontSize: 14, lineHeight: 1.35, color: 'var(--ink)', fontWeight: 600, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        <div style={{ padding: '8px 12px', minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                          <div style={{ fontSize: 16, lineHeight: 1.35, color: 'var(--ink)', fontWeight: 600, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                             {v.title}
                           </div>
-                          <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 6 }}>{v.published ? fmtDate(v.published) : ''}</div>
+                          <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 8 }}>{v.published ? fmtDate(v.published) : ''}</div>
                         </div>
                       </button>
                     );
