@@ -327,21 +327,31 @@ export default function HomePage() {
                 </div>
               </div>
               {/* Info side */}
-              <div style={{ padding: '32px 36px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <div style={{ fontSize: 12, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>{t('hero.week')} {next.week}</div>
-                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 14, color: FANTA, letterSpacing: '0.06em', textTransform: 'uppercase', marginTop: 14 }}>Lon Fanta FC</div>
-                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, color: 'var(--muted)', margin: '4px 0', textTransform: 'uppercase' }}>{t('schedule.vs')}</div>
-                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(32px, 4vw, 52px)', lineHeight: 0.95, textTransform: 'uppercase', letterSpacing: '0.01em' }}>{next.opponent}</div>
-                <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', marginTop: 24 }}>
+              <div style={{ padding: '28px 32px', display: 'grid', gridTemplateRows: 'auto 1fr auto', height: '100%' }}>
+                {/* Top: Week & teams */}
+                <div>
+                  <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 8 }}>{t('hero.week')} {next.week}</div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(20px, 2.5vw, 28px)', color: FANTA, textTransform: 'uppercase' }}>Lon Fanta FC</div>
+                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 16, color: 'var(--muted)', textTransform: 'uppercase' }}>{t('schedule.vs')}</div>
+                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(20px, 2.5vw, 28px)', textTransform: 'uppercase' }}>{next.opponent}</div>
+                  </div>
+                </div>
+
+                {/* Middle: Spacer */}
+                <div />
+
+                {/* Bottom: Date & time & venue */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
                   <div>
                     <div style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>{fmtDate(next.date)}</div>
-                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 28, color: FANTA, marginTop: 2 }}>{next.time || '17:30'}</div>
-                    <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{t('schedule.kickoff')}</div>
+                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(24px, 3vw, 36px)', color: FANTA, marginTop: 4 }}>{next.time || '17:30'}</div>
+                    <div style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 2 }}>{t('schedule.kickoff')}</div>
                   </div>
                   {next.venue && (
-                    <div style={{ borderLeft: '1px solid var(--line)', paddingLeft: 28 }}>
-                      <div style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>📍</div>
-                      <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, marginTop: 6, textTransform: 'uppercase' }}>{next.venue}</div>
+                    <div>
+                      <div style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>📍 {t('schedule.venue')}</div>
+                      <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(18px, 2.5vw, 26px)', marginTop: 4, textTransform: 'uppercase' }}>{next.venue}</div>
                     </div>
                   )}
                 </div>
@@ -357,15 +367,16 @@ export default function HomePage() {
             {upcoming.length <= 1 ? (
               <div style={{ color: 'var(--muted)', fontSize: 14, padding: '20px 0' }}>{t('schedule.noUpcoming')}</div>
             ) : upcoming.slice(1).map(m => (
-              <div key={m.id} style={{ background: 'var(--card)', padding: '16px 14px', marginBottom: 12, display: 'grid', gridTemplateColumns: '80px 1fr auto', gap: 12, alignItems: 'center', borderLeft: `3px solid ${FANTA}`, minHeight: 80 }}>
-                <div style={{ width: 80, height: 64, background: '#0a0a0a', backgroundImage: m.image_url ? `url(${resolveImg(m.image_url)})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {!m.image_url && <JerseyNumber n={m.week} size={22} color={FANTA} />}
+              <div key={m.id} style={{ background: 'var(--card)', padding: '12px 14px', marginBottom: 14, display: 'grid', gridTemplateColumns: '120px 1fr', gap: 14, alignItems: 'stretch', borderLeft: `3px solid ${FANTA}`, minHeight: 120 }}>
+                <div style={{ width: 120, height: 120, background: '#0a0a0a', backgroundImage: m.image_url ? `url(${resolveImg(m.image_url)})` : 'none', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {!m.image_url && <JerseyNumber n={m.week} size={28} color={FANTA} />}
                 </div>
-                <div>
-                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 17, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{m.opponent}</div>
-                  <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{fmtDate(m.date)} · {m.venue}</div>
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 6 }}>
+                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{m.opponent}</div>
+                  <div style={{ fontSize: 12, color: 'var(--muted)' }}>{fmtDate(m.date)}</div>
+                  <div style={{ fontSize: 12, color: 'var(--muted)' }}>{m.venue}</div>
+                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, color: FANTA, marginTop: 4 }}>{m.time || '17:30'}</div>
                 </div>
-                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 16, color: 'var(--ink)' }}>{m.time || '17:30'}</div>
               </div>
             ))}
           </div>
@@ -374,15 +385,16 @@ export default function HomePage() {
             {played.length === 0 ? (
               <div style={{ color: 'var(--muted)', fontSize: 14, padding: '20px 0' }}>—</div>
             ) : [...played].reverse().slice(0, 6).map(m => (
-              <div key={m.id} style={{ background: 'var(--card)', padding: '10px 12px', marginBottom: 8, display: 'grid', gridTemplateColumns: '1fr auto 1fr auto', gap: 8, alignItems: 'center', fontSize: 13 }}>
+              <div key={m.id} style={{ background: 'var(--card)', padding: '10px 12px', marginBottom: 8, display: 'grid', gridTemplateColumns: '1fr auto 1fr auto auto', gap: 8, alignItems: 'center', fontSize: 12 }}>
                 <div style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 14, textTransform: 'uppercase' }}>{m.opponent}</div>
+                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 13, textTransform: 'uppercase' }}>{m.opponent}</div>
+                  <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 1 }}>{fmtDate(m.date)}</div>
                 </div>
                 <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 15, color: 'var(--ink)', fontWeight: 600 }}>{m.score}</div>
                 <div style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 14, textTransform: 'uppercase' }}>Lon Fanta</div>
+                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 13, textTransform: 'uppercase' }}>Lon Fanta</div>
                 </div>
-                <div style={{ width: 26, height: 26, background: m.result === 'W' ? FANTA : m.result === 'D' ? 'var(--muted)' : '#aa2222', color: m.result === 'W' ? '#0a0a0a' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 12, flexShrink: 0 }}>{m.result}</div>
+                <div style={{ width: 24, height: 24, background: m.result === 'W' ? FANTA : m.result === 'D' ? 'var(--muted)' : '#aa2222', color: m.result === 'W' ? '#0a0a0a' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 11, flexShrink: 0 }}>{m.result}</div>
               </div>
             ))}
           </div>
