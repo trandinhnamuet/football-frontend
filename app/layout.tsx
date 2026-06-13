@@ -3,8 +3,31 @@ import './globals.css';
 import { AppContextProvider } from './contexts/AppContext';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://lonfantafc.com'),
   title: 'Lon Fanta FC',
   description: 'Đội bóng phong trào Hà Nội — #ĐamMêBấtTận',
+  openGraph: {
+    title: 'Lon Fanta FC',
+    description: 'Đội bóng phong trào Hà Nội — #ĐamMêBấtTận',
+    type: 'website',
+    locale: 'vi_VN',
+    url: 'https://lonfantafc.com',
+    siteName: 'Lon Fanta FC',
+    images: [
+      {
+        url: '/api/og',
+        width: 1200,
+        height: 630,
+        alt: 'Lon Fanta FC - Trận đấu sắp tới',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Lon Fanta FC',
+    description: 'Đội bóng phong trào Hà Nội — #ĐamMêBấtTận',
+    images: ['/api/og'],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
