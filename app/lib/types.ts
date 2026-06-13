@@ -8,6 +8,7 @@ export interface Player {
   boots: string;
   nick: string;
   image_url: string | null;
+  zoom_image_url: string | null;
   is_active: boolean;
   stat_goals: number;
   stat_assists: number;

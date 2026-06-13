@@ -50,7 +50,9 @@ function JerseyNumber({ n, size = 80, color = 'var(--ink)' }: { n: number | stri
 }
 
 function Avatar({ p, size = 56 }: { p: Player; size?: number }) {
-  const imgSrc = p.image_url ? `${BASE}${p.image_url}` : DEFAULT_AVATAR;
+  // Prefer the dedicated "zoom" photo, fall back to the avatar, then default
+  const src = p.zoom_image_url || p.image_url;
+  const imgSrc = src ? `${BASE}${src}` : DEFAULT_AVATAR;
   return (
     <img
       src={imgSrc}
@@ -450,7 +452,7 @@ export default function HomePage() {
                       {/* Large avatar overflowing the card top */}
                       <div style={{ position: 'absolute', top: -110, left: 16 }}>
                         <img
-                          src={p.image_url ? `${BASE}${p.image_url}` : DEFAULT_AVATAR}
+                          src={(p.zoom_image_url || p.image_url) ? `${BASE}${p.zoom_image_url || p.image_url}` : DEFAULT_AVATAR}
                           alt={p.first_name}
                           width={240} height={240}
                           style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'block' }}

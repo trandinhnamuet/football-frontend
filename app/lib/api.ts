@@ -47,6 +47,17 @@ export const api = {
     if (r.status === 401) { handleUnauthorized(); throw new Error('Unauthorized'); }
     return r.json();
   },
+  uploadPlayerZoomImage: async (id: number, file: File, password: string) => {
+    const form = new FormData();
+    form.append('image', file);
+    const r = await fetch(`${BASE}/api/players/${id}/zoom-image`, {
+      method: 'PATCH',
+      headers: { 'x-admin-password': password },
+      body: form,
+    });
+    if (r.status === 401) { handleUnauthorized(); throw new Error('Unauthorized'); }
+    return r.json();
+  },
   createPlayer: (data: Partial<Player>, password: string) =>
     fetchJSON<Player>('/api/players', {
       method: 'POST',

@@ -27,7 +27,7 @@ const ALL_ROLES = ['Tự do', 'GK', 'DEF', 'MID', 'FWD'];
 interface EditModalProps {
   player: Player;
   isNew?: boolean;
-  onSave: (id: number, data: Partial<Player>, file: File | null) => Promise<void>;
+  onSave: (id: number, data: Partial<Player>, file: File | null, zoomFile: File | null) => Promise<void>;
   onDelete?: (id: number) => Promise<void>;
   onClose: () => void;
 }
@@ -44,6 +44,8 @@ function EditModal({ player, isNew, onSave, onDelete, onClose }: EditModalProps)
   });
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [zoomFile, setZoomFile] = useState<File | null>(null);
+  const [zoomPreview, setZoomPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
@@ -55,6 +57,12 @@ function EditModal({ player, isNew, onSave, onDelete, onClose }: EditModalProps)
     const f = e.target.files?.[0] || null;
     setFile(f);
     if (f) setPreview(URL.createObjectURL(f));
+  }
+
+  function handleZoomFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0] || null;
+    setZoomFile(f);
+    if (f) setZoomPreview(URL.createObjectURL(f));
   }
 
   async function handleSave() {
@@ -71,7 +79,7 @@ function EditModal({ player, isNew, onSave, onDelete, onClose }: EditModalProps)
         joined: form.joined,
       };
       if (form.num.trim()) payload.num = parseInt(form.num, 10);
-      await onSave(player.id, payload, file);
+      await onSave(player.id, payload, file, zoomFile);
       onClose();
     } catch (e: any) { setError(e.message || 'Lỗi lưu'); }
     finally { setSaving(false); }
@@ -114,35 +122,63 @@ function EditModal({ player, isNew, onSave, onDelete, onClose }: EditModalProps)
         </div>
 
         <div style={{ padding: '28px' }}>
-          {/* Avatar preview + upload */}
-          <div style={{ display: 'flex', gap: 20, marginBottom: 24, alignItems: 'flex-start' }}>
-            <div style={{ flexShrink: 0 }}>
-              {(preview || player.image_url) ? (
-                <img
-                  src={preview || `${BASE}${player.image_url}`}
-                  alt="Avatar"
-                  width={90} height={90}
-                  style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'block' }}
-                />
-              ) : (
-                <Image
-                  src={DEFAULT_PLAYER_AVATAR_URL}
-                  alt="Default Avatar"
-                  width={90}
-                  height={90}
-                  style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'block' }}
-                />
-              )}
+          {/* Two images: avatar + zoom */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
+            {/* Avatar */}
+            <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+              <div style={{ flexShrink: 0 }}>
+                {(preview || player.image_url) ? (
+                  <img
+                    src={preview || `${BASE}${player.image_url}`}
+                    alt="Avatar"
+                    width={72} height={72}
+                    style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'block' }}
+                  />
+                ) : (
+                  <Image
+                    src={DEFAULT_PLAYER_AVATAR_URL}
+                    alt="Default Avatar"
+                    width={72}
+                    height={72}
+                    style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'block' }}
+                  />
+                )}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <label style={labelStyle}>Ảnh đại diện</label>
+                <label style={{ display: 'block', background: 'rgba(255,255,255,0.06)', border: `1px dashed ${LINE}`, color: MUTED, padding: '10px 14px', fontSize: 13, cursor: 'pointer', textAlign: 'center' }}>
+                  {file ? '✓ Đã chọn' : '+ Chọn ảnh'}
+                  <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+                </label>
+                {player.image_url && !file && (
+                  <div style={{ fontSize: 11, color: MUTED, marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{player.image_url.split('/').pop()}</div>
+                )}
+              </div>
             </div>
-            <div style={{ flex: 1 }}>
-              <label style={labelStyle}>Ảnh đại diện</label>
-              <label style={{ display: 'block', background: 'rgba(255,255,255,0.06)', border: `1px dashed ${LINE}`, color: MUTED, padding: '10px 14px', fontSize: 13, cursor: 'pointer', textAlign: 'center' }}>
-                {file ? `✓ ${file.name}` : '+ Chọn ảnh mới'}
-                <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
-              </label>
-              {player.image_url && !file && (
-                <div style={{ fontSize: 11, color: MUTED, marginTop: 4 }}>Ảnh hiện tại: {player.image_url.split('/').pop()}</div>
-              )}
+            {/* Zoom image — used on homepage hero & squad */}
+            <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+              <div style={{ flexShrink: 0 }}>
+                {(zoomPreview || player.zoom_image_url) ? (
+                  <img
+                    src={zoomPreview || `${BASE}${player.zoom_image_url}`}
+                    alt="Zoom"
+                    width={72} height={72}
+                    style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'block' }}
+                  />
+                ) : (
+                  <div style={{ width: 72, height: 72, background: 'rgba(255,255,255,0.06)', border: `1px dashed ${LINE}`, clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: MUTED, fontSize: 22 }}>🔍</div>
+                )}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <label style={labelStyle}>Ảnh zoom (trang chủ)</label>
+                <label style={{ display: 'block', background: 'rgba(255,255,255,0.06)', border: `1px dashed ${LINE}`, color: MUTED, padding: '10px 14px', fontSize: 13, cursor: 'pointer', textAlign: 'center' }}>
+                  {zoomFile ? '✓ Đã chọn' : '+ Chọn ảnh'}
+                  <input type="file" accept="image/*" onChange={handleZoomFileChange} style={{ display: 'none' }} />
+                </label>
+                {player.zoom_image_url && !zoomFile && (
+                  <div style={{ fontSize: 11, color: MUTED, marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{player.zoom_image_url.split('/').pop()}</div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -330,15 +366,12 @@ function PlayerManagementContent() {
     finally { setImporting(false); }
   }
 
-  async function handleSavePlayer(id: number, data: Partial<Player>, file: File | null) {
+  async function handleSavePlayer(id: number, data: Partial<Player>, file: File | null, zoomFile: File | null) {
     const pw = getPassword();
-    if (addingPlayer) {
-      const created = await api.createPlayer(data, pw);
-      if (file) await api.uploadPlayerImage(created.id, file, pw);
-    } else {
-      await api.updatePlayer(id, data, pw);
-      if (file) await api.uploadPlayerImage(id, file, pw);
-    }
+    const targetId = addingPlayer ? (await api.createPlayer(data, pw)).id : id;
+    if (!addingPlayer) await api.updatePlayer(id, data, pw);
+    if (file) await api.uploadPlayerImage(targetId, file, pw);
+    if (zoomFile) await api.uploadPlayerZoomImage(targetId, zoomFile, pw);
     await loadPlayers();
   }
 
@@ -349,7 +382,7 @@ function PlayerManagementContent() {
 
   const blankPlayer = {
     id: 0, num: 0, first_name: '', last_name: '', role: 'Tự do', joined: new Date().getFullYear().toString(),
-    boots: 'Phải', nick: '', image_url: '', is_active: true,
+    boots: 'Phải', nick: '', image_url: '', zoom_image_url: '', is_active: true,
     stat_goals: 0, stat_assists: 0, stat_saves: 0, stat_tackles: 0, stat_passes: 0,
     stat_attendance: 0, stat_minutes: 0, stat_points: 0, stat_matches: 0,
   } as unknown as Player;
