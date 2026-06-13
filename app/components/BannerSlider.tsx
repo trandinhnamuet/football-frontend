@@ -59,7 +59,7 @@ export default function BannerSlider() {
               <img
                 src={resolveSrc(s.image_url)}
                 alt={caption(s) || 'Banner'}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', backgroundColor: '#1a1a1a' }}
               />
               {/* gradient + caption */}
               {caption(s) && (
@@ -81,7 +81,7 @@ export default function BannerSlider() {
             <div
               key={s.id}
               className="banner-slide"
-              style={{ flex: '0 0 100%', width: '100%', height: '100vh', background: '#0a0a0a' }}
+              style={{ flex: '0 0 100%', width: '100%', height: '60vh', background: '#0a0a0a' }}
             >
               {s.link_url
                 ? <a href={s.link_url} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100%', height: '100%' }}>{inner}</a>

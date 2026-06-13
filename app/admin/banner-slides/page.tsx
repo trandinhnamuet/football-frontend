@@ -162,7 +162,7 @@ function BannerSlidesContent() {
     setBusy(true);
     try {
       const created = await api.createBannerSlide({ caption: '', caption_en: '', image_url: '', is_active: true }, getPassword());
-      setSlides(s => [...s, created]);
+      setSlides(s => [created, ...s]);
       flash('✓ Đã thêm ảnh mới — hãy tải ảnh lên');
     } catch (e: any) { flash('Lỗi: ' + e.message); }
     finally { setBusy(false); }
