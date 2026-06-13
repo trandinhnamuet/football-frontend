@@ -542,10 +542,10 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <div className="mob-video-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 340px', gap: 28, alignItems: 'start' }}>
-            {/* Main player (left) — +40% larger, narrower recs give it the room */}
+          <div className="mob-video-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 460px', gap: 28, alignItems: 'start' }}>
+            {/* Main player (left) — -20% smaller to give the recs column more room */}
             <div>
-              <div style={{ position: 'relative', width: '100%', maxWidth: 1600, aspectRatio: '16/9', background: '#0a0a0a', borderLeft: `4px solid ${FANTA}` }}>
+              <div style={{ position: 'relative', width: '100%', maxWidth: 1280, aspectRatio: '16/9', background: '#0a0a0a', borderLeft: `4px solid ${FANTA}` }}>
                 {activeVideo && (
                   <iframe
                     src={toYoutubeEmbed(activeVideo.url)}
@@ -579,20 +579,20 @@ export default function HomePage() {
                         key={v.videoId}
                         onClick={() => setActiveVideo({ url: v.url, title: v.title })}
                         style={{
-                          display: 'flex', flexDirection: 'column',
+                          display: 'grid', gridTemplateColumns: '200px 1fr', gap: 14, alignItems: 'center',
                           background: isActive ? 'rgba(255,107,26,0.12)' : 'var(--card)',
                           border: isActive ? `1px solid ${FANTA}` : '1px solid transparent',
-                          padding: 0, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', overflow: 'hidden',
+                          padding: 10, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', overflow: 'hidden',
                         }}
                       >
-                        {/* Full thumbnail — contain on black so nothing is cropped */}
-                        <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', background: '#000' }}>
+                        {/* Full thumbnail — contain on black so nothing is cropped, scales down to fit */}
+                        <div style={{ position: 'relative', width: 200, aspectRatio: '16/9', background: '#000', flexShrink: 0 }}>
                           <img src={v.thumbnail} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
-                          {isActive && <div style={{ position: 'absolute', top: 8, left: 8, background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 12, padding: '5px 10px', letterSpacing: '0.08em' }}>▶</div>}
+                          {isActive && <div style={{ position: 'absolute', top: 6, left: 6, background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 11, padding: '4px 8px', letterSpacing: '0.08em' }}>▶</div>}
                         </div>
                         {/* Info: title + publish date */}
-                        <div style={{ padding: '12px 14px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                          <div style={{ fontSize: 15, lineHeight: 1.35, color: 'var(--ink)', fontWeight: 600, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                          <div style={{ fontSize: 15, lineHeight: 1.35, color: 'var(--ink)', fontWeight: 600, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                             {v.title}
                           </div>
                           {v.published && (
