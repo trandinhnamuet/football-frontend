@@ -367,15 +367,15 @@ export default function HomePage() {
             {upcoming.length <= 1 ? (
               <div style={{ color: 'var(--muted)', fontSize: 14, padding: '20px 0' }}>{t('schedule.noUpcoming')}</div>
             ) : upcoming.slice(1).map(m => (
-              <div key={m.id} style={{ background: 'var(--card)', padding: '12px 14px', marginBottom: 14, display: 'grid', gridTemplateColumns: '120px 1fr', gap: 14, alignItems: 'stretch', borderLeft: `3px solid ${FANTA}`, minHeight: 120 }}>
-                <div style={{ width: 120, height: 120, background: '#0a0a0a', backgroundImage: m.image_url ? `url(${resolveImg(m.image_url)})` : 'none', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {!m.image_url && <JerseyNumber n={m.week} size={28} color={FANTA} />}
+              <div key={m.id} style={{ background: 'var(--card)', padding: '16px 18px', marginBottom: 16, display: 'grid', gridTemplateColumns: '160px 1fr', gap: 18, alignItems: 'stretch', borderLeft: `3px solid ${FANTA}`, minHeight: 160 }}>
+                <div style={{ width: 160, height: 160, background: '#0a0a0a', backgroundImage: m.image_url ? `url(${resolveImg(m.image_url)})` : 'none', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {!m.image_url && <JerseyNumber n={m.week} size={36} color={FANTA} />}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 6 }}>
-                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{m.opponent}</div>
-                  <div style={{ fontSize: 12, color: 'var(--muted)' }}>{fmtDate(m.date)}</div>
-                  <div style={{ fontSize: 12, color: 'var(--muted)' }}>{m.venue}</div>
-                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, color: FANTA, marginTop: 4 }}>{m.time || '17:30'}</div>
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 8 }}>
+                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{m.opponent}</div>
+                  <div style={{ fontSize: 16, color: 'var(--muted)' }}>{fmtDate(m.date)}</div>
+                  <div style={{ fontSize: 16, color: 'var(--muted)' }}>{m.venue}</div>
+                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, color: FANTA, marginTop: 6 }}>{m.time || '17:30'}</div>
                 </div>
               </div>
             ))}
@@ -385,16 +385,18 @@ export default function HomePage() {
             {played.length === 0 ? (
               <div style={{ color: 'var(--muted)', fontSize: 14, padding: '20px 0' }}>—</div>
             ) : [...played].reverse().slice(0, 6).map(m => (
-              <div key={m.id} style={{ background: 'var(--card)', padding: '10px 12px', marginBottom: 8, display: 'grid', gridTemplateColumns: '1fr auto 1fr auto auto', gap: 8, alignItems: 'center', fontSize: 12 }}>
-                <div style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div key={m.id} style={{ background: 'var(--card)', padding: '10px 12px', marginBottom: 8, display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, alignItems: 'center', fontSize: 12 }}>
+                <div style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}>
                   <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 13, textTransform: 'uppercase' }}>{m.opponent}</div>
                   <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 1 }}>{fmtDate(m.date)}</div>
                 </div>
-                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 15, color: 'var(--ink)', fontWeight: 600 }}>{m.score}</div>
-                <div style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 15, color: 'var(--ink)', fontWeight: 600, minWidth: 32, textAlign: 'center' }}>{m.score}</div>
+                  <div style={{ width: 22, height: 22, background: m.result === 'W' ? FANTA : m.result === 'D' ? 'var(--muted)' : '#aa2222', color: m.result === 'W' ? '#0a0a0a' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 10, flexShrink: 0 }}>{m.result}</div>
+                </div>
+                <div style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'right' }}>
                   <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 13, textTransform: 'uppercase' }}>Lon Fanta</div>
                 </div>
-                <div style={{ width: 24, height: 24, background: m.result === 'W' ? FANTA : m.result === 'D' ? 'var(--muted)' : '#aa2222', color: m.result === 'W' ? '#0a0a0a' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 11, flexShrink: 0 }}>{m.result}</div>
               </div>
             ))}
           </div>
