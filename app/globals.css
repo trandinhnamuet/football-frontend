@@ -261,7 +261,7 @@ input, textarea, select, button {
   }
 
   /* --- Banner slider --- */
-  .banner-slide { height: 63vh !important; min-height: 63vh !important; }
+  .banner-slide { aspect-ratio: 16 / 9 !important; height: auto !important; min-height: 0 !important; }
   .banner-arrow { width: 34px !important; height: 34px !important; font-size: 20px !important; }
   .banner-caption { padding: 0 16px 32px !important; }
   .banner-caption span { font-size: 11px !important; padding: 4px 10px !important; }
