@@ -90,7 +90,7 @@ export default function BannerSlider() {
             <div
               key={s.id}
               className="banner-slide"
-              style={{ flex: '0 0 100%', width: '100%', aspectRatio: '16 / 9', background: '#0a0a0a' }}
+              style={{ flex: '0 0 100%', width: '100%', aspectRatio: '1920 / 850', background: '#0a0a0a' }}
             >
               {s.link_url
                 ? <a href={s.link_url} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100%', height: '100%' }}>{inner}</a>
