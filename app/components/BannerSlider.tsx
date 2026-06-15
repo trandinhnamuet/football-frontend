@@ -61,7 +61,7 @@ export default function BannerSlider() {
                 <img
                   src={resolveSrc(s.image_url)}
                   alt=""
-                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'blur(10px)', zIndex: 0 }}
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'blur(10px) brightness(0.45)', zIndex: 0 }}
                 />
               )}
               {/* Main image with contain — sits on top, allows blurred bg to show through empty space */}
