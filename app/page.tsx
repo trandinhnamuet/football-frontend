@@ -425,7 +425,7 @@ export default function HomePage() {
             <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 1.0, textTransform: 'uppercase', marginTop: 16 }}>{t('squad.title')}</h2>
             <p style={{ color: 'var(--muted)', fontSize: 15, marginTop: 14 }}>{players.length} {t('squad.subtitle')}</p>
           </div>
-          <Link href="/players" style={{ background: FANTA, color: '#0a0a0a', padding: '14px 24px', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+          <Link href="/players" className="btn-view-all" style={{ background: FANTA, color: '#0a0a0a', padding: '14px 24px', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
             {t('squad.viewAll')}
           </Link>
         </div>
@@ -460,7 +460,7 @@ export default function HomePage() {
               >
                 {squadVisible.map(p => {
                   return (
-                    <div key={p.id} style={{ background: 'var(--card)', paddingTop: 150, paddingLeft: 16, paddingRight: 16, paddingBottom: 18, position: 'relative', borderLeft: `4px solid ${FANTA}`, overflow: 'visible' }}>
+                    <div key={p.id} className="squad-card" style={{ background: 'var(--card)', paddingTop: 150, paddingLeft: 16, paddingRight: 16, paddingBottom: 18, position: 'relative', borderLeft: `4px solid ${FANTA}`, overflow: 'visible' }}>
                       {/* Large avatar overflowing the card top */}
                       <div style={{ position: 'absolute', top: -110, left: 16 }}>
                         <img
@@ -505,7 +505,7 @@ export default function HomePage() {
             <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s03')}</div>
             <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 12 }}>{t('news.title')}</h2>
           </div>
-          <Link href="/news" style={{ background: FANTA, color: '#0a0a0a', padding: '14px 24px', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+          <Link href="/news" className="btn-view-all" style={{ background: FANTA, color: '#0a0a0a', padding: '14px 24px', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
             {t('news.viewAll')}
           </Link>
         </div>
@@ -634,6 +634,7 @@ export default function HomePage() {
                 href={videoHighlight?.channel_url || 'https://www.youtube.com/@fclonfanta'}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="btn-yt-channel"
                 style={{ marginTop: 18, display: 'inline-block', color: FANTA, fontFamily: 'Anton, sans-serif', fontSize: 14, letterSpacing: '0.04em', textTransform: 'uppercase', textDecoration: 'none' }}
               >
                 {t('video.watchChannel')}
@@ -653,7 +654,7 @@ export default function HomePage() {
               <div style={{ marginTop: 20 }}>{t('cta.title2')}</div>
             </div>
           </div>
-          <Link href="/dashboard" style={{ background: '#0a0a0a', color: FANTA, padding: '24px 40px', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.04em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+          <Link href="/dashboard" className="btn-cta-dashboard" style={{ background: '#0a0a0a', color: FANTA, padding: '24px 40px', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.04em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
             {t('cta.btn')}
           </Link>
         </div>
@@ -665,11 +666,13 @@ export default function HomePage() {
           <div>
             <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s01')}</div>
             {aboutData?.banner_image_url && (
-              <img
-                src={`${BASE}${aboutData.banner_image_url}`}
-                alt="Lon Fanta FC"
-                style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', marginTop: 16, marginBottom: 8 }}
-              />
+              <div className="intro-banner" style={{ marginTop: 16, marginBottom: 8 }}>
+                <img
+                  src={`${BASE}${aboutData.banner_image_url}`}
+                  alt="Lon Fanta FC"
+                  style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover' }}
+                />
+              </div>
             )}
             <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 5vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', letterSpacing: '0.01em', marginTop: 16 }}>{t('intro.label')}</h2>
           </div>
@@ -684,7 +687,7 @@ export default function HomePage() {
                 { n: teamStats.wins, l: t('intro.wins') },
                 { n: teamStats.gf, l: t('intro.goals') },
               ].map(s => (
-                <div key={s.l} style={{ background: 'var(--bg)', padding: '20px 16px', borderTop: `3px solid ${FANTA}` }}>
+                <div key={s.l} className="stat-card" style={{ background: 'var(--bg)', padding: '20px 16px', borderTop: `3px solid ${FANTA}` }}>
                   <JerseyNumber n={s.n} size={48} color="var(--ink)" />
                   <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 8 }}>{s.l}</div>
                 </div>

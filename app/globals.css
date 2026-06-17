@@ -535,3 +535,84 @@ input, textarea, select, button {
   border-color: var(--fanta) !important;
 }
 
+/* ── YouTube channel link hover ──────────────────────────────────────────── */
+.btn-yt-channel {
+  position: relative;
+  transition: letter-spacing 0.25s ease;
+}
+.btn-yt-channel::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--fanta);
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-yt-channel:hover {
+  letter-spacing: 0.08em !important;
+}
+.btn-yt-channel:hover::after {
+  width: 100%;
+}
+
+/* ── CTA Dashboard button hover ──────────────────────────────────────────── */
+.btn-cta-dashboard {
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.22s ease, background 0.22s ease, color 0.22s ease;
+}
+.btn-cta-dashboard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  background: #f4f1ea !important;
+  color: #0a0a0a !important;
+}
+
+/* ── View-all buttons (squad & news) hover ───────────────────────────────── */
+.btn-view-all {
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.22s ease, background 0.22s ease, color 0.22s ease;
+}
+.btn-view-all:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(255, 107, 26, 0.45);
+  background: #0a0a0a !important;
+  color: var(--fanta) !important;
+}
+
+/* ── Squad player card hover ─────────────────────────────────────────────── */
+.squad-card {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
+}
+.squad-card img {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.squad-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+.squad-card:hover img {
+  transform: scale(1.06);
+}
+
+/* ── Intro banner image hover ────────────────────────────────────────────── */
+.intro-banner {
+  overflow: hidden;
+}
+.intro-banner img {
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  display: block;
+}
+.intro-banner:hover img {
+  transform: scale(1.04);
+}
+
+/* ── Intro stats card hover ──────────────────────────────────────────────── */
+.stat-card {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
+}
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(255, 107, 26, 0.28);
+}
+
