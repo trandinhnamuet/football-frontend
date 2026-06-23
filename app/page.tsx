@@ -154,12 +154,11 @@ export default function HomePage() {
     );
   }
 
-  // BẢNG XẾP HẠNG ĐIỂM — tạm ẩn
-  // const board = [...players].sort((a, b) => b.stat_points - a.stat_points);
-  // const top1 = board[0];
-  // const top2 = board[1];
-  // const top3 = board[2];
-  // const rest = board.slice(3, 12);
+  const board = [...players].sort((a, b) => b.stat_points - a.stat_points);
+  const top1 = board[0];
+  const top2 = board[1];
+  const top3 = board[2];
+  const rest = board.slice(3, 12);
   const safeSquadPage = Math.min(squadPage, totalSquadPages - 1);
   const squadVisible = players.slice(safeSquadPage * squadPageSize, (safeSquadPage + 1) * squadPageSize);
 
