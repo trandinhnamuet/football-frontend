@@ -154,11 +154,12 @@ export default function HomePage() {
     );
   }
 
-  const board = [...players].sort((a, b) => b.stat_points - a.stat_points);
-  const top1 = board[0];
-  const top2 = board[1];
-  const top3 = board[2];
-  const rest = board.slice(3, 12);
+  // BẢNG XẾP HẠNG ĐIỂM — tạm ẩn
+  // const board = [...players].sort((a, b) => b.stat_points - a.stat_points);
+  // const top1 = board[0];
+  // const top2 = board[1];
+  // const top3 = board[2];
+  // const rest = board.slice(3, 12);
   const safeSquadPage = Math.min(squadPage, totalSquadPages - 1);
   const squadVisible = players.slice(safeSquadPage * squadPageSize, (safeSquadPage + 1) * squadPageSize);
 
@@ -171,8 +172,8 @@ export default function HomePage() {
       {/* BANNER SLIDER — admin-managed running images (e.g. Man of the week) */}
       <BannerSlider />
 
-      {/* HERO — Leaderboard */}
-      <section className="mob-p-hero" style={{ position: 'relative', overflow: 'hidden', padding: '48px 48px 64px', backgroundImage: 'repeating-linear-gradient(45deg, transparent 0 60px, rgba(255,107,26,0.025) 60px 61px)' }}>
+      {/* BẢNG XẾP HẠNG ĐIỂM — tạm ẩn */}
+      {false && (<section className="mob-p-hero" style={{ position: 'relative', overflow: 'hidden', padding: '48px 48px 64px', backgroundImage: 'repeating-linear-gradient(45deg, transparent 0 60px, rgba(255,107,26,0.025) 60px 61px)' }}>
         <div style={{ position: 'absolute', top: 20, right: -100, pointerEvents: 'none', fontFamily: 'Anton, sans-serif', fontSize: 380, lineHeight: 0.8, color: FANTA, opacity: 0.07, letterSpacing: '-0.04em', whiteSpace: 'nowrap' }}>2026</div>
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
@@ -315,7 +316,7 @@ export default function HomePage() {
             </div>
           )}
         </div>
-      </section>
+      </section>)}
 
       {/* SCHEDULE — moved above squad, next-match-focused layout */}
       <section id="schedule" className="mob-p-section" style={{ padding: '80px 48px' }}>
