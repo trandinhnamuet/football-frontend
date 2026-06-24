@@ -127,7 +127,7 @@ export default function MemorialSlider() {
           const excerpt = lang === 'en' && post.excerpt_en ? post.excerpt_en : post.excerpt;
           const tag     = lang === 'en' && post.tag_en     ? post.tag_en     : post.tag;
           return (
-            <div key={post.id} style={{ background: 'var(--card)', display: 'flex', flexDirection: 'column', borderLeft: `3px solid ${FANTA}`, overflow: 'hidden' }}>
+            <div key={post.id} className="memorial-card" style={{ background: 'var(--card)', display: 'flex', flexDirection: 'column', borderLeft: `3px solid ${FANTA}`, overflow: 'hidden' }}>
               {/* Image */}
               <div style={
                 isMobile
@@ -137,7 +137,7 @@ export default function MemorialSlider() {
                 {post.image_url ? (
                   <>
                     <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${resolveImg(post.image_url)})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'blur(14px)', transform: 'scale(1.1)' }} />
-                    <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${resolveImg(post.image_url)})`, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
+                    <div className="memorial-card-img" style={{ position: 'absolute', inset: 0, backgroundImage: `url(${resolveImg(post.image_url)})`, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
                   </>
                 ) : (
                   <div style={{ position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(135deg, transparent 0 14px, rgba(255,107,26,0.06) 14px 15px)' }} />
