@@ -6,7 +6,7 @@ import { api } from '../lib/api';
 import { useApp } from '../contexts/AppContext';
 
 const BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
-const PAGE_SIZE = 4;
+const PAGE_SIZE = 6;
 
 function resolveImg(url: string | null | undefined): string {
   if (!url) return '';
@@ -102,7 +102,7 @@ export default function MemorialSlider() {
           flex: 1,
           minHeight: 0,
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
+          gridTemplateColumns: 'repeat(3, 1fr)',
           gridTemplateRows: '1fr 1fr',
           gap: 12,
         }}
@@ -116,8 +116,8 @@ export default function MemorialSlider() {
               key={post.id}
               style={{ background: 'var(--card)', display: 'flex', flexDirection: 'column', borderLeft: `4px solid ${FANTA}`, overflow: 'hidden' }}
             >
-              {/* Image — 58% of card height */}
-              <div style={{ flex: '0 0 58%', background: '#0a0a0a', position: 'relative', overflow: 'hidden' }}>
+              {/* Image — 52% of card height */}
+              <div style={{ flex: '0 0 52%', background: '#0a0a0a', position: 'relative', overflow: 'hidden' }}>
                 {post.image_url ? (
                   <>
                     <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${resolveImg(post.image_url)})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'blur(14px)', transform: 'scale(1.1)' }} />
