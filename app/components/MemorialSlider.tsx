@@ -6,27 +6,46 @@ import { api } from '../lib/api';
 import { useApp } from '../contexts/AppContext';
 
 const BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
-const PAGE_SIZE = 6;
+
+type Layout = '3x2' | '4x1' | '4x2';
+
+const LAYOUT_CONFIG: Record<Layout, {
+  pageSize: number;
+  cols: number;
+  rows: number;
+  imgFlex: string;
+  label: string;
+}> = {
+  '3x2': { pageSize: 6,  cols: 3, rows: 2, imgFlex: '0 0 52%', label: 'V1 · 3×2 · 6 bài/slide' },
+  '4x1': { pageSize: 4,  cols: 4, rows: 1, imgFlex: '0 0 62%', label: 'V2 · 4×1 · 4 bài/slide' },
+  '4x2': { pageSize: 8,  cols: 4, rows: 2, imgFlex: '0 0 54%', label: 'V3 · 4×2 · 8 bài/slide' },
+};
 
 function resolveImg(url: string | null | undefined): string {
   if (!url) return '';
   return url.startsWith('/uploads') ? `${BASE}${url}` : url;
 }
 
-export default function MemorialSlider() {
+interface Props {
+  layout?: Layout;
+}
+
+export default function MemorialSlider({ layout = '3x2' }: Props) {
   const { t, lang } = useApp();
   const [posts, setPosts] = useState<MemorialPost[]>([]);
   const [page, setPage] = useState(0);
   const [slideClass, setSlideClass] = useState('slide-from-right');
   const [animKey, setAnimKey] = useState(0);
 
+  const cfg = LAYOUT_CONFIG[layout];
+
   useEffect(() => {
     api.getMemorialPosts().then(setPosts).catch(() => {});
   }, []);
 
-  const totalPages = Math.max(1, Math.ceil(posts.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(posts.length / cfg.pageSize));
   const safePage = Math.min(page, totalPages - 1);
-  const visible = posts.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
+  const visible = posts.slice(safePage * cfg.pageSize, (safePage + 1) * cfg.pageSize);
 
   function go(dir: 'next' | 'prev') {
     const cls = dir === 'next' ? 'slide-from-right' : 'slide-from-left';
@@ -60,9 +79,27 @@ export default function MemorialSlider() {
         flexDirection: 'column',
         boxSizing: 'border-box',
         overflow: 'hidden',
+        position: 'relative',
       }}
     >
-      {/* Header — compact so cards get most of the height */}
+      {/* Version badge */}
+      <div style={{
+        position: 'absolute',
+        top: 12,
+        right: 56,
+        background: FANTA,
+        color: '#0a0a0a',
+        fontFamily: 'Anton, sans-serif',
+        fontSize: 11,
+        letterSpacing: '0.12em',
+        textTransform: 'uppercase',
+        padding: '4px 12px',
+        zIndex: 10,
+      }}>
+        {cfg.label}
+      </div>
+
+      {/* Header */}
       <div
         style={{
           display: 'flex',
@@ -94,7 +131,7 @@ export default function MemorialSlider() {
         )}
       </div>
 
-      {/* Cards — 2 columns × 2 rows, fills all remaining vertical space */}
+      {/* Cards grid */}
       <div
         key={animKey}
         className={`${slideClass} mob-memorial-grid`}
@@ -102,8 +139,8 @@ export default function MemorialSlider() {
           flex: 1,
           minHeight: 0,
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gridTemplateRows: '1fr 1fr',
+          gridTemplateColumns: `repeat(${cfg.cols}, 1fr)`,
+          gridTemplateRows: cfg.rows === 1 ? '1fr' : '1fr 1fr',
           gap: 12,
         }}
       >
@@ -116,8 +153,8 @@ export default function MemorialSlider() {
               key={post.id}
               style={{ background: 'var(--card)', display: 'flex', flexDirection: 'column', borderLeft: `4px solid ${FANTA}`, overflow: 'hidden' }}
             >
-              {/* Image — 52% of card height */}
-              <div style={{ flex: '0 0 52%', background: '#0a0a0a', position: 'relative', overflow: 'hidden' }}>
+              {/* Image */}
+              <div style={{ flex: cfg.imgFlex, background: '#0a0a0a', position: 'relative', overflow: 'hidden' }}>
                 {post.image_url ? (
                   <>
                     <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${resolveImg(post.image_url)})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'blur(14px)', transform: 'scale(1.1)' }} />
@@ -133,7 +170,7 @@ export default function MemorialSlider() {
                 )}
               </div>
 
-              {/* Content — fills remaining 42% */}
+              {/* Content */}
               <div style={{ flex: 1, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 6, overflow: 'hidden' }}>
                 <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.12em', textTransform: 'uppercase', flexShrink: 0 }}>
                   {fmtDate(post.published_at)}
