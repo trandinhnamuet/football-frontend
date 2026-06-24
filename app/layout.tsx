@@ -13,20 +13,13 @@ export const metadata: Metadata = {
     locale: 'vi_VN',
     url: 'https://lonfantafc.com',
     siteName: 'Lon Fanta FC',
-    images: [
-      {
-        url: '/api/og',
-        width: 1200,
-        height: 630,
-        alt: 'Lon Fanta FC - Trận đấu sắp tới',
-      },
-    ],
+    // og:image tags are emitted automatically from app/opengraph-image.tsx
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Lon Fanta FC',
     description: 'Đội bóng phong trào Hà Nội — #ĐamMêBấtTận',
-    images: ['/api/og'],
+    // twitter:image tags are emitted automatically from app/twitter-image.tsx
   },
 };
 

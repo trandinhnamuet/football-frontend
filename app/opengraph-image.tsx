@@ -1,13 +1,27 @@
 import { ImageResponse } from 'next/og';
 
+// Image metadata — Next auto-emits og:image:type / width / height from these.
+export const alt = 'Lon Fanta FC - Trận đấu sắp tới';
+export const size = { width: 1200, height: 630 };
+export const contentType = 'image/png';
+
+// Regenerate (and CDN-cache) the image at most every 5 minutes.
+// This keeps the og image statically optimized, so crawlers (Messenger, Zalo,
+// Facebook) get an instant, already-rendered PNG instead of waiting for a
+// request-time render that can time out and produce no preview.
+export const revalidate = 300;
+
 const FANTA = '#ff6b1a';
 const BG = '#0a0a0a';
 
 async function getNextMatch() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    // Hard timeout so a slow/cold backend can never stall the image render and
+    // cause the crawler to give up. On timeout we fall back to the generic card.
     const res = await fetch(`${baseUrl}/api/matches`, {
       next: { revalidate: 300 }, // Cache for 5 minutes
+      signal: AbortSignal.timeout(2500),
     });
     if (!res.ok) return null;
     const matches = await res.json();
@@ -18,7 +32,7 @@ async function getNextMatch() {
   }
 }
 
-export async function GET() {
+export default async function Image() {
   try {
     const match = await getNextMatch();
 
@@ -48,7 +62,7 @@ export async function GET() {
             </div>
           </div>
         ),
-        { width: 1200, height: 630 }
+        { ...size }
       );
     }
 
@@ -262,7 +276,7 @@ export async function GET() {
           </div>
         </div>
       ),
-      { width: 1200, height: 630 }
+      { ...size }
     );
   } catch (error) {
     return new ImageResponse(
@@ -283,7 +297,7 @@ export async function GET() {
           LON FANTA FC
         </div>
       ),
-      { width: 1200, height: 630 }
+      { ...size }
     );
   }
 }
