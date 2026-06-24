@@ -139,7 +139,7 @@ export default async function Image() {
                 flex: 1,
               }}
             >
-              <div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <div
                   style={{
                     fontSize: 24,
@@ -148,7 +148,7 @@ export default async function Image() {
                     letterSpacing: '0.1em',
                   }}
                 >
-                  TUẦN {match.week}
+                  {`TUẦN ${match.week}`}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
                   <div
@@ -188,7 +188,7 @@ export default async function Image() {
                 minWidth: 280,
               }}
             >
-              <div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <div
                   style={{
                     fontSize: 20,
@@ -204,7 +204,7 @@ export default async function Image() {
                 </div>
               </div>
 
-              <div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <div
                   style={{
                     fontSize: 20,
@@ -227,7 +227,7 @@ export default async function Image() {
               </div>
 
               {match.venue && (
-                <div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <div
                     style={{
                       fontSize: 20,
@@ -271,7 +271,7 @@ export default async function Image() {
                 letterSpacing: '0.05em',
               }}
             >
-              ⏱ {countdown}
+              {`⏱ ${countdown}`}
             </div>
           </div>
         </div>
