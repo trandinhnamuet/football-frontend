@@ -35,6 +35,20 @@ export interface Article {
   published_at: string;
 }
 
+export interface MemorialPost {
+  id: number;
+  title: string;
+  title_en: string;
+  content: string;
+  content_en: string;
+  excerpt: string;
+  excerpt_en: string;
+  image_url: string | null;
+  tag: string;
+  tag_en: string;
+  published_at: string;
+}
+
 export interface Match {
   id: number;
   week: number;

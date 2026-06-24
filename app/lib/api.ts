@@ -1,4 +1,4 @@
-import { Player, Article, Match, TeamStats, DriveLink, VideoHighlight, RecommendedVideo, BannerSlide } from './types';
+import { Player, Article, MemorialPost, Match, TeamStats, DriveLink, VideoHighlight, RecommendedVideo, BannerSlide } from './types';
 
 const BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 
@@ -99,6 +99,38 @@ export const api = {
     const form = new FormData();
     form.append('image', file);
     const r = await fetch(`${BASE}/api/articles/upload-image`, {
+      method: 'POST',
+      headers: { 'x-admin-password': password },
+      body: form,
+    });
+    if (r.status === 401) { handleUnauthorized(); throw new Error('Unauthorized'); }
+    return r.json() as Promise<{ url: string }>;
+  },
+
+  // Memorial Posts
+  getMemorialPosts: () => fetchJSON<MemorialPost[]>('/api/memorial-posts'),
+  getMemorialPost: (id: number) => fetchJSON<MemorialPost>(`/api/memorial-posts/${id}`),
+  createMemorialPost: (data: Partial<MemorialPost>, password: string) =>
+    fetchJSON<MemorialPost>('/api/memorial-posts', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: { 'x-admin-password': password },
+    }),
+  updateMemorialPost: (id: number, data: Partial<MemorialPost>, password: string) =>
+    fetchJSON<MemorialPost>(`/api/memorial-posts/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+      headers: { 'x-admin-password': password },
+    }),
+  deleteMemorialPost: (id: number, password: string) =>
+    fetchJSON(`/api/memorial-posts/${id}`, {
+      method: 'DELETE',
+      headers: { 'x-admin-password': password },
+    }),
+  uploadMemorialPostImage: async (file: File, password: string) => {
+    const form = new FormData();
+    form.append('image', file);
+    const r = await fetch(`${BASE}/api/memorial-posts/upload-image`, {
       method: 'POST',
       headers: { 'x-admin-password': password },
       body: form,

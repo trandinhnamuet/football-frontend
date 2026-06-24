@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import BannerSlider from './components/BannerSlider';
-import { Player, Article, Match, TeamStats, RecommendedVideo, FANTA, ROLES, fmtDate } from './lib/types';
+import MemorialSlider from './components/MemorialSlider';
+import { Player, Article, Match, RecommendedVideo, FANTA, ROLES, fmtDate } from './lib/types';
 import { api } from './lib/api';
 import { useApp } from './contexts/AppContext';
 import { DEFAULT_PLAYER_AVATAR_URL } from './lib/assets';
@@ -71,7 +72,6 @@ export default function HomePage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [played, setPlayed] = useState<Match[]>([]);
   const [upcoming, setUpcoming] = useState<Match[]>([]);
-  const [teamStats, setTeamStats] = useState<TeamStats>({ played: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0 });
   const [videoHighlight, setVideoHighlight] = useState<{ youtube_url: string; title: string; title_en: string; is_active: boolean; channel_url?: string } | null>(null);
   const [aboutData, setAboutData] = useState<{ banner_image_url: string } | null>(null);
   const [recommendations, setRecommendations] = useState<RecommendedVideo[]>([]);
@@ -104,15 +104,13 @@ export default function HomePage() {
         api.getArticles(),
         api.getPlayed(),
         api.getUpcoming(),
-        api.getTeamStats(),
         api.getVideoHighlight(),
         api.getAboutPage(),
-      ]).then(([p, a, pl, up, ts, vh, ab]) => {
+      ]).then(([p, a, pl, up, vh, ab]) => {
         setPlayers(p);
         setArticles(a);
         setPlayed(pl);
         setUpcoming(up);
-        setTeamStats(ts);
         setVideoHighlight(vh);
         setAboutData(ab);
       }).catch(() => {});
@@ -170,6 +168,9 @@ export default function HomePage() {
 
       {/* BANNER SLIDER — admin-managed running images (e.g. Man of the week) */}
       <BannerSlider />
+
+      {/* BÀI VIẾT KỈ NIỆM — auto-sliding 4 posts per page */}
+      <MemorialSlider />
 
       {/* BẢNG XẾP HẠNG ĐIỂM — tạm ẩn */}
       {false && (<section className="mob-p-hero" style={{ position: 'relative', overflow: 'hidden', padding: '48px 48px 64px', backgroundImage: 'repeating-linear-gradient(45deg, transparent 0 60px, rgba(255,107,26,0.025) 60px 61px)' }}>
@@ -680,15 +681,18 @@ export default function HomePage() {
             <p style={{ fontSize: 17, lineHeight: 1.6, color: 'var(--muted)', margin: 0 }}>
               {t('intro.body')}
             </p>
-            <div className="mob-stats-grid" style={{ marginTop: 36, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+            <div className="mob-stats-grid" style={{ marginTop: 36, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
               {[
-                { n: 2019, l: t('intro.founded') },
-                { n: players.length, l: t('intro.members') },
-                { n: teamStats.wins, l: t('intro.wins') },
-                { n: teamStats.gf, l: t('intro.goals') },
+                { n: t('intro.foundedYear'), l: t('intro.founded'), isText: false },
+                { n: t('intro.memberCount'), l: t('intro.members'), isText: false },
+                { n: t('intro.scheduleTime'), l: t('intro.scheduleLabel'), isText: true },
               ].map(s => (
                 <div key={s.l} className="stat-card" style={{ background: 'var(--bg)', padding: '20px 16px', borderTop: `3px solid ${FANTA}` }}>
-                  <JerseyNumber n={s.n} size={48} color="var(--ink)" />
+                  {s.isText ? (
+                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, lineHeight: 1.25, color: 'var(--ink)', letterSpacing: '-0.01em' }}>{s.n}</div>
+                  ) : (
+                    <JerseyNumber n={s.n} size={48} color="var(--ink)" />
+                  )}
                   <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 8 }}>{s.l}</div>
                 </div>
               ))}
