@@ -49,14 +49,34 @@ export default function MemorialSlider() {
   if (posts.length === 0) return null;
 
   return (
-    <section className="mob-p-section" style={{ padding: '80px 48px', background: 'var(--bg)', borderTop: `1px solid ${FANTA}33` }}>
-      {/* Header */}
-      <div className="mob-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 36 }}>
+    <section
+      className="mob-p-section"
+      style={{
+        aspectRatio: '1920 / 850',
+        padding: '28px 48px',
+        background: 'var(--bg)',
+        borderTop: `1px solid ${FANTA}33`,
+        display: 'flex',
+        flexDirection: 'column',
+        boxSizing: 'border-box',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Header — compact so cards get most of the height */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexShrink: 0,
+          marginBottom: 14,
+        }}
+      >
         <div>
-          <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>
+          <div style={{ fontSize: 11, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>
             {t('sections.s05')}
           </div>
-          <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 12 }}>
+          <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(28px, 3vw, 44px)', lineHeight: 0.95, textTransform: 'uppercase', margin: '6px 0 0' }}>
             {t('memorial.title')}
           </h2>
         </div>
@@ -64,21 +84,28 @@ export default function MemorialSlider() {
           <div style={{ display: 'flex', gap: 8 }}>
             <button
               onClick={() => go('prev')}
-              style={{ background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}44`, color: FANTA, width: 44, height: 44, fontFamily: 'Anton, sans-serif', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{ background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}44`, color: FANTA, width: 40, height: 40, fontFamily: 'Anton, sans-serif', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >‹</button>
             <button
               onClick={() => go('next')}
-              style={{ background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}44`, color: FANTA, width: 44, height: 44, fontFamily: 'Anton, sans-serif', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{ background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}44`, color: FANTA, width: 40, height: 40, fontFamily: 'Anton, sans-serif', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >›</button>
           </div>
         )}
       </div>
 
-      {/* Cards */}
+      {/* Cards — 2 columns × 2 rows, fills all remaining vertical space */}
       <div
         key={animKey}
         className={`${slideClass} mob-memorial-grid`}
-        style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}
+        style={{
+          flex: 1,
+          minHeight: 0,
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gridTemplateRows: '1fr 1fr',
+          gap: 12,
+        }}
       >
         {visible.map(post => {
           const title = lang === 'en' && post.title_en ? post.title_en : post.title;
@@ -89,8 +116,8 @@ export default function MemorialSlider() {
               key={post.id}
               style={{ background: 'var(--card)', display: 'flex', flexDirection: 'column', borderLeft: `4px solid ${FANTA}`, overflow: 'hidden' }}
             >
-              {/* Image */}
-              <div style={{ aspectRatio: '16/9', background: '#0a0a0a', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
+              {/* Image — 58% of card height */}
+              <div style={{ flex: '0 0 58%', background: '#0a0a0a', position: 'relative', overflow: 'hidden' }}>
                 {post.image_url ? (
                   <>
                     <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${resolveImg(post.image_url)})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'blur(14px)', transform: 'scale(1.1)' }} />
@@ -105,16 +132,17 @@ export default function MemorialSlider() {
                   </div>
                 )}
               </div>
-              {/* Content */}
-              <div style={{ padding: '18px', flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+
+              {/* Content — fills remaining 42% */}
+              <div style={{ flex: 1, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 6, overflow: 'hidden' }}>
+                <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.12em', textTransform: 'uppercase', flexShrink: 0 }}>
                   {fmtDate(post.published_at)}
                 </div>
-                <h3 style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, lineHeight: 1.1, letterSpacing: '0.01em', textTransform: 'uppercase', margin: 0 }}>
+                <h3 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(15px, 1.4vw, 20px)', lineHeight: 1.05, letterSpacing: '0.01em', textTransform: 'uppercase', margin: 0, flexShrink: 0 }}>
                   {title}
                 </h3>
                 {excerpt && (
-                  <p style={{ color: 'var(--muted)', fontSize: 13, lineHeight: 1.55, margin: 0, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  <p style={{ color: 'var(--muted)', fontSize: 13, lineHeight: 1.5, margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                     {excerpt}
                   </p>
                 )}
@@ -126,7 +154,7 @@ export default function MemorialSlider() {
 
       {/* Dots */}
       {totalPages > 1 && (
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 24 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, paddingTop: 10, flexShrink: 0 }}>
           {Array.from({ length: totalPages }, (_, i) => (
             <button
               key={i}
