@@ -207,6 +207,19 @@ const adminSections: AdminSection[] = [
       'Bật/tắt hiển thị & sắp xếp thứ tự',
     ],
   },
+  {
+    title: 'Bài Viết Kỉ Niệm',
+    description: 'Quản lý các bài viết kỉ niệm hiển thị dạng slide tự động trên trang chủ',
+    href: '/admin/memorial-management',
+    icon: '🏅',
+    features: [
+      'Tạo bài viết kỉ niệm mới (hỗ trợ tiếng Việt & Anh)',
+      'Chỉnh sửa tiêu đề, tóm tắt, nội dung',
+      'Tải ảnh bìa cho từng bài viết',
+      'Phân loại bằng tags',
+      'Xóa bài viết',
+    ],
+  },
 ];
 
 export default function AdminPage() {
