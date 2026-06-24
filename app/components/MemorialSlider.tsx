@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { MemorialPost, FANTA, fmtDate } from '../lib/types';
 import { api } from '../lib/api';
@@ -127,7 +128,7 @@ export default function MemorialSlider() {
           const excerpt = lang === 'en' && post.excerpt_en ? post.excerpt_en : post.excerpt;
           const tag     = lang === 'en' && post.tag_en     ? post.tag_en     : post.tag;
           return (
-            <div key={post.id} className="memorial-card" style={{ background: 'var(--card)', display: 'flex', flexDirection: 'column', borderLeft: `3px solid ${FANTA}`, overflow: 'hidden' }}>
+            <Link key={post.id} href={`/members/${post.id}`} className="memorial-card" style={{ textDecoration: 'none', color: 'inherit', background: 'var(--card)', display: 'flex', flexDirection: 'column', borderLeft: `3px solid ${FANTA}`, overflow: 'hidden' }}>
               {/* Image */}
               <div style={
                 isMobile
@@ -163,7 +164,7 @@ export default function MemorialSlider() {
                   </p>
                 )}
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
