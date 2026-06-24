@@ -7,32 +7,12 @@ import { useApp } from '../contexts/AppContext';
 
 const BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 
-type Layout = '2x2' | '3x2' | '4x1' | '4x2';
-
-const LAYOUT_CONFIG: Record<Layout, {
-  pageSize: number;
-  cols: number;
-  rows: number;
-  imgFlex: string;
-  label: string;
-}> = {
-  '2x2': { pageSize: 4,  cols: 2, rows: 2, imgFlex: '0 0 52%', label: 'Mobile · 2×2 · 4 bài/slide' },
-  '3x2': { pageSize: 6,  cols: 3, rows: 2, imgFlex: '0 0 52%', label: 'V1 · 3×2 · 6 bài/slide' },
-  '4x1': { pageSize: 4,  cols: 4, rows: 1, imgFlex: '0 0 62%', label: 'V2 · 4×1 · 4 bài/slide' },
-  '4x2': { pageSize: 8,  cols: 4, rows: 2, imgFlex: '0 0 54%', label: 'V3 · 4×2 · 8 bài/slide' },
-};
-
 function resolveImg(url: string | null | undefined): string {
   if (!url) return '';
   return url.startsWith('/uploads') ? `${BASE}${url}` : url;
 }
 
-interface Props {
-  layout?: Layout;
-  hideOnMobile?: boolean;
-}
-
-export default function MemorialSlider({ layout = '3x2', hideOnMobile }: Props) {
+export default function MemorialSlider() {
   const { t, lang } = useApp();
   const [posts, setPosts] = useState<MemorialPost[]>([]);
   const [page, setPage] = useState(0);
@@ -52,22 +32,19 @@ export default function MemorialSlider({ layout = '3x2', hideOnMobile }: Props) 
     api.getMemorialPosts().then(setPosts).catch(() => {});
   }, []);
 
-  const effectiveLayout: Layout = isMobile ? '2x2' : layout;
-  const cfg = LAYOUT_CONFIG[effectiveLayout];
+  // Desktop: 4x1 (4 posts, 1 row). Mobile: 2x2 (4 posts, 2 rows).
+  const pageSize = 4;
+  const cols = isMobile ? 2 : 4;
+  const rows = isMobile ? 2 : 1;
 
-  const totalPages = Math.max(1, Math.ceil(posts.length / cfg.pageSize));
+  const totalPages = Math.max(1, Math.ceil(posts.length / pageSize));
   const safePage = Math.min(page, totalPages - 1);
-  const visible = posts.slice(safePage * cfg.pageSize, (safePage + 1) * cfg.pageSize);
+  const visible = posts.slice(safePage * pageSize, (safePage + 1) * pageSize);
 
   function go(dir: 'next' | 'prev') {
-    const cls = dir === 'next' ? 'slide-from-right' : 'slide-from-left';
-    setSlideClass(cls);
+    setSlideClass(dir === 'next' ? 'slide-from-right' : 'slide-from-left');
     setAnimKey(k => k + 1);
-    setPage(p =>
-      dir === 'next'
-        ? (p + 1) % totalPages
-        : (p - 1 + totalPages) % totalPages,
-    );
+    setPage(p => dir === 'next' ? (p + 1) % totalPages : (p - 1 + totalPages) % totalPages);
   }
 
   useEffect(() => {
@@ -75,12 +52,10 @@ export default function MemorialSlider({ layout = '3x2', hideOnMobile }: Props) 
     const timer = setInterval(() => go('next'), 5000);
     return () => clearInterval(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalPages, effectiveLayout]);
+  }, [totalPages, isMobile]);
 
-  if (hideOnMobile && isMobile) return null;
   if (posts.length === 0) return null;
 
-  /* ── desktop: aspect-ratio box; mobile: height driven by content ── */
   const sectionStyle: React.CSSProperties = isMobile
     ? {
         padding: '24px 16px 20px',
@@ -100,45 +75,10 @@ export default function MemorialSlider({ layout = '3x2', hideOnMobile }: Props) 
         flexDirection: 'column',
         boxSizing: 'border-box',
         overflow: 'hidden',
-        position: 'relative',
-      };
-
-  const gridStyle: React.CSSProperties = isMobile
-    ? {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: 10,
-      }
-    : {
-        flex: 1,
-        minHeight: 0,
-        display: 'grid',
-        gridTemplateColumns: `repeat(${cfg.cols}, 1fr)`,
-        gridTemplateRows: cfg.rows === 1 ? '1fr' : '1fr 1fr',
-        gap: 12,
       };
 
   return (
     <section className="mob-p-section" style={sectionStyle}>
-
-      {/* Version badge — desktop only */}
-      {!isMobile && (
-        <div style={{
-          position: 'absolute',
-          top: 12,
-          right: 56,
-          background: FANTA,
-          color: '#0a0a0a',
-          fontFamily: 'Anton, sans-serif',
-          fontSize: 11,
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          padding: '4px 12px',
-          zIndex: 10,
-        }}>
-          {cfg.label}
-        </div>
-      )}
 
       {/* Header */}
       <div style={{
@@ -164,38 +104,35 @@ export default function MemorialSlider({ layout = '3x2', hideOnMobile }: Props) 
         </div>
         {totalPages > 1 && (
           <div style={{ display: 'flex', gap: 6 }}>
-            <button
-              onClick={() => go('prev')}
-              style={{ background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}44`, color: FANTA, width: isMobile ? 32 : 40, height: isMobile ? 32 : 40, fontFamily: 'Anton, sans-serif', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            >‹</button>
-            <button
-              onClick={() => go('next')}
-              style={{ background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}44`, color: FANTA, width: isMobile ? 32 : 40, height: isMobile ? 32 : 40, fontFamily: 'Anton, sans-serif', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            >›</button>
+            <button onClick={() => go('prev')} style={{ background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}44`, color: FANTA, width: isMobile ? 32 : 40, height: isMobile ? 32 : 40, fontFamily: 'Anton, sans-serif', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>‹</button>
+            <button onClick={() => go('next')} style={{ background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}44`, color: FANTA, width: isMobile ? 32 : 40, height: isMobile ? 32 : 40, fontFamily: 'Anton, sans-serif', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>›</button>
           </div>
         )}
       </div>
 
-      {/* Cards grid */}
+      {/* Cards */}
       <div
         key={animKey}
         className={`${slideClass} mob-memorial-grid`}
-        style={gridStyle}
+        style={{
+          ...(isMobile ? {} : { flex: 1, minHeight: 0 }),
+          display: 'grid',
+          gridTemplateColumns: `repeat(${cols}, 1fr)`,
+          gridTemplateRows: rows === 1 ? '1fr' : '1fr 1fr',
+          gap: isMobile ? 10 : 12,
+        }}
       >
         {visible.map(post => {
-          const title = lang === 'en' && post.title_en ? post.title_en : post.title;
+          const title   = lang === 'en' && post.title_en   ? post.title_en   : post.title;
           const excerpt = lang === 'en' && post.excerpt_en ? post.excerpt_en : post.excerpt;
-          const tag = lang === 'en' && post.tag_en ? post.tag_en : post.tag;
+          const tag     = lang === 'en' && post.tag_en     ? post.tag_en     : post.tag;
           return (
-            <div
-              key={post.id}
-              style={{ background: 'var(--card)', display: 'flex', flexDirection: 'column', borderLeft: `3px solid ${FANTA}`, overflow: 'hidden' }}
-            >
+            <div key={post.id} style={{ background: 'var(--card)', display: 'flex', flexDirection: 'column', borderLeft: `3px solid ${FANTA}`, overflow: 'hidden' }}>
               {/* Image */}
               <div style={
                 isMobile
                   ? { aspectRatio: '16/9', background: '#0a0a0a', position: 'relative', overflow: 'hidden', flexShrink: 0 }
-                  : { flex: cfg.imgFlex, background: '#0a0a0a', position: 'relative', overflow: 'hidden' }
+                  : { flex: '0 0 62%', background: '#0a0a0a', position: 'relative', overflow: 'hidden' }
               }>
                 {post.image_url ? (
                   <>
@@ -237,11 +174,7 @@ export default function MemorialSlider({ layout = '3x2', hideOnMobile }: Props) 
           {Array.from({ length: totalPages }, (_, i) => (
             <button
               key={i}
-              onClick={() => {
-                setSlideClass(i > safePage ? 'slide-from-right' : 'slide-from-left');
-                setAnimKey(k => k + 1);
-                setPage(i);
-              }}
+              onClick={() => { setSlideClass(i > safePage ? 'slide-from-right' : 'slide-from-left'); setAnimKey(k => k + 1); setPage(i); }}
               style={{ width: i === safePage ? 18 : 5, height: 5, background: i === safePage ? FANTA : 'var(--line)', border: 'none', cursor: 'pointer', transition: 'all 0.3s', padding: 0, borderRadius: 3 }}
             />
           ))}

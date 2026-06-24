@@ -208,12 +208,12 @@ const adminSections: AdminSection[] = [
     ],
   },
   {
-    title: 'Bài Viết Kỉ Niệm',
-    description: 'Quản lý các bài viết kỉ niệm hiển thị dạng slide tự động trên trang chủ',
+    title: 'Giới Thiệu Thành Viên',
+    description: 'Quản lý các bài viết giới thiệu thành viên hiển thị dạng slide tự động trên trang chủ',
     href: '/admin/memorial-management',
     icon: '🏅',
     features: [
-      'Tạo bài viết kỉ niệm mới (hỗ trợ tiếng Việt & Anh)',
+      'Tạo bài viết mới (hỗ trợ tiếng Việt & Anh)',
       'Chỉnh sửa tiêu đề, tóm tắt, nội dung',
       'Tải ảnh bìa cho từng bài viết',
       'Phân loại bằng tags',

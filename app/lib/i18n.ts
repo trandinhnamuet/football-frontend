@@ -3,7 +3,7 @@ export type Lang = 'vi' | 'en';
 const vi = {
   nav: {
     intro: 'Giới thiệu',
-    squad: 'Đội hình',
+    squad: 'Thành viên',
     news: 'Tin tức',
     schedule: 'Lịch thi đấu',
     dashboard: 'Dashboard',
@@ -30,11 +30,11 @@ const vi = {
     noData: 'Chưa có dữ liệu cầu thủ. Đang đồng bộ từ Excel...',
   },
   sections: {
-    s01: '01 / GIỚI THIỆU',
-    s02: '02 / ĐỘI HÌNH',
-    s03: '03 / TIN TỨC',
-    s04: '04 / LỊCH THI ĐẤU',
-    s05: '05 / BÀI VIẾT KỈ NIỆM',
+    s01: 'GIỚI THIỆU',
+    s02: 'THÀNH VIÊN',
+    s03: 'TIN TỨC',
+    s04: 'LỊCH THI ĐẤU',
+    s05: 'GIỚI THIỆU THÀNH VIÊN',
   },
   intro: {
     label: 'Về Lon Fanta FC',
@@ -49,8 +49,8 @@ const vi = {
     learnMoreHover: 'Giới thiệu về Lon Fanta FC',
   },
   memorial: {
-    title: 'Bài viết kỉ niệm',
-    noData: 'Chưa có bài viết kỉ niệm.',
+    title: 'Giới thiệu thành viên',
+    noData: 'Chưa có bài viết nào.',
   },
   about: {
     title: 'Về chúng tôi',
@@ -58,7 +58,7 @@ const vi = {
     noContent: 'Nội dung đang được cập nhật...',
     editHint: 'Chỉnh sửa nội dung này trong trang Admin',  },
   squad: {
-    title: 'Đội hình',
+    title: 'Thành viên',
     subtitle: 'cầu thủ · Bốn vai trò · Một tinh thần',
     viewAll: 'XEM TẤT CẢ →',
     noData: 'Đang đồng bộ dữ liệu cầu thủ...',
@@ -120,7 +120,7 @@ const vi = {
 const en = {
   nav: {
     intro: 'About',
-    squad: 'Squad',
+    squad: 'Members',
     news: 'News',
     schedule: 'Schedule',
     dashboard: 'Dashboard',
@@ -147,11 +147,11 @@ const en = {
     noData: 'No player data yet. Syncing from Excel...',
   },
   sections: {
-    s01: '01 / ABOUT',
-    s02: '02 / SQUAD',
-    s03: '03 / NEWS',
-    s04: '04 / SCHEDULE',
-    s05: '05 / MEMORIES',
+    s01: 'ABOUT',
+    s02: 'MEMBERS',
+    s03: 'NEWS',
+    s04: 'SCHEDULE',
+    s05: 'MEMBERS',
   },
   intro: {
     label: 'About Lon Fanta FC',
@@ -166,8 +166,8 @@ const en = {
     learnMoreHover: 'About Lon Fanta FC',
   },
   memorial: {
-    title: 'Memories',
-    noData: 'No memorial posts yet.',
+    title: 'Members',
+    noData: 'No posts yet.',
   },
   about: {
     title: 'About Us',
@@ -175,7 +175,7 @@ const en = {
     noContent: 'Content coming soon...',
     editHint: 'Edit this content in the Admin panel',  },
   squad: {
-    title: 'Squad',
+    title: 'Members',
     subtitle: 'players · Four positions · One spirit',
     viewAll: 'VIEW ALL →',
     noData: 'Syncing player data...',

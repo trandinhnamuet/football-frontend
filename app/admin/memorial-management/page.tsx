@@ -183,7 +183,7 @@ function MemorialManagementContent() {
           <div>
             <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>Quản trị nội dung</div>
             <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 56, lineHeight: 0.92, letterSpacing: '0.01em', textTransform: 'uppercase', margin: 0 }}>
-              BÀI VIẾT <span style={{ color: FANTA }}>KỈ NIỆM</span>
+              GIỚI THIỆU <span style={{ color: FANTA }}>THÀNH VIÊN</span>
             </h1>
           </div>
           {mode === 'list' && (
@@ -199,7 +199,7 @@ function MemorialManagementContent() {
         {mode !== 'list' && (
           <div style={{ background: CARD, border: `1px solid rgba(255,107,26,0.3)`, padding: '32px', marginBottom: 40 }}>
             <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, textTransform: 'uppercase', marginBottom: 24, color: FANTA }}>
-              {mode === 'new' ? '+ Bài viết kỉ niệm mới' : '✎ Chỉnh sửa bài viết'}
+              {mode === 'new' ? '+ Bài viết mới' : '✎ Chỉnh sửa bài viết'}
             </div>
             <MemorialForm
               initial={editing ? {
@@ -221,7 +221,7 @@ function MemorialManagementContent() {
           <div style={{ textAlign: 'center', padding: 60, color: MUTED, fontFamily: 'Anton, sans-serif', fontSize: 24 }}>Đang tải...</div>
         ) : posts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: 60, background: CARD, borderLeft: `4px solid ${FANTA}` }}>
-            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 28, color: MUTED, textTransform: 'uppercase' }}>Chưa có bài viết kỉ niệm</div>
+            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 28, color: MUTED, textTransform: 'uppercase' }}>Chưa có bài viết nào</div>
           </div>
         ) : (
           <div style={{ display: 'grid', gap: 12 }}>

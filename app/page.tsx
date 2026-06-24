@@ -169,10 +169,8 @@ export default function HomePage() {
       {/* BANNER SLIDER — admin-managed running images (e.g. Man of the week) */}
       <BannerSlider />
 
-      {/* BÀI VIẾT KỈ NIỆM — 3 layout versions for review; mobile shows only first as 2x2 */}
-      <MemorialSlider layout="3x2" />
-      <MemorialSlider layout="4x1" hideOnMobile />
-      <MemorialSlider layout="4x2" hideOnMobile />
+      {/* GIỚI THIỆU THÀNH VIÊN — 4x1 desktop, 2x2 mobile */}
+      <MemorialSlider />
 
       {/* BẢNG XẾP HẠNG ĐIỂM — tạm ẩn */}
       {false && (<section className="mob-p-hero" style={{ position: 'relative', overflow: 'hidden', padding: '48px 48px 64px', backgroundImage: 'repeating-linear-gradient(45deg, transparent 0 60px, rgba(255,107,26,0.025) 60px 61px)' }}>
