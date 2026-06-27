@@ -9,17 +9,17 @@ const BLACK = '#0a0a0a';
 const INK = '#f4f1ea';
 const MUTED = '#a09b94';
 
-async function getPost(id: string): Promise<MemorialPost | null> {
+async function getPost(slug: string): Promise<MemorialPost | null> {
   try {
-    const res = await fetch(`${BASE}/api/memorial-posts/${id}`, { next: { revalidate: 60 } });
+    const res = await fetch(`${BASE}/api/memorial-posts/${encodeURIComponent(slug)}`, { next: { revalidate: 60 } });
     if (!res.ok) return null;
     return res.json();
   } catch { return null; }
 }
 
-export default async function MemberPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const post = await getPost(id);
+export default async function MemberPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = await getPost(slug);
   if (!post) notFound();
 
   const resolveImg = (url: string) => url.startsWith('/uploads') ? `${BASE}${url}` : url;

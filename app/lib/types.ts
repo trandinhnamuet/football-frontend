@@ -37,6 +37,7 @@ export interface Article {
 
 export interface MemorialPost {
   id: number;
+  slug?: string | null;
   title: string;
   title_en: string;
   content: string;

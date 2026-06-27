@@ -109,7 +109,7 @@ export const api = {
 
   // Memorial Posts
   getMemorialPosts: () => fetchJSON<MemorialPost[]>('/api/memorial-posts'),
-  getMemorialPost: (id: number) => fetchJSON<MemorialPost>(`/api/memorial-posts/${id}`),
+  getMemorialPost: (idOrSlug: number | string) => fetchJSON<MemorialPost>(`/api/memorial-posts/${idOrSlug}`),
   createMemorialPost: (data: Partial<MemorialPost>, password: string) =>
     fetchJSON<MemorialPost>('/api/memorial-posts', {
       method: 'POST',

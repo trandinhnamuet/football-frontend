@@ -18,6 +18,7 @@ function getPassword() {
 
 const emptyForm = {
   title: '', title_en: '',
+  slug: '',
   content: '', content_en: '',
   excerpt: '', excerpt_en: '',
   tag: '', tag_en: '',
@@ -72,6 +73,14 @@ function MemorialForm({ initial, onSave, onCancel }: {
         <div>
           <label style={labelStyle}>Title (EN)</label>
           <input style={inputStyle} value={form.title_en} onChange={set('title_en')} placeholder="Memorial post title in English" />
+        </div>
+      </div>
+      <div>
+        <label style={labelStyle}>Slug (đường dẫn)</label>
+        <input style={inputStyle} value={form.slug} onChange={set('slug')} placeholder="vd: ngo-thanh-tuan" />
+        <div style={{ fontSize: 11, color: MUTED, marginTop: 6 }}>
+          Đường dẫn trang: <span style={{ color: FANTA }}>lonfantafc.com/members/{(form.slug || '').trim() || '<id>'}</span>
+          {' '}— để trống sẽ dùng ID. Dấu tiếng Việt sẽ tự bỏ khi lưu.
         </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -204,6 +213,7 @@ function MemorialManagementContent() {
             <MemorialForm
               initial={editing ? {
                 title: editing.title || '', title_en: editing.title_en || '',
+                slug: editing.slug || '',
                 content: editing.content || '', content_en: editing.content_en || '',
                 excerpt: editing.excerpt || '', excerpt_en: editing.excerpt_en || '',
                 tag: editing.tag || '', tag_en: editing.tag_en || '',
@@ -237,6 +247,7 @@ function MemorialManagementContent() {
                     <span style={{ fontSize: 12, color: MUTED }}>{fmtDate(post.published_at)}</span>
                   </div>
                   <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, letterSpacing: '0.01em', textTransform: 'uppercase' }}>{post.title}</div>
+                  <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>/members/<span style={{ color: post.slug ? FANTA : MUTED }}>{post.slug || post.id}</span></div>
                   {post.excerpt && (
                     <div style={{ fontSize: 13, color: MUTED, marginTop: 4 }}>{post.excerpt.slice(0, 120)}...</div>
                   )}
