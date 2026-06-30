@@ -304,6 +304,22 @@ input, textarea, select, button {
   /* --- Intro / About section --- */
   .mob-intro-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
   .mob-stats-grid { grid-template-columns: 1fr 1fr !important; }
+  /* "Tìm hiểu thêm" button: 380px min-width overflows narrow phones — go full width */
+  .btn-learn-more { min-width: 0 !important; width: 100% !important; }
+
+  /* --- Schedule next-match badges: shrink + add transparency so they cover
+         less of the match image on mobile --- */
+  .nextmatch-badge {
+    top: 10px !important; left: 10px !important;
+    font-size: 10px !important; padding: 4px 9px !important;
+    letter-spacing: 0.1em !important;
+    background: rgba(255, 107, 26, 0.82) !important;
+  }
+  .nextmatch-countdown {
+    bottom: 10px !important; right: 10px !important;
+    font-size: 15px !important; padding: 5px 11px !important;
+    background: rgba(10, 10, 10, 0.6) !important;
+  }
 
   /* --- Dashboard --- */
   .mob-kpi-grid  { grid-template-columns: repeat(3, 1fr) !important; }

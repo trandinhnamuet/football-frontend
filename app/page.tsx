@@ -334,10 +334,10 @@ export default function HomePage() {
             <div className="mob-nextmatch next-match-card" style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.8fr', gap: 0, marginBottom: 28, background: 'var(--card)', borderLeft: `5px solid ${FANTA}`, overflow: 'hidden' }}>
               {/* Image side */}
               <div className="mob-nextmatch-img" style={{ position: 'relative', minHeight: 380, background: '#0a0a0a', backgroundImage: next.image_url ? `url(${resolveImg(next.image_url)})` : 'repeating-linear-gradient(45deg, transparent 0 30px, rgba(255,107,26,0.06) 30px 31px)', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
-                <div style={{ position: 'absolute', top: 18, left: 18, background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 13, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '6px 14px' }}>
+                <div className="nextmatch-badge" style={{ position: 'absolute', top: 18, left: 18, background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 13, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '6px 14px' }}>
                   ▶ {t('schedule.nextMatch')}
                 </div>
-                <div style={{ position: 'absolute', bottom: 18, right: 18, background: 'rgba(10,10,10,0.85)', color: FANTA, fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.02em', padding: '8px 16px', textTransform: 'uppercase' }}>
+                <div className="nextmatch-countdown" style={{ position: 'absolute', bottom: 18, right: 18, background: 'rgba(10,10,10,0.85)', color: FANTA, fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.02em', padding: '8px 16px', textTransform: 'uppercase' }}>
                   ⏱ {countdown}
                 </div>
               </div>
