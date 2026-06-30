@@ -342,11 +342,11 @@ export default function HomePage() {
                 </div>
               </div>
               {/* Info side */}
-              <div style={{ padding: '40px 48px', display: 'grid', gridTemplateRows: 'auto 1fr auto', height: '100%' }}>
+              <div className="mob-nextmatch-info" style={{ padding: '40px 48px', display: 'grid', gridTemplateRows: 'auto 1fr auto', height: '100%', minWidth: 0 }}>
                 {/* Top: Week & teams */}
-                <div>
+                <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: 12, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 12 }}>{t('hero.week')} {next.week}</div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
+                  <div className="mob-nextmatch-teams" style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
                     <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 56px)', color: FANTA, textTransform: 'uppercase' }}>Lon Fanta FC</div>
                     <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, color: 'var(--muted)', textTransform: 'uppercase' }}>{t('schedule.vs')}</div>
                     <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 56px)', textTransform: 'uppercase' }}>{next.opponent}</div>

@@ -274,6 +274,13 @@ input, textarea, select, button {
   /* --- Schedule: featured next match stacks --- */
   .mob-nextmatch { grid-template-columns: 1fr !important; }
   .mob-nextmatch-img { min-height: 200px !important; }
+  .mob-nextmatch-info { padding: 24px 18px !important; }
+  /* Team names wrap + shrink on mobile so the non-wrapping clamp(40px+) text
+     can't force the card wider than the viewport (which pushed the countdown
+     badge off-screen). */
+  .mob-nextmatch-teams { flex-wrap: wrap !important; gap: 4px 12px !important; }
+  .mob-nextmatch-teams > div { font-size: 30px !important; }
+  .mob-nextmatch-teams > div:nth-child(2) { font-size: 18px !important; }
 
   /* --- Video: YouTube-style layout stacks, recs go full width --- */
   .mob-video-grid { grid-template-columns: 1fr !important; gap: 18px !important; }
