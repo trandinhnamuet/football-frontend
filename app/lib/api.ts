@@ -1,6 +1,14 @@
 import { Player, Article, MemorialPost, Match, TeamStats, DriveLink, VideoHighlight, RecommendedVideo, BannerSlide } from './types';
 
-const BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
+export const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
+const BASE = API_BASE;
+
+export interface ArticleImage {
+  filename: string;
+  url: string;
+  size: number;
+  uploaded_at: string;
+}
 
 function handleUnauthorized() {
   if (typeof window !== 'undefined') {
@@ -104,8 +112,18 @@ export const api = {
       body: form,
     });
     if (r.status === 401) { handleUnauthorized(); throw new Error('Unauthorized'); }
-    return r.json() as Promise<{ url: string }>;
+    if (!r.ok) throw new Error(await r.text() || `HTTP ${r.status}`);
+    return r.json() as Promise<{ url: string; filename: string; size: number }>;
   },
+  getArticleImages: (password: string) =>
+    fetchJSON<ArticleImage[]>('/api/articles/images', {
+      headers: { 'x-admin-password': password },
+    }),
+  deleteArticleImage: (filename: string, password: string) =>
+    fetchJSON<{ deleted: boolean; filename: string }>(`/api/articles/images/${encodeURIComponent(filename)}`, {
+      method: 'DELETE',
+      headers: { 'x-admin-password': password },
+    }),
 
   // Memorial Posts
   getMemorialPosts: () => fetchJSON<MemorialPost[]>('/api/memorial-posts'),

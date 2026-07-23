@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import AdminGuard from '../../components/AdminGuard';
 import AdminHeader from '../../components/AdminHeader';
+import ArticleImageLibrary, { absoluteUrl } from '../../components/ArticleImageLibrary';
 import { Article, FANTA, fmtDate } from '../../lib/types';
 import { api } from '../../lib/api';
+import { compressImage, formatBytes } from '../../lib/imageCompress';
 
 const BLACK = '#0a0a0a';
 const CARD = '#1a1a1a';
@@ -21,21 +23,52 @@ const emptyForm = { title: '', title_en: '', content: '', content_en: '', excerp
 
 function NewsForm({ initial, onSave, onCancel }: { initial: typeof emptyForm & { id?: number }; onSave: (data: any) => Promise<void>; onCancel: () => void }) {
   const [form, setForm] = useState(initial);
-  const [uploading, setUploading] = useState(false);
+  const [uploading, setUploading] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const contentEnRef = useRef<HTMLTextAreaElement>(null);
+  // Which content box the library inserts into — follows whichever was focused last.
+  const [target, setTarget] = useState<'content' | 'content_en'>('content');
+  // An untouched textarea reports caret 0, which would insert at the very top;
+  // append to the end until the writer has actually placed the caret.
+  const caretPlaced = useRef(false);
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setForm(f => ({ ...f, [k]: e.target.value }));
+
+  function focusContent(which: 'content' | 'content_en') {
+    setTarget(which);
+    caretPlaced.current = true;
+  }
+
+  function insertIntoContent(html: string) {
+    const el = (target === 'content' ? contentRef : contentEnRef).current;
+    const start = el && caretPlaced.current ? el.selectionStart : -1;
+    const end = el && caretPlaced.current ? el.selectionEnd : -1;
+    const splice = (v: string) => (start < 0 ? v + html : v.slice(0, start) + html + v.slice(end));
+    setForm(f => (target === 'content'
+      ? { ...f, content: splice(f.content) }
+      : { ...f, content_en: splice(f.content_en) }));
+    if (el && start >= 0) {
+      requestAnimationFrame(() => {
+        el.focus();
+        el.setSelectionRange(start + html.length, start + html.length);
+      });
+    }
+  }
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploading(true);
+    setUploading('Đang nén...');
+    setError('');
     try {
-      const res = await api.uploadArticleImage(file, getPassword());
+      const result = await compressImage(file);
+      setUploading(`Đang tải lên (${formatBytes(result.originalSize)} → ${formatBytes(result.size)})...`);
+      const res = await api.uploadArticleImage(result.file, getPassword());
       setForm(f => ({ ...f, image_url: res.url }));
     } catch { setError('Upload ảnh thất bại'); }
-    finally { setUploading(false); }
+    finally { setUploading(''); e.target.value = ''; }
   }
 
   async function submit() {
@@ -75,14 +108,22 @@ function NewsForm({ initial, onSave, onCancel }: { initial: typeof emptyForm & {
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         <div>
-          <label style={labelStyle}>Nội dung (VI) * — HTML hỗ trợ</label>
-          <textarea style={{ ...inputStyle, height: 220, resize: 'vertical', fontFamily: 'monospace', fontSize: 13 }} value={form.content} onChange={set('content')} placeholder="<p>Nội dung bài viết...</p>" />
+          <label style={labelStyle}>
+            Nội dung (VI) * — HTML hỗ trợ
+            {target === 'content' && <span style={{ color: FANTA, marginLeft: 8 }}>● đang chọn để chèn ảnh</span>}
+          </label>
+          <textarea ref={contentRef} onFocus={() => focusContent('content')} style={{ ...inputStyle, height: 220, resize: 'vertical', fontFamily: 'monospace', fontSize: 13, borderColor: target === 'content' ? `${FANTA}66` : LINE }} value={form.content} onChange={set('content')} placeholder="<p>Nội dung bài viết...</p>" />
         </div>
         <div>
-          <label style={labelStyle}>Content (EN)</label>
-          <textarea style={{ ...inputStyle, height: 220, resize: 'vertical', fontFamily: 'monospace', fontSize: 13 }} value={form.content_en} onChange={set('content_en')} placeholder="<p>Article content...</p>" />
+          <label style={labelStyle}>
+            Content (EN)
+            {target === 'content_en' && <span style={{ color: FANTA, marginLeft: 8 }}>● đang chọn để chèn ảnh</span>}
+          </label>
+          <textarea ref={contentEnRef} onFocus={() => focusContent('content_en')} style={{ ...inputStyle, height: 220, resize: 'vertical', fontFamily: 'monospace', fontSize: 13, borderColor: target === 'content_en' ? `${FANTA}66` : LINE }} value={form.content_en} onChange={set('content_en')} placeholder="<p>Article content...</p>" />
         </div>
       </div>
+
+      <ArticleImageLibrary password={getPassword()} onInsert={insertIntoContent} />
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 16 }}>
         <div>
           <label style={labelStyle}>Tag (VI)</label>
@@ -99,8 +140,15 @@ function NewsForm({ initial, onSave, onCancel }: { initial: typeof emptyForm & {
         <div>
           <label style={labelStyle}>Ảnh đại diện</label>
           <input type="file" accept="image/*" onChange={handleImageUpload} style={{ ...inputStyle, padding: '8px 12px', cursor: 'pointer' }} />
-          {uploading && <div style={{ fontSize: 12, color: FANTA, marginTop: 4 }}>Đang upload...</div>}
-          {form.image_url && <div style={{ fontSize: 11, color: '#1f8a5b', marginTop: 4, wordBreak: 'break-all' }}>✓ {form.image_url}</div>}
+          {uploading && <div style={{ fontSize: 12, color: FANTA, marginTop: 4 }}>{uploading}</div>}
+          {form.image_url && (
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={absoluteUrl(form.image_url)} alt="" style={{ width: 48, height: 48, objectFit: 'cover', border: `1px solid ${LINE}` }} />
+              <div style={{ fontSize: 11, color: '#1f8a5b', wordBreak: 'break-all', flex: 1 }}>✓ {form.image_url}</div>
+              <button type="button" onClick={() => setForm(f => ({ ...f, image_url: '' }))} style={{ background: 'transparent', color: MUTED, border: `1px solid ${LINE}`, padding: '4px 8px', fontSize: 11, cursor: 'pointer' }}>Bỏ</button>
+            </div>
+          )}
         </div>
       </div>
       {error && <div style={{ color: '#cc4444', fontSize: 13, padding: '10px 14px', background: 'rgba(204,68,68,0.1)', border: '1px solid rgba(204,68,68,0.3)' }}>{error}</div>}
