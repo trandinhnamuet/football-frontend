@@ -3,7 +3,13 @@
 import { useState, useEffect, ReactNode } from 'react';
 
 const FANTA = '#FF6B1A';
-const BLACK = '#0a0a0a';
+const BLACK = 'var(--bg)';
+const CARD = 'var(--card)';
+const INK = 'var(--ink)';
+const MUTED = 'var(--muted)';
+const LINE = 'var(--line)';
+// Text sitting on a FANTA-orange fill stays dark in both themes.
+const ON_FANTA = '#0a0a0a';
 const KEY = 'lffc_admin_pw';
 
 interface Props { children: ReactNode }
@@ -43,6 +49,9 @@ export default function AdminGuard({ children }: Props) {
         setAuthenticated(true);
         setError('');
         setMessage('');
+        // Let admin chrome rendered outside this guard (the sidebar, which lives
+        // in the admin layout) know it can show itself without a page reload.
+        window.dispatchEvent(new CustomEvent('admin-authenticated'));
       } else {
         if (!silent) setError('Sai mật khẩu');
         localStorage.removeItem(KEY);
@@ -57,7 +66,7 @@ export default function AdminGuard({ children }: Props) {
   if (checking) {
     return (
       <div style={{ minHeight: '100vh', background: BLACK, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ color: '#a09b94', fontFamily: 'Anton, sans-serif', fontSize: 24 }}>...</div>
+        <div style={{ color: MUTED, fontFamily: 'Anton, sans-serif', fontSize: 24 }}>...</div>
       </div>
     );
   }
@@ -65,11 +74,11 @@ export default function AdminGuard({ children }: Props) {
   if (!authenticated) {
     return (
       <div style={{ minHeight: '100vh', background: BLACK, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ background: '#1a1a1a', padding: '48px', width: '100%', maxWidth: 400, border: `1px solid ${FANTA}` }}>
-          <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 36, color: '#f4f1ea', textTransform: 'uppercase', marginBottom: 8 }}>
+        <div style={{ background: CARD, padding: '48px', width: '100%', maxWidth: 400, border: `1px solid ${FANTA}` }}>
+          <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 36, color: INK, textTransform: 'uppercase', marginBottom: 8 }}>
             Admin Access
           </div>
-          <div style={{ color: '#a09b94', fontSize: 13, marginBottom: 28 }}>Nhập mật khẩu để tiếp tục</div>
+          <div style={{ color: MUTED, fontSize: 13, marginBottom: 28 }}>Nhập mật khẩu để tiếp tục</div>
           {message && (
             <div style={{ color: '#facc15', fontSize: 13, marginBottom: 16, padding: '10px 14px', background: 'rgba(250,204,21,0.08)', border: '1px solid rgba(250,204,21,0.3)' }}>
               {message}
@@ -82,8 +91,8 @@ export default function AdminGuard({ children }: Props) {
             onKeyDown={e => e.key === 'Enter' && verifyPassword(input)}
             placeholder="Mật khẩu admin"
             style={{
-              width: '100%', background: BLACK, border: `1px solid ${error ? '#cc3333' : 'rgba(255,255,255,0.15)'}`,
-              color: '#f4f1ea', padding: '14px 16px', fontSize: 16, fontFamily: 'inherit',
+              width: '100%', background: 'var(--input-bg)', border: `1px solid ${error ? '#cc3333' : LINE}`,
+              color: INK, padding: '14px 16px', fontSize: 16, fontFamily: 'inherit',
               outline: 'none', boxSizing: 'border-box',
             }}
           />
@@ -91,7 +100,7 @@ export default function AdminGuard({ children }: Props) {
           <button
             onClick={() => verifyPassword(input)}
             style={{
-              marginTop: 16, width: '100%', background: FANTA, color: BLACK, border: 'none',
+              marginTop: 16, width: '100%', background: FANTA, color: ON_FANTA, border: 'none',
               padding: '14px', fontFamily: 'Anton, sans-serif', fontSize: 18, letterSpacing: '0.06em',
               textTransform: 'uppercase', cursor: 'pointer',
             }}

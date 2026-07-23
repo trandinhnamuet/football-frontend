@@ -7,11 +7,14 @@ import AdminHeader from '../../components/AdminHeader';
 import { Match, FANTA, fmtDate } from '../../lib/types';
 import { api } from '../../lib/api';
 
-const BLACK = '#0a0a0a';
-const CARD = '#1a1a1a';
-const INK = '#f4f1ea';
-const MUTED = '#a09b94';
-const LINE = 'rgba(255,255,255,0.15)';
+const BLACK = 'var(--bg)';
+const CARD = 'var(--card)';
+const INK = 'var(--ink)';
+const MUTED = 'var(--muted)';
+const LINE = 'var(--line)';
+// Text sitting on a FANTA-orange fill stays dark in both themes — light text on
+// orange fails contrast.
+const ON_FANTA = '#0a0a0a';
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 
 function resolveImg(url: string): string {
@@ -87,7 +90,7 @@ function MatchModal({ initial, mode, onSave, onClose }: MatchModalProps) {
   }
 
   const inputStyle: React.CSSProperties = {
-    width: '100%', background: 'rgba(255,255,255,0.06)', border: `1px solid ${LINE}`,
+    width: '100%', background: 'var(--hover-bg)', border: `1px solid ${LINE}`,
     color: INK, padding: '10px 14px', fontSize: 14, fontFamily: 'inherit',
     outline: 'none', boxSizing: 'border-box',
   };
@@ -101,7 +104,7 @@ function MatchModal({ initial, mode, onSave, onClose }: MatchModalProps) {
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div style={{ background: '#111', border: `1px solid ${FANTA}44`, width: '100%', maxWidth: 580, maxHeight: '90vh', overflowY: 'auto' }}>
+      <div style={{ background: 'var(--card)', border: `1px solid ${FANTA}44`, width: '100%', maxWidth: 580, maxHeight: '90vh', overflowY: 'auto' }}>
         <div style={{ padding: '20px 28px', borderBottom: `1px solid ${LINE}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
@@ -158,14 +161,14 @@ function MatchModal({ initial, mode, onSave, onClose }: MatchModalProps) {
           <div>
             <label style={labelStyle}>Ảnh trận đấu (hiển thị trong lịch thi đấu)</label>
             <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-              <div style={{ width: 140, height: 80, flexShrink: 0, background: 'rgba(255,255,255,0.06)', border: `1px solid ${LINE}`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              <div style={{ width: 140, height: 80, flexShrink: 0, background: 'var(--hover-bg)', border: `1px solid ${LINE}`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                 {form.image_url
                   ? <img src={resolveImg(form.image_url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   : <span style={{ color: MUTED, fontSize: 11 }}>Chưa có ảnh</span>}
               </div>
               <div style={{ flex: 1 }}>
                 <input type="file" accept="image/*" onChange={handleUploadImage} style={{ display: 'none' }} id="match-image-file" />
-                <label htmlFor="match-image-file" style={{ display: 'inline-block', background: '#222', color: INK, padding: '9px 16px', cursor: 'pointer', fontSize: 13 }}>
+                <label htmlFor="match-image-file" style={{ display: 'inline-block', background: 'var(--hover-bg)', color: INK, padding: '9px 16px', cursor: 'pointer', fontSize: 13 }}>
                   {uploading ? 'Đang tải lên...' : (form.image_url ? 'Đổi ảnh' : 'Tải ảnh lên')}
                 </label>
                 {form.image_url && (
@@ -213,7 +216,7 @@ function MatchModal({ initial, mode, onSave, onClose }: MatchModalProps) {
             <button
               onClick={handleSave}
               disabled={saving}
-              style={{ flex: 1, background: FANTA, color: BLACK, border: 'none', padding: '13px', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.7 : 1 }}
+              style={{ flex: 1, background: FANTA, color: ON_FANTA, border: 'none', padding: '13px', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.7 : 1 }}
             >
               {saving ? '...' : mode === 'create' ? 'Thêm trận' : 'Lưu thay đổi'}
             </button>
@@ -322,7 +325,7 @@ function ScheduleManagementContent() {
           </div>
           <button
             onClick={() => setModal({ mode: 'create', data: { ...emptyMatch, week: matches.length + 1 } })}
-            style={{ background: FANTA, color: BLACK, border: 'none', padding: '14px 28px', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}
+            style={{ background: FANTA, color: ON_FANTA, border: 'none', padding: '14px 28px', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}
           >
             + Thêm trận
           </button>
@@ -338,7 +341,7 @@ function ScheduleManagementContent() {
         <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
           {([['ALL', `Tất cả (${matches.length})`], ['upcoming', `Sắp tới (${matches.filter(m => m.is_upcoming).length})`], ['played', `Đã đá (${matches.filter(m => !m.is_upcoming).length})`]] as const).map(([val, label]) => (
             <button key={val} onClick={() => setFilter(val)} style={{
-              background: filter === val ? INK : 'rgba(255,255,255,0.05)',
+              background: filter === val ? INK : 'var(--input-bg)',
               color: filter === val ? BLACK : INK,
               border: `1px solid ${filter === val ? INK : LINE}`,
               padding: '8px 16px', fontSize: 12, letterSpacing: '0.06em', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600, textTransform: 'uppercase',
@@ -351,7 +354,7 @@ function ScheduleManagementContent() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: 60, color: MUTED, fontFamily: 'Anton, sans-serif', fontSize: 24 }}>Đang tải...</div>
         ) : (
-          <div style={{ background: CARD, border: `1px solid rgba(255,255,255,0.06)` }}>
+          <div style={{ background: CARD, border: `1px solid var(--hover-bg)` }}>
             {/* Table header */}
             <div style={{ display: 'grid', gridTemplateColumns: '50px 60px 80px 100px 1fr 1fr 80px 80px 120px', gap: 12, padding: '12px 20px', borderBottom: `1px solid ${LINE}`, fontSize: 10, color: MUTED, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 700 }}>
               <div>Ảnh</div>
@@ -377,13 +380,13 @@ function ScheduleManagementContent() {
                   gridTemplateColumns: '50px 60px 80px 100px 1fr 1fr 80px 80px 120px',
                   gap: 12,
                   padding: '8px 20px',
-                  borderBottom: i < filtered.length - 1 ? `1px solid rgba(255,255,255,0.05)` : 'none',
+                  borderBottom: i < filtered.length - 1 ? `1px solid var(--input-bg)` : 'none',
                   alignItems: 'center',
                   borderLeft: `3px solid ${m.is_upcoming ? FANTA : (resultColor[m.result] || 'transparent')}`,
-                  background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)',
+                  background: i % 2 === 0 ? 'transparent' : 'var(--soft)',
                 }}
               >
-                <div style={{ width: 50, height: 36, background: '#0a0a0a', border: `1px solid ${FANTA}33`, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ width: 50, height: 36, background: 'var(--alt-bg)', border: `1px solid ${FANTA}33`, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   {m.image_url
                     ? <img src={resolveImg(m.image_url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     : <div style={{ fontSize: 10, color: MUTED, textAlign: 'center' }}>—</div>}

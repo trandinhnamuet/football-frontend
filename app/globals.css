@@ -18,6 +18,14 @@
   --nav-muted: #a09b94;
   --shadow: rgba(0,0,0,0.08);
   --btn-shadow: #1a1a1a;
+  /* Form / panel surfaces — used heavily by the admin screens. Kept as their
+     own vars because a translucent white overlay reads as "slightly raised" on
+     dark but washes out to invisible on light. */
+  --input-bg: #ffffff;
+  --hover-bg: rgba(0,0,0,0.055);
+  --soft: rgba(0,0,0,0.03);
+  /* Long-form body copy: a touch softer than --ink so paragraphs don't glare. */
+  --prose: #2f2b26;
 }
 
 /* Dark theme */
@@ -33,6 +41,10 @@
   --nav-muted: #a09b94;
   --shadow: rgba(0,0,0,0.4);
   --btn-shadow: #aaaaaa;
+  --input-bg: rgba(255,255,255,0.05);
+  --hover-bg: rgba(255,255,255,0.08);
+  --soft: rgba(255,255,255,0.02);
+  --prose: #d8d3cb;
 }
 
 html, body {
@@ -106,6 +118,151 @@ input, textarea, select, button {
    RESPONSIVE / MOBILE UTILITIES
    All use !important to override inline React styles
    ================================================ */
+
+/* ── Admin shell: left sidebar + content column ──────────────────────────── */
+.admin-shell {
+  display: flex;
+  align-items: flex-start;
+  min-height: 100vh;
+  background: var(--bg);
+}
+.admin-content {
+  flex: 1;
+  min-width: 0; /* let wide tables scroll instead of stretching the flex item */
+}
+
+.admin-sidebar {
+  position: sticky;
+  top: 0;
+  flex-shrink: 0;
+  width: 224px;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--card);
+  border-right: 1px solid var(--line);
+  padding: 18px 12px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 60;
+}
+
+.admin-sidebar-brand {
+  font-family: Anton, sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+  padding: 4px 10px 14px;
+}
+
+.admin-side-back {
+  display: block;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 107, 26, 0.4);
+  color: #FF6B1A;
+  background: rgba(255, 107, 26, 0.08);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.admin-side-back:hover {
+  background: #FF6B1A;
+  color: #0a0a0a;
+}
+
+.admin-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-side-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+}
+.admin-side-link:hover {
+  background: var(--hover-bg);
+  color: var(--ink);
+}
+.admin-side-link[data-active='true'] {
+  background: var(--hover-bg);
+  color: #FF6B1A;
+  border-left-color: #FF6B1A;
+}
+.admin-side-icon { font-size: 15px; line-height: 1; }
+
+.admin-side-home {
+  margin-top: auto;
+  padding: 12px 12px 0;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  text-decoration: none;
+}
+.admin-side-home:hover { color: #FF6B1A; }
+
+/* Drawer toggle — desktop keeps the sidebar permanently docked */
+.admin-sidebar-toggle { display: none; }
+.admin-sidebar-backdrop { display: none; }
+
+@media (max-width: 900px) {
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100%;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 6px 0 34px rgba(0, 0, 0, 0.42);
+    z-index: 210;
+  }
+  .admin-sidebar[data-open='true'] { transform: translateX(0); }
+
+  .admin-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 205;
+  }
+
+  .admin-sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    left: 12px;
+    bottom: 16px;
+    width: 46px;
+    height: 46px;
+    border: none;
+    border-radius: 50%;
+    background: #FF6B1A;
+    color: #0a0a0a;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    z-index: 220;
+  }
+}
 
 /* ── Header nav hover effects ────────────────────────────────────────────── */
 .nav-link {

@@ -113,7 +113,7 @@ export default function DashboardPage() {
                   key={m.key}
                   onClick={() => setMetric(m.key)}
                   style={{
-                    background: metric === m.key ? INK : 'rgba(255,255,255,0.05)',
+                    background: metric === m.key ? INK : 'var(--hover-bg)',
                     color: metric === m.key ? BLACK : INK,
                     border: `1px solid ${metric === m.key ? INK : LINE}`,
                     padding: '7px 14px', fontSize: 12, letterSpacing: '0.06em', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600,
@@ -132,7 +132,7 @@ export default function DashboardPage() {
                   key={r}
                   onClick={() => setRoleFilter(r)}
                   style={{
-                    background: roleFilter === r ? INK : 'rgba(255,255,255,0.05)',
+                    background: roleFilter === r ? INK : 'var(--hover-bg)',
                     color: roleFilter === r ? BLACK : INK,
                     border: `1px solid ${roleFilter === r ? INK : LINE}`,
                     padding: '7px 14px', fontSize: 12, letterSpacing: '0.06em', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600,
@@ -169,7 +169,9 @@ export default function DashboardPage() {
           ) : (
             <ResponsiveContainer width="100%" height={400}>
               <BarChart data={chartData} margin={{ top: 0, right: 0, bottom: 60, left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                {/* SVG presentation attributes don't resolve var(), so use a
+                    mid-grey that reads on both light and dark backgrounds. */}
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.28)" />
                 <XAxis
                   dataKey="name"
                   tick={{ fill: MUTED, fontSize: 11, fontFamily: 'Space Grotesk' }}

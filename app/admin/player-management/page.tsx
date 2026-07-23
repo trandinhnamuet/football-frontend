@@ -10,11 +10,14 @@ import { api } from '../../lib/api';
 import { DEFAULT_PLAYER_AVATAR_URL } from '../../lib/assets';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-const BLACK = '#0a0a0a';
-const CARD = '#1a1a1a';
-const INK = '#f4f1ea';
-const MUTED = '#a09b94';
-const LINE = 'rgba(255,255,255,0.15)';
+const BLACK = 'var(--bg)';
+const CARD = 'var(--card)';
+const INK = 'var(--ink)';
+const MUTED = 'var(--muted)';
+const LINE = 'var(--line)';
+// Text sitting on a FANTA-orange fill stays dark in both themes — light text on
+// orange fails contrast.
+const ON_FANTA = '#0a0a0a';
 
 const roleColors: Record<string, string> = { GK: '#aa3333', DEF: '#2a6fdb', MID: '#1f8a5b', FWD: FANTA };
 
@@ -97,7 +100,7 @@ function EditModal({ player, isNew, onSave, onDelete, onClose }: EditModalProps)
   }
 
   const inputStyle: React.CSSProperties = {
-    width: '100%', background: 'rgba(255,255,255,0.06)', border: `1px solid ${LINE}`,
+    width: '100%', background: 'var(--hover-bg)', border: `1px solid ${LINE}`,
     color: INK, padding: '10px 14px', fontSize: 14, fontFamily: 'inherit',
     outline: 'none', boxSizing: 'border-box',
   };
@@ -109,7 +112,7 @@ function EditModal({ player, isNew, onSave, onDelete, onClose }: EditModalProps)
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div style={{ background: '#111', border: `1px solid ${FANTA}44`, width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto' }}>
+      <div style={{ background: 'var(--card)', border: `1px solid ${FANTA}44`, width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto' }}>
         {/* Header */}
         <div style={{ padding: '20px 28px', borderBottom: `1px solid ${LINE}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
@@ -146,7 +149,7 @@ function EditModal({ player, isNew, onSave, onDelete, onClose }: EditModalProps)
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <label style={labelStyle}>Ảnh đại diện</label>
-                <label style={{ display: 'block', background: 'rgba(255,255,255,0.06)', border: `1px dashed ${LINE}`, color: MUTED, padding: '10px 14px', fontSize: 13, cursor: 'pointer', textAlign: 'center' }}>
+                <label style={{ display: 'block', background: 'var(--hover-bg)', border: `1px dashed ${LINE}`, color: MUTED, padding: '10px 14px', fontSize: 13, cursor: 'pointer', textAlign: 'center' }}>
                   {file ? '✓ Đã chọn' : '+ Chọn ảnh'}
                   <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
                 </label>
@@ -166,12 +169,12 @@ function EditModal({ player, isNew, onSave, onDelete, onClose }: EditModalProps)
                     style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'block' }}
                   />
                 ) : (
-                  <div style={{ width: 72, height: 72, background: 'rgba(255,255,255,0.06)', border: `1px dashed ${LINE}`, clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: MUTED, fontSize: 22 }}>🔍</div>
+                  <div style={{ width: 72, height: 72, background: 'var(--hover-bg)', border: `1px dashed ${LINE}`, clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: MUTED, fontSize: 22 }}>🔍</div>
                 )}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <label style={labelStyle}>Ảnh zoom (trang chủ)</label>
-                <label style={{ display: 'block', background: 'rgba(255,255,255,0.06)', border: `1px dashed ${LINE}`, color: MUTED, padding: '10px 14px', fontSize: 13, cursor: 'pointer', textAlign: 'center' }}>
+                <label style={{ display: 'block', background: 'var(--hover-bg)', border: `1px dashed ${LINE}`, color: MUTED, padding: '10px 14px', fontSize: 13, cursor: 'pointer', textAlign: 'center' }}>
                   {zoomFile ? '✓ Đã chọn' : '+ Chọn ảnh'}
                   <input type="file" accept="image/*" onChange={handleZoomFileChange} style={{ display: 'none' }} />
                 </label>
@@ -241,7 +244,7 @@ function EditModal({ player, isNew, onSave, onDelete, onClose }: EditModalProps)
                 { label: 'Điểm danh', value: player.stat_attendance },
                 { label: 'Trận', value: player.stat_matches },
               ].map(s => (
-                <div key={s.label} style={{ textAlign: 'center', background: 'rgba(255,255,255,0.04)', padding: '10px 6px' }}>
+                <div key={s.label} style={{ textAlign: 'center', background: 'var(--soft)', padding: '10px 6px' }}>
                   <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, color: s.accent ? FANTA : INK }}>{s.value}</div>
                   <div style={{ fontSize: 9, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 2 }}>{s.label}</div>
                 </div>
@@ -257,7 +260,7 @@ function EditModal({ player, isNew, onSave, onDelete, onClose }: EditModalProps)
             <button
               onClick={handleSave}
               disabled={saving || deleting}
-              style={{ flex: 1, background: FANTA, color: BLACK, border: 'none', padding: '13px', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.7 : 1 }}
+              style={{ flex: 1, background: FANTA, color: ON_FANTA, border: 'none', padding: '13px', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.7 : 1 }}
             >
               {saving ? '...' : (isNew ? 'Thêm cầu thủ' : 'Lưu thay đổi')}
             </button>
@@ -295,7 +298,7 @@ function StatMini({ label, value, accent }: { label: string; value: number; acce
 function PlayerCard({ player, onEdit }: { player: Player; onEdit: () => void }) {
   return (
     <div style={{ background: CARD, padding: 20, position: 'relative', overflow: 'hidden', borderLeft: `4px solid ${roleColors[player.role] || FANTA}` }}>
-      <div style={{ position: 'absolute', top: 8, right: 10, fontFamily: 'Anton, sans-serif', fontSize: 72, lineHeight: 0.85, color: 'rgba(255,255,255,0.04)' }}>{player.num}</div>
+      <div style={{ position: 'absolute', top: 8, right: 10, fontFamily: 'Anton, sans-serif', fontSize: 72, lineHeight: 0.85, color: 'var(--soft)' }}>{player.num}</div>
 
       <div style={{ marginBottom: 12 }}>
         {player.image_url ? (
@@ -309,7 +312,7 @@ function PlayerCard({ player, onEdit }: { player: Player; onEdit: () => void }) 
       <div style={{ fontSize: 11, color: roleColors[player.role] || FANTA, letterSpacing: '0.14em', textTransform: 'uppercase', marginTop: 2, fontWeight: 700 }}>#{player.num} · {player.role}</div>
       <div style={{ fontSize: 12, color: MUTED, marginTop: 3, fontStyle: 'italic' }}>"{player.nick}"</div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, borderTop: `1px solid rgba(255,255,255,0.08)`, paddingTop: 10, marginTop: 10, marginBottom: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, borderTop: `1px solid var(--hover-bg)`, paddingTop: 10, marginTop: 10, marginBottom: 12 }}>
         <StatMini label="Điểm" value={Math.round(player.stat_points)} accent />
         <StatMini label="Bàn" value={player.stat_goals} />
         <StatMini label="Kiến tạo" value={player.stat_assists} />
@@ -420,13 +423,13 @@ function PlayerManagementContent() {
             <p style={{ color: MUTED, fontSize: 14, marginTop: 8 }}>Thêm/sửa/xóa thủ công · Import từ Sheet thông tin · Điểm đồng bộ từ Sheet thống kê</p>
           </div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <button onClick={() => setAddingPlayer(true)} style={{ background: 'rgba(255,255,255,0.06)', color: INK, border: `1px solid ${LINE}`, padding: '14px 22px', fontFamily: 'Anton, sans-serif', fontSize: 15, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer' }}>
+            <button onClick={() => setAddingPlayer(true)} style={{ background: 'var(--hover-bg)', color: INK, border: `1px solid ${LINE}`, padding: '14px 22px', fontFamily: 'Anton, sans-serif', fontSize: 15, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer' }}>
               + Thêm cầu thủ
             </button>
             <button onClick={handleImport} disabled={importing} style={{ background: 'rgba(255,107,26,0.12)', color: FANTA, border: `1px solid ${FANTA}66`, padding: '14px 22px', fontFamily: 'Anton, sans-serif', fontSize: 15, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer', opacity: importing ? 0.7 : 1 }}>
               {importing ? 'Đang import...' : '⬇ Import cầu thủ'}
             </button>
-            <button onClick={handleSync} disabled={syncing} style={{ background: FANTA, color: BLACK, border: 'none', padding: '14px 22px', fontFamily: 'Anton, sans-serif', fontSize: 15, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer', opacity: syncing ? 0.7 : 1 }}>
+            <button onClick={handleSync} disabled={syncing} style={{ background: FANTA, color: ON_FANTA, border: 'none', padding: '14px 22px', fontFamily: 'Anton, sans-serif', fontSize: 15, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer', opacity: syncing ? 0.7 : 1 }}>
               {syncing ? 'Đang đồng bộ...' : '↻ Đồng bộ điểm'}
             </button>
           </div>
@@ -441,7 +444,7 @@ function PlayerManagementContent() {
         <div style={{ display: 'flex', gap: 8, marginBottom: 28 }}>
           {['ALL', 'Tự do', 'GK', 'DEF', 'MID', 'FWD'].map(r => (
             <button key={r} onClick={() => setRoleFilter(r)} style={{
-              background: roleFilter === r ? INK : 'rgba(255,255,255,0.05)',
+              background: roleFilter === r ? INK : 'var(--input-bg)',
               color: roleFilter === r ? BLACK : INK,
               border: `1px solid ${roleFilter === r ? INK : LINE}`,
               padding: '8px 16px', fontSize: 12, letterSpacing: '0.06em', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600, textTransform: 'uppercase',

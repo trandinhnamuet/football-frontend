@@ -185,9 +185,9 @@ export default function DriveLinksAdminPage() {
           <div style={{ background: `${FANTA}15`, border: `1px solid ${FANTA}44`, padding: '12px 16px', marginBottom: 24, borderRadius: 4, fontSize: 13, lineHeight: 1.6 }}>
             <div style={{ color: FANTA, fontWeight: 600, marginBottom: 6 }}>⚠️ Cách lưu link ảnh:</div>
             <div style={{ color: INK }}>
-              Lưu <strong>File ID</strong> từ URL Google Drive (ví dụ: <code style={{ background: '#0a0a0a', padding: '2px 4px' }}>1F2aB3cD4eF5gH6iJ7kL8</code>), không phải đường link đầy đủ hoặc folder link.<br/>
+              Lưu <strong>File ID</strong> từ URL Google Drive (ví dụ: <code style={{ background: 'var(--hover-bg)', color: 'var(--ink)', padding: '2px 4px' }}>1F2aB3cD4eF5gH6iJ7kL8</code>), không phải đường link đầy đủ hoặc folder link.<br/>
               Lý do: Folder link bị chặn bởi CORS (403 Forbidden), chỉ file ID có thể load được trên browser.<br/>
-              📌 Lấy File ID từ: <code style={{ background: '#0a0a0a', padding: '2px 4px' }}>drive.google.com/file/d/<strong>FILE_ID_ĐÂY</strong>/view</code>
+              📌 Lấy File ID từ: <code style={{ background: 'var(--hover-bg)', color: 'var(--ink)', padding: '2px 4px' }}>drive.google.com/file/d/<strong>FILE_ID_ĐÂY</strong>/view</code>
             </div>
           </div>
 
@@ -214,7 +214,7 @@ export default function DriveLinksAdminPage() {
                   <div style={{ fontSize: 12, color: MUTED, marginTop: 6, lineHeight: 1.5, background: 'rgba(255,107,26,0.05)', padding: '8px 10px', borderRadius: 2 }}>
                     <strong style={{ color: FANTA }}>📌 Cách lấy File ID:</strong>
                     <br/>① Mở ảnh trên Google Drive
-                    <br/>② Lấy từ URL: <code style={{ background: '#0a0a0a', padding: '2px 4px', fontSize: 11 }}>...file/d/<strong>FILE_ID_ĐÂY</strong>/view?...</code>
+                    <br/>② Lấy từ URL: <code style={{ background: 'var(--hover-bg)', color: 'var(--ink)', padding: '2px 4px', fontSize: 11 }}>...file/d/<strong>FILE_ID_ĐÂY</strong>/view?...</code>
                     <br/>③ Copy đoạn FILE_ID (khoảng 30-40 ký tự chữ số, gạch ngang)
                     <br/><strong style={{ color: '#22c55e', fontSize: 11 }}>✓ VD: 1F2aB3cD4eF5gH6iJ7kL8mN9oP0qR1sT2uV3w</strong>
                   </div>
@@ -291,7 +291,7 @@ export default function DriveLinksAdminPage() {
                     onClick={() => togglePublic(link)}
                     style={{
                       padding: '4px 10px', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 11,
-                      background: link.is_public ? '#22c55e22' : 'rgba(255,255,255,0.05)',
+                      background: link.is_public ? '#22c55e22' : 'var(--hover-bg)',
                       color: link.is_public ? '#22c55e' : MUTED,
                       letterSpacing: '0.06em', textTransform: 'uppercase',
                     }}

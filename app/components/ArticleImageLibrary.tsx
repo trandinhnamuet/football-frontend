@@ -5,10 +5,12 @@ import { api, API_BASE, ArticleImage } from '../lib/api';
 import { compressImage, formatBytes } from '../lib/imageCompress';
 import { FANTA } from '../lib/types';
 
-const CARD = '#1a1a1a';
-const INK = '#f4f1ea';
-const MUTED = '#a09b94';
-const LINE = 'rgba(255,255,255,0.15)';
+const CARD = 'var(--card)';
+const INK = 'var(--ink)';
+const MUTED = 'var(--muted)';
+const LINE = 'var(--line)';
+// Text sitting on a FANTA-orange fill stays dark in both themes.
+const ON_FANTA = '#0a0a0a';
 
 /** Absolute URL — article HTML is rendered on the site domain, not the API domain. */
 export function absoluteUrl(url: string) {
@@ -121,12 +123,12 @@ export default function ArticleImageLibrary({
   }
 
   const btn: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.08)', color: INK, border: `1px solid ${LINE}`,
+    background: 'var(--hover-bg)', color: INK, border: `1px solid ${LINE}`,
     padding: '5px 8px', fontFamily: 'inherit', fontSize: 11, cursor: 'pointer', flex: 1,
   };
 
   return (
-    <div style={{ border: `1px solid ${LINE}`, background: 'rgba(255,255,255,0.02)', padding: 20 }}>
+    <div style={{ border: `1px solid ${LINE}`, background: 'var(--soft)', padding: 20 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 14 }}>
         <div>
           <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, textTransform: 'uppercase', color: FANTA }}>
@@ -142,7 +144,7 @@ export default function ArticleImageLibrary({
             type="button"
             onClick={() => fileInput.current?.click()}
             disabled={!!progress}
-            style={{ background: FANTA, color: '#0a0a0a', border: 'none', padding: '10px 20px', fontFamily: 'Anton, sans-serif', fontSize: 14, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: progress ? 'default' : 'pointer', opacity: progress ? 0.6 : 1 }}
+            style={{ background: FANTA, color: ON_FANTA, border: 'none', padding: '10px 20px', fontFamily: 'Anton, sans-serif', fontSize: 14, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: progress ? 'default' : 'pointer', opacity: progress ? 0.6 : 1 }}
           >
             + Tải ảnh lên
           </button>
@@ -162,7 +164,7 @@ export default function ArticleImageLibrary({
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: 12, maxHeight: 420, overflowY: 'auto' }}>
           {images.map(img => (
             <div key={img.filename} style={{ background: CARD, border: `1px solid ${LINE}`, display: 'flex', flexDirection: 'column' }}>
-              <a href={absoluteUrl(img.url)} target="_blank" rel="noreferrer" style={{ display: 'block', height: 110, background: '#000', overflow: 'hidden' }}>
+              <a href={absoluteUrl(img.url)} target="_blank" rel="noreferrer" style={{ display: 'block', height: 110, background: 'var(--alt-bg)', overflow: 'hidden' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={absoluteUrl(img.url)} alt={img.filename} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
               </a>

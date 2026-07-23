@@ -59,7 +59,7 @@ function SlideCard({ slide, onChange, onDelete, onSave, onMoveUp, onMoveDown, is
   };
 
   return (
-    <div style={{ background: CARD, border: `1px solid ${slide.is_active ? FANTA + '55' : 'rgba(255,255,255,0.08)'}`, display: 'grid', gridTemplateColumns: '260px 1fr', gap: 20, padding: 18 }}>
+    <div style={{ background: CARD, border: `1px solid ${slide.is_active ? FANTA + '55' : 'var(--line)'}`, display: 'grid', gridTemplateColumns: '260px 1fr', gap: 20, padding: 18 }}>
       {/* Image */}
       <div>
         <div style={{ width: '100%', aspectRatio: '16/9', background: '#111', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -74,11 +74,11 @@ function SlideCard({ slide, onChange, onDelete, onSave, onMoveUp, onMoveDown, is
         {/* Reorder controls */}
         <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
           <button onClick={onMoveUp} disabled={busy || isFirst} title="Di chuyển lên"
-            style={{ flex: 1, background: isFirst ? 'rgba(255,255,255,0.04)' : 'rgba(255,107,26,0.12)', color: isFirst ? MUTED : FANTA, border: `1px solid ${isFirst ? 'rgba(255,255,255,0.08)' : FANTA + '55'}`, padding: '7px', cursor: isFirst ? 'default' : 'pointer', fontFamily: 'Anton, sans-serif', fontSize: 14, opacity: isFirst ? 0.5 : 1 }}>
+            style={{ flex: 1, background: isFirst ? 'var(--hover-bg)' : 'rgba(255,107,26,0.12)', color: isFirst ? MUTED : FANTA, border: `1px solid ${isFirst ? 'var(--line)' : FANTA + '55'}`, padding: '7px', cursor: isFirst ? 'default' : 'pointer', fontFamily: 'Anton, sans-serif', fontSize: 14, opacity: isFirst ? 0.5 : 1 }}>
             ↑ Lên
           </button>
           <button onClick={onMoveDown} disabled={busy || isLast} title="Di chuyển xuống"
-            style={{ flex: 1, background: isLast ? 'rgba(255,255,255,0.04)' : 'rgba(255,107,26,0.12)', color: isLast ? MUTED : FANTA, border: `1px solid ${isLast ? 'rgba(255,255,255,0.08)' : FANTA + '55'}`, padding: '7px', cursor: isLast ? 'default' : 'pointer', fontFamily: 'Anton, sans-serif', fontSize: 14, opacity: isLast ? 0.5 : 1 }}>
+            style={{ flex: 1, background: isLast ? 'var(--hover-bg)' : 'rgba(255,107,26,0.12)', color: isLast ? MUTED : FANTA, border: `1px solid ${isLast ? 'var(--line)' : FANTA + '55'}`, padding: '7px', cursor: isLast ? 'default' : 'pointer', fontFamily: 'Anton, sans-serif', fontSize: 14, opacity: isLast ? 0.5 : 1 }}>
             ↓ Xuống
           </button>
         </div>

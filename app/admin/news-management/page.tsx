@@ -9,11 +9,14 @@ import { Article, FANTA, fmtDate } from '../../lib/types';
 import { api } from '../../lib/api';
 import { compressImage, formatBytes } from '../../lib/imageCompress';
 
-const BLACK = '#0a0a0a';
-const CARD = '#1a1a1a';
-const INK = '#f4f1ea';
-const MUTED = '#a09b94';
-const LINE = 'rgba(255,255,255,0.15)';
+const BLACK = 'var(--bg)';
+const CARD = 'var(--card)';
+const INK = 'var(--ink)';
+const MUTED = 'var(--muted)';
+const LINE = 'var(--line)';
+// Text sitting on a FANTA-orange fill stays dark in both themes — light text on
+// orange fails contrast.
+const ON_FANTA = '#0a0a0a';
 
 function getPassword() {
   return typeof window !== 'undefined' ? (localStorage.getItem('lffc_admin_pw') || '') : '';
@@ -81,7 +84,7 @@ function NewsForm({ initial, onSave, onCancel }: { initial: typeof emptyForm & {
     finally { setSaving(false); }
   }
 
-  const inputStyle: React.CSSProperties = { width: '100%', background: 'rgba(255,255,255,0.05)', border: `1px solid ${LINE}`, color: INK, padding: '10px 14px', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' };
+  const inputStyle: React.CSSProperties = { width: '100%', background: 'var(--input-bg)', border: `1px solid ${LINE}`, color: INK, padding: '10px 14px', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' };
   const labelStyle: React.CSSProperties = { fontSize: 11, color: MUTED, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 600, display: 'block', marginBottom: 6 };
 
   return (
@@ -153,7 +156,7 @@ function NewsForm({ initial, onSave, onCancel }: { initial: typeof emptyForm & {
       </div>
       {error && <div style={{ color: '#cc4444', fontSize: 13, padding: '10px 14px', background: 'rgba(204,68,68,0.1)', border: '1px solid rgba(204,68,68,0.3)' }}>{error}</div>}
       <div style={{ display: 'flex', gap: 12 }}>
-        <button onClick={submit} disabled={saving} style={{ background: FANTA, color: BLACK, border: 'none', padding: '12px 28px', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
+        <button onClick={submit} disabled={saving} style={{ background: FANTA, color: ON_FANTA, border: 'none', padding: '12px 28px', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
           {saving ? 'Đang lưu...' : (form.id ? 'Cập nhật' : 'Đăng bài')}
         </button>
         <button onClick={onCancel} style={{ background: 'transparent', color: MUTED, border: `1px solid ${LINE}`, padding: '12px 24px', fontFamily: 'inherit', fontSize: 14, cursor: 'pointer' }}>Hủy</button>
@@ -211,7 +214,7 @@ function NewsManagementContent() {
             </h1>
           </div>
           {mode === 'list' && (
-            <button onClick={() => { setEditing(null); setMode('new'); }} style={{ background: FANTA, color: BLACK, border: 'none', padding: '14px 28px', fontFamily: 'Anton, sans-serif', fontSize: 18, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>
+            <button onClick={() => { setEditing(null); setMode('new'); }} style={{ background: FANTA, color: ON_FANTA, border: 'none', padding: '14px 28px', fontFamily: 'Anton, sans-serif', fontSize: 18, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>
               + VIẾT BÀI MỚI
             </button>
           )}
@@ -250,14 +253,14 @@ function NewsManagementContent() {
               <div key={article.id} style={{ background: CARD, padding: '20px 24px', display: 'grid', gridTemplateColumns: '1fr auto', gap: 20, alignItems: 'center', borderLeft: `4px solid ${FANTA}` }}>
                 <div>
                   <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 6 }}>
-                    {article.tag && <span style={{ background: FANTA, color: BLACK, padding: '2px 8px', fontFamily: 'Anton, sans-serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{article.tag}</span>}
+                    {article.tag && <span style={{ background: FANTA, color: ON_FANTA, padding: '2px 8px', fontFamily: 'Anton, sans-serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{article.tag}</span>}
                     <span style={{ fontSize: 12, color: MUTED }}>{fmtDate(article.published_at)}</span>
                   </div>
                   <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, letterSpacing: '0.01em', textTransform: 'uppercase' }}>{article.title}</div>
                   {article.excerpt && <div style={{ fontSize: 13, color: MUTED, marginTop: 4 }}>{article.excerpt.slice(0, 120)}...</div>}
                 </div>
                 <div style={{ display: 'flex', gap: 10 }}>
-                  <Link href={`/news/${article.id}`} target="_blank" style={{ background: 'rgba(255,255,255,0.08)', color: INK, padding: '8px 16px', textDecoration: 'none', fontSize: 12, fontFamily: 'Anton, sans-serif', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Xem</Link>
+                  <Link href={`/news/${article.id}`} target="_blank" style={{ background: 'var(--hover-bg)', color: INK, padding: '8px 16px', textDecoration: 'none', fontSize: 12, fontFamily: 'Anton, sans-serif', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Xem</Link>
                   <button onClick={() => { setEditing(article); setMode('edit'); window.scrollTo(0, 0); }} style={{ background: 'rgba(255,107,26,0.15)', color: FANTA, border: `1px solid ${FANTA}33`, padding: '8px 16px', fontFamily: 'Anton, sans-serif', fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>Sửa</button>
                   <button onClick={() => handleDelete(article.id)} disabled={deleting === article.id} style={{ background: 'rgba(204,68,68,0.1)', color: '#cc4444', border: '1px solid rgba(204,68,68,0.3)', padding: '8px 16px', fontFamily: 'Anton, sans-serif', fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>
                     {deleting === article.id ? '...' : 'Xóa'}

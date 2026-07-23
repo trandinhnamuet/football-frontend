@@ -6,11 +6,14 @@ import AdminHeader from '../../components/AdminHeader';
 import { MemorialPost, FANTA, fmtDate } from '../../lib/types';
 import { api } from '../../lib/api';
 
-const BLACK = '#0a0a0a';
-const CARD = '#1a1a1a';
-const INK = '#f4f1ea';
-const MUTED = '#a09b94';
-const LINE = 'rgba(255,255,255,0.15)';
+const BLACK = 'var(--bg)';
+const CARD = 'var(--card)';
+const INK = 'var(--ink)';
+const MUTED = 'var(--muted)';
+const LINE = 'var(--line)';
+// Text sitting on a FANTA-orange fill stays dark in both themes — light text on
+// orange fails contrast.
+const ON_FANTA = '#0a0a0a';
 
 function getPassword() {
   return typeof window !== 'undefined' ? (localStorage.getItem('lffc_admin_pw') || '') : '';
@@ -60,7 +63,7 @@ function MemorialForm({ initial, onSave, onCancel }: {
     finally { setSaving(false); }
   }
 
-  const inputStyle: React.CSSProperties = { width: '100%', background: 'rgba(255,255,255,0.05)', border: `1px solid ${LINE}`, color: INK, padding: '10px 14px', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' };
+  const inputStyle: React.CSSProperties = { width: '100%', background: 'var(--input-bg)', border: `1px solid ${LINE}`, color: INK, padding: '10px 14px', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' };
   const labelStyle: React.CSSProperties = { fontSize: 11, color: MUTED, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 600, display: 'block', marginBottom: 6 };
 
   return (
@@ -132,7 +135,7 @@ function MemorialForm({ initial, onSave, onCancel }: {
         <button
           onClick={submit}
           disabled={saving}
-          style={{ background: FANTA, color: BLACK, border: 'none', padding: '12px 28px', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.6 : 1 }}
+          style={{ background: FANTA, color: ON_FANTA, border: 'none', padding: '12px 28px', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.6 : 1 }}
         >
           {saving ? 'Đang lưu...' : (form.id ? 'Cập nhật' : 'Đăng bài')}
         </button>
@@ -198,7 +201,7 @@ function MemorialManagementContent() {
           {mode === 'list' && (
             <button
               onClick={() => { setEditing(null); setMode('new'); }}
-              style={{ background: FANTA, color: BLACK, border: 'none', padding: '14px 28px', fontFamily: 'Anton, sans-serif', fontSize: 18, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}
+              style={{ background: FANTA, color: ON_FANTA, border: 'none', padding: '14px 28px', fontFamily: 'Anton, sans-serif', fontSize: 18, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}
             >
               + VIẾT BÀI MỚI
             </button>
@@ -240,7 +243,7 @@ function MemorialManagementContent() {
                 <div>
                   <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 6 }}>
                     {post.tag && (
-                      <span style={{ background: FANTA, color: BLACK, padding: '2px 8px', fontFamily: 'Anton, sans-serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                      <span style={{ background: FANTA, color: ON_FANTA, padding: '2px 8px', fontFamily: 'Anton, sans-serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                         {post.tag}
                       </span>
                     )}
