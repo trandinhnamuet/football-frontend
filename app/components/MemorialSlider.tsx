@@ -155,7 +155,7 @@ export default function MemorialSlider() {
                 <div style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', flexShrink: 0 }}>
                   {fmtDate(post.published_at)}
                 </div>
-                <h3 style={{ fontFamily: 'Anton, sans-serif', fontSize: isMobile ? 13 : 'clamp(15px, 1.4vw, 20px)', lineHeight: 1.1, letterSpacing: '0.01em', textTransform: 'uppercase', margin: 0, flexShrink: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                <h3 style={{ fontFamily: 'Anton, sans-serif', fontSize: isMobile ? 13 : 'clamp(15px, 1.4vw, 20px)', lineHeight: 1.25, letterSpacing: '0.01em', textTransform: 'uppercase', margin: 0, flexShrink: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   {title}
                 </h3>
                 {excerpt && !isMobile && (

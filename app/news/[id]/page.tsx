@@ -5,9 +5,12 @@ import Footer from '../../components/Footer';
 import { Article, FANTA, fmtDate } from '../../lib/types';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-const BLACK = '#0a0a0a';
-const INK = '#f4f1ea';
-const MUTED = '#a09b94';
+const BLACK = 'var(--bg)';
+const INK = 'var(--ink)';
+const MUTED = 'var(--muted)';
+// Text sitting on a FANTA-orange fill stays dark in both themes — light text on
+// orange fails contrast.
+const ON_FANTA = '#0a0a0a';
 
 async function getArticle(id: string): Promise<Article | null> {
   try {
@@ -31,12 +34,12 @@ export default async function ArticlePage({ params }: { params: Promise<{ id: st
         </div>
 
         {article.tag && (
-          <div style={{ display: 'inline-block', background: FANTA, color: BLACK, padding: '4px 12px', fontFamily: 'Anton, sans-serif', fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 16 }}>
+          <div style={{ display: 'inline-block', background: FANTA, color: ON_FANTA, padding: '4px 12px', fontFamily: 'Anton, sans-serif', fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 16 }}>
             {article.tag}
           </div>
         )}
 
-        <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(36px, 5vw, 64px)', lineHeight: 1.0, letterSpacing: '0.01em', textTransform: 'uppercase', marginBottom: 16 }}>
+        <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(36px, 5vw, 64px)', lineHeight: 1.2, letterSpacing: '0.01em', textTransform: 'uppercase', marginBottom: 16 }}>
           {article.title}
         </h1>
 
@@ -53,13 +56,13 @@ export default async function ArticlePage({ params }: { params: Promise<{ id: st
         )}
 
         {article.excerpt && (
-          <p style={{ fontSize: 18, lineHeight: 1.7, color: '#d8d3cb', borderLeft: `4px solid ${FANTA}`, paddingLeft: 20, marginBottom: 32, fontStyle: 'italic' }}>
+          <p style={{ fontSize: 18, lineHeight: 1.7, color: 'var(--prose)', borderLeft: `4px solid ${FANTA}`, paddingLeft: 20, marginBottom: 32, fontStyle: 'italic' }}>
             {article.excerpt}
           </p>
         )}
 
         <div
-          style={{ fontSize: 16, lineHeight: 1.8, color: '#d8d3cb' }}
+          style={{ fontSize: 16, lineHeight: 1.8, color: 'var(--prose)' }}
           dangerouslySetInnerHTML={{ __html: article.content }}
         />
       </main>

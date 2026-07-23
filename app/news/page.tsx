@@ -5,10 +5,13 @@ import SyncTrigger from '../components/SyncTrigger';
 import { Article, FANTA, fmtDate } from '../lib/types';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-const BLACK = '#0a0a0a';
-const CARD = '#1a1a1a';
-const INK = '#f4f1ea';
-const MUTED = '#a09b94';
+const BLACK = 'var(--bg)';
+const CARD = 'var(--card)';
+const INK = 'var(--ink)';
+const MUTED = 'var(--muted)';
+// Text sitting on a FANTA-orange fill stays dark in both themes — light text on
+// orange fails contrast.
+const ON_FANTA = '#0a0a0a';
 
 async function getArticles(): Promise<Article[]> {
   try {
@@ -39,7 +42,7 @@ export default async function NewsPage() {
         {articles.length === 0 ? (
           <div style={{ padding: '80px 40px', textAlign: 'center', background: CARD, borderLeft: `4px solid ${FANTA}` }}>
             <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 32, color: MUTED, textTransform: 'uppercase' }}>Chưa có bài viết nào</div>
-            <Link href="/admin/news-management" style={{ display: 'inline-block', marginTop: 20, background: FANTA, color: BLACK, padding: '14px 28px', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            <Link href="/admin/news-management" style={{ display: 'inline-block', marginTop: 20, background: FANTA, color: ON_FANTA, padding: '14px 28px', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
               + Viết bài đầu tiên
             </Link>
           </div>
@@ -49,21 +52,21 @@ export default async function NewsPage() {
               <Link key={article.id} href={`/news/${article.id}`} style={{ textDecoration: 'none', color: 'inherit', background: CARD, overflow: 'hidden', display: 'block' }}>
                 <div style={{
                   aspectRatio: '16/9',
-                  background: '#2a1a0a',
+                  background: 'var(--alt-bg)',
                   backgroundImage: article.image_url ? `url(${BASE}${article.image_url})` : 'repeating-linear-gradient(135deg, transparent 0 14px, rgba(0,0,0,0.18) 14px 15px)',
                   backgroundSize: 'cover', backgroundPosition: 'center',
                   position: 'relative',
                 }}>
                   {article.tag && (
-                    <div style={{ position: 'absolute', top: 12, left: 12, background: FANTA, color: BLACK, padding: '3px 10px', fontFamily: 'Anton, sans-serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                    <div style={{ position: 'absolute', top: 12, left: 12, background: FANTA, color: ON_FANTA, padding: '3px 10px', fontFamily: 'Anton, sans-serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                       {article.tag}
                     </div>
                   )}
                 </div>
                 <div style={{ padding: '20px' }}>
                   <div style={{ fontSize: 11, color: MUTED, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6 }}>{fmtDate(article.published_at)}</div>
-                  <h3 style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, lineHeight: 1.1, letterSpacing: '0.01em', textTransform: 'uppercase', marginBottom: 8 }}>{article.title}</h3>
-                  {article.excerpt && <p style={{ color: '#d8d3cb', fontSize: 13, lineHeight: 1.55, margin: 0 }}>{article.excerpt}</p>}
+                  <h3 style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, lineHeight: 1.25, letterSpacing: '0.01em', textTransform: 'uppercase', marginBottom: 8 }}>{article.title}</h3>
+                  {article.excerpt && <p style={{ color: 'var(--prose)', fontSize: 13, lineHeight: 1.55, margin: 0 }}>{article.excerpt}</p>}
                 </div>
               </Link>
             ))}

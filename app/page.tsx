@@ -547,7 +547,7 @@ export default function HomePage() {
                 </div>
                 <div style={{ padding: i === 0 ? '24px' : '18px' }}>
                   <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{fmtDate(article.published_at)}</div>
-                  <h3 style={{ fontFamily: 'Anton, sans-serif', fontSize: i === 0 ? 32 : 18, lineHeight: 1.05, letterSpacing: '0.01em', textTransform: 'uppercase', marginTop: 6, marginBottom: 8 }}>{article.title}</h3>
+                  <h3 style={{ fontFamily: 'Anton, sans-serif', fontSize: i === 0 ? 32 : 18, lineHeight: 1.25, letterSpacing: '0.01em', textTransform: 'uppercase', marginTop: 6, marginBottom: 8 }}>{article.title}</h3>
                   {article.excerpt && <p style={{ color: 'var(--muted)', fontSize: i === 0 ? 14 : 12, lineHeight: 1.55, margin: 0 }}>{article.excerpt}</p>}
                 </div>
               </Link>
