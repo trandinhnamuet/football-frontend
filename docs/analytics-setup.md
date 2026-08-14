@@ -124,14 +124,28 @@ Bốn biến, giống nhau ở cả hai site:
 2. Thêm cả 4 biến, tick môi trường **Production** (và Preview nếu muốn test trước).
 3. **Deployments → Redeploy** bản mới nhất (bắt buộc, vì `NEXT_PUBLIC_*` nhúng lúc build).
 
+Ngoài ra vào tab **Analytics** của project bật **Web Analytics** — đây là lớp đo
+thứ hai (Vercel Analytics), độc lập với GA4 và không cần biến môi trường nào.
+
 ### lonfantafc.com (VPS 103.28.33.163)
+
+Server đọc env từ **`.env.local`** (không phải `.env.production`). Bốn khoá đã
+được thêm sẵn vào file đó dưới dạng rỗng, `ADMIN_PASSWORD` đã điền sẵn bằng giá
+trị lấy từ `/root/football-backend/.env`. Chỉ cần điền 3 khoá GA còn lại:
 
 ```bash
 ssh root@103.28.33.163
 cd /root/football-frontend
-nano .env.production          # điền 4 biến
+nano .env.local               # điền NEXT_PUBLIC_GA_ID, GA_PROPERTY_ID, GA_SERVICE_ACCOUNT_KEY
+bash /root/deploy-fe.sh       # pull + build + pm2 restart
+```
+
+Hoặc làm tay:
+
+```bash
+pm2 stop football-frontend    # giải phóng RAM, VPS chỉ có 3.8GB
 npm run build                 # BẮT BUỘC — NEXT_PUBLIC_GA_ID nhúng lúc build
-pm2 restart football-frontend
+pm2 restart football-frontend --update-env
 pm2 logs football-frontend --lines 30
 ```
 
