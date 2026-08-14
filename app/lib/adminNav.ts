@@ -13,6 +13,20 @@ export interface AdminSection {
 
 export const adminSections: AdminSection[] = [
   {
+    title: 'Thống Kê Truy Cập',
+    short: 'Traffic',
+    description: 'Xem lượng truy cập website theo ngày, nguồn khách, thiết bị và trang được xem nhiều nhất',
+    href: '/admin/analytics',
+    icon: '📊',
+    features: [
+      'Người dùng, phiên, lượt xem trang kèm so sánh với kỳ trước',
+      'Biểu đồ diễn biến theo ngày (hôm nay / 7 / 28 / 90 ngày)',
+      'Số người đang online theo thời gian thực',
+      'Top trang, nguồn traffic, thiết bị và khu vực',
+      'Dữ liệu lấy trực tiếp từ Google Analytics 4',
+    ],
+  },
+  {
     title: 'Quản lý Cầu Thủ',
     short: 'Cầu thủ',
     description: 'Quản lý thông tin đội hình, cập nhật dữ liệu cầu thủ từ file Excel hoặc thủ công',
