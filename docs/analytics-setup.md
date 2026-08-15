@@ -22,19 +22,17 @@ nhúng, `/admin/analytics` báo "chưa cấu hình". Không có nguy cơ site l�
 **Hạn chế cần biết trước:**
 
 - **Ad-blocker chặn ~10–25% lượt truy cập ở VN.** Số GA4 luôn thấp hơn thực tế.
-  Cả hai site đều tự host trên VPS nên muốn biết hụt bao nhiêu thì đối chiếu với
-  access log của nginx — log ghi mọi request, ad-blocker không can thiệp được:
-
-  ```bash
-  # số lượt xem trang thật của www.trecome.vn hôm nay, đã loại bot và tài nguyên tĩnh
-  grep "$(date '+%d/%b/%Y')" /var/log/nginx/access.log \
-    | grep -v '/_next/\|\.css\|\.js\|\.svg\|\.png\|\.woff' \
-    | grep -vi 'bot\|crawl\|spider' | wc -l
-  ```
+- **Không có IP, không có mã định danh khách, không xem được từng lượt lẻ.** GA4
+  dùng IP để suy ra vị trí rồi vứt bỏ; Data API không trả IP, cũng không trả
+  `client_id`. Mọi thứ đều đã gộp sẵn.
 - **Lưu dữ liệu chi tiết mặc định chỉ 2 tháng.** Phải tự đổi lên 14 tháng — xem
   bước 7. Báo cáo tổng hợp thì giữ lâu hơn.
 - **Số liệu trễ 24–48h mới ổn định.** Realtime có ngay, nhưng báo cáo ngày hôm nay
   còn nhảy.
+
+Hai hạn chế đầu được bù bằng **lớp đo thứ hai tự viết** — xem
+[Nhật ký truy cập tự lưu](#nhật-ký-truy-cập-tự-lưu) ở cuối tài liệu. Hai lớp chạy
+song song, không thay thế nhau.
 
 ---
 
@@ -344,3 +342,76 @@ Property vừa tạo thì **24–48 giờ đầu** báo cáo theo ngày sẽ tr�
 
 Bên `football-frontend` cấu trúc tương đương, đặt trong `app/lib/` và `app/components/`,
 riêng phần xác thực dùng lại `AdminGuard` + header `x-admin-password` sẵn có.
+
+---
+
+## Nhật ký truy cập tự lưu
+
+Lớp đo thứ hai, **chạy song song với GA4**, có ở cả hai web tại `/admin/visitors`
+(tách riêng khỏi `/admin/analytics`, hai màn hình có link qua lại).
+
+### Vì sao cần thêm
+
+| GA4 | Nhật ký tự lưu |
+|---|---|
+| Không cho IP thô | Lưu IP từng lượt |
+| Không cho mã định danh khách | `visitor_id` sinh ở trình duyệt, mình toàn quyền |
+| Chỉ trả số đã gộp | Xem được từng lượt lẻ, tìm theo IP / visitor / đường dẫn |
+| Bị ad-blocker chặn ~10–25% | Beacon về chính domain nên không chặn được |
+| Có phễu, so sánh nhóm, dự đoán | Không có — vẫn cần GA4 cho những thứ đó |
+
+### Cách hoạt động
+
+1. `VisitTracker` (nhúng trong root layout) sinh `visitor_id` lưu **localStorage**
+   và `session_id` lưu **sessionStorage**, mỗi lần đổi route thì `sendBeacon` về
+   `/api/track`.
+2. `/api/track` lọc bot theo user-agent, bỏ qua nếu cùng khách + cùng đường dẫn
+   trong 5 giây, chặn quá 120 bản ghi/phút mỗi IP, kiểm dạng UUID rồi mới ghi.
+   **Luôn trả 204** kể cả khi bỏ qua hoặc lỗi.
+3. Ghi vào bảng `visits` của database `webstats` trên MariaDB ngay trên VPS.
+   Hai site dùng chung bảng, phân biệt bằng cột `site`.
+4. `/api/visitors` (yêu cầu đăng nhập admin) trả số liệu cho màn hình.
+
+Khu `/admin` **không** bị đo — mình tự vào thì tính vào thống kê chỉ làm nhiễu.
+
+### Env
+
+| Biến | trecome.vn | lonfantafc.com |
+|---|---|---|
+| `STATS_SITE` | `trecome` | `lonfanta` |
+| `STATS_DB_HOST` | `127.0.0.1` | `127.0.0.1` |
+| `STATS_DB_USER` | `webstats` | `webstats` |
+| `STATS_DB_PASS` | xem `trecome-server/server-state.md` | |
+| `STATS_DB_NAME` | `webstats` | `webstats` |
+
+Không set thì tính năng tự tắt: beacon vẫn trả 204 nhưng không ghi gì, màn hình
+báo "chưa cấu hình". Không có nguy cơ site lỗi.
+
+### Vận hành
+
+```bash
+# Xem nhanh trong DB
+mysql --defaults-extra-file=/root/.my.webstats.cnf -e \
+  "SELECT site, COUNT(*) luot, COUNT(DISTINCT visitor_id) khach, COUNT(DISTINCT ip) ip
+     FROM visits GROUP BY site;" webstats
+
+# Dọn dữ liệu quá hạn (cron đã chạy 3h sáng hằng ngày, giữ 365 ngày)
+/root/prune-visits.sh 365
+```
+
+### Hai cái bẫy đã dính, đừng lặp lại
+
+**Múi giờ.** MariaDB chạy `Asia/Ho_Chi_Minh` nên `DATETIME` lưu giờ +07. Pool
+mysql2 phải khai `timezone: '+07:00'`. Để `'Z'` là lệch đúng 7 tiếng, và bug này
+chỉ lộ ra khi nhìn màn hình chứ test API không thấy.
+
+**Giả mạo IP.** IP lấy từ `X-Real-IP` do nginx đặt, **không** lấy phần tử đầu của
+`X-Forwarded-For` — đoạn đó client tự khai. Điều này chỉ an toàn khi cổng ứng
+dụng (3004/3005/3006) không mở ra internet. Mở cổng ra ngoài là mất luôn tính
+tin cậy của cột IP.
+
+### Riêng tư
+
+Đang lưu IP thô, không cắt bớt. IP là dữ liệu cá nhân theo **Nghị định 13/2023**;
+nếu web có khách EU thì cần nêu trong chính sách riêng tư. Muốn giảm rủi ro có
+thể ẩn danh octet cuối (`123.45.67.0`) — đổi ở `recordVisit()` trong `lib/visits.ts`.
