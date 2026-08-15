@@ -199,7 +199,11 @@ function VisitorsScreen() {
 
             <div className="an-card" style={{ marginBottom: 12 }}>
               <h2>Diễn biến theo ngày</h2>
-              <div className="an-hint">Một khách có thể tạo nhiều lượt truy cập</div>
+              <div className="an-hint">
+                {data.daily.length < 2
+                  ? 'Mới có dữ liệu của một ngày — cần từ hai ngày trở lên mới vẽ được đường'
+                  : 'Một khách có thể tạo nhiều lượt truy cập'}
+              </div>
               <div className="an-legend">
                 {SERIES.map((series) => (
                   <span key={series.key} style={{ color: series.color }}>

@@ -40,7 +40,11 @@ function pool(): mysql.Pool {
       database: process.env.STATS_DB_NAME,
       connectionLimit: 5,
       waitForConnections: true,
-      timezone: 'Z',
+      // MariaDB trên VPS chạy Asia/Ho_Chi_Minh nên cột DATETIME lưu giờ +07.
+      // Khai báo đúng ở đây thì mysql2 mới dựng được Date đúng mốc thời gian;
+      // để mặc định 'Z' là lệch đúng 7 tiếng. Cũng nhờ vậy `DATE(created_at)`
+      // gom theo ngày Việt Nam, hợp với người đọc báo cáo.
+      timezone: '+07:00',
     });
   }
   return globalForPool.__visitsPool;
