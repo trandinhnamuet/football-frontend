@@ -69,9 +69,9 @@ Google giới hạn số tài khoản mà một số điện thoại được d�
 mức reset rất chậm (tính bằng tháng). Cách xử lý:
 
 - **Đừng để nó chặn tiến độ.** Tạo GA4 property + Cloud project bằng một tài khoản
-  Google sẵn có, chạy tracking trước. Khi có `it@trecome.vn` thì thêm nó làm
-  **Administrator** (Admin → Property access management), Cloud project chuyển
-  quyền qua IAM, rồi gỡ tài khoản cũ. Không mất dữ liệu, không phải làm lại.
+  Google sẵn có và chạy tracking trước; bàn giao sang `it@trecome.vn` sau. Quy
+  trình bàn giao xem mục [Chuyển quyền sang it@trecome.vn sau](#chuyển-quyền-sang-ittrecomevn-sau)
+  bên dưới — dữ liệu không mất, không phải gắn lại tag.
 - **Mua SIM riêng cho công ty** (~50–70k) — đây mới là lời giải lâu dài chứ không
   phải chữa cháy. Số cá nhân gắn vào tài khoản dùng chung thì người đó nghỉ việc
   hay đổi số là mất đường khôi phục, đúng cái rủi ro checklist bên trên nói tới.
@@ -89,6 +89,57 @@ mức reset rất chậm (tính bằng tháng). Cách xử lý:
 > **TXT**, không bắt buộc đổi MX — vẫn có thể tắt dịch vụ Gmail và giữ nguyên
 > iRedMail. Sở dĩ không chọn Workspace là vì chi phí ~6–7 USD/người/tháng, chứ
 > không phải vì nó phá mail server.
+
+#### Chuyển quyền sang it@trecome.vn sau
+
+Đã đối chiếu tài liệu Google, các mốc dưới đây là bắt buộc và đúng thứ tự.
+
+**Điều kiện tiên quyết:** `it@trecome.vn` phải **đã là một Google Account** thì mới
+thêm vào GA được — *"You can only add users whose email addresses are registered in
+Google accounts."* Nên vẫn phải giải quyết chuyện SIM, chỉ là không bị chặn ngay.
+
+**1. Google Analytics** — cấp quyền ở **cấp Account**, không phải cấp Property:
+
+> *"If you add a user at the account level, then that user also has access to all the
+> properties in the account, with the same set of permissions. If you add a user at
+> the property level, then the user has access to only that property."*
+
+→ Admin → **Account access management** (không phải *Property* access management) →
+thêm `it@trecome.vn` với vai trò **Administrator**. Cấp ở Account thì tự động phủ
+xuống mọi property bên dưới.
+
+Gỡ tài khoản cũ **sau** khi đã thêm xong: *"if you are the last user who has the
+Administrator role, you cannot delete yourself"* — nên nếu làm ngược thứ tự sẽ bị
+chặn.
+
+**2. Google Cloud** — có thêm một bước dễ bỏ sót:
+
+> *"If your project is not part of an organization, you must use the Google Cloud
+> console to grant the Owner role"* (gcloud/API **không** làm được), và *"the user
+> must be granted the owner role using the Cloud Platform Console and must explicitly
+> accept the invitation."*
+
+→ IAM & Admin → Grant access → `it@trecome.vn` → role **Owner** → Google gửi lời mời
+qua email, phải mở hộp thư `it@trecome.vn` **bấm chấp nhận** thì quyền mới có hiệu lực.
+
+**Nên giữ 2 owner thay vì gỡ sạch tài khoản cũ:** *"A Project resource becomes
+orphaned if it does not have an owner… we recommend that more than one owner be
+associated with the project at all times."*
+
+**Những thứ KHÔNG bị ảnh hưởng khi đổi chủ:**
+
+- Dữ liệu lịch sử trong GA4 — thuộc về property, không thuộc về người dùng
+- `NEXT_PUBLIC_GA_ID` và tag trên site — không phải gắn lại
+- `GA_SERVICE_ACCOUNT_KEY` — service account là tài nguyên **của project**, không
+  gắn với owner là người, nên đổi owner không làm hỏng key
+
+**Nếu sau này muốn chuyển hẳn property sang một Analytics Account khác** (thay vì chỉ
+đổi người quản trị): Admin → Move property. *"All reporting data associated with a
+property is moved (not copied) to the destination account"*, tracking ID giữ nguyên
+nên không phải retag. Nhưng: cần vai trò Administrator + Editor ở **cả hai** account,
+không chuyển được nếu property đã liên kết Google Ad Manager hoặc hai account thuộc
+hai Google Marketing Platform organization khác nhau, và **change history cũ ở lại
+account nguồn**.
 
 ### Bắt buộc làm ngay sau khi tạo xong
 
