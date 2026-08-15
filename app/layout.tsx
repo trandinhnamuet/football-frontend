@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { AppContextProvider } from './contexts/AppContext';
 import GoogleAnalytics from './components/GoogleAnalytics';
+import VisitTracker from './components/VisitTracker';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://lonfantafc.com'),
@@ -43,7 +44,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AppContextProvider>
           {children}
         </AppContextProvider>
+        {/* Hai lop do song song: GA4 cho buc tranh tong hop, VisitTracker ghi
+            tung luot kem IP va visitor ID vao DB cua minh. */}
         <GoogleAnalytics />
+        <VisitTracker />
       </body>
     </html>
   );

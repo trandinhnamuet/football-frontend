@@ -27,6 +27,21 @@ export const adminSections: AdminSection[] = [
     ],
   },
   {
+    title: 'Nhật Ký Truy Cập',
+    short: 'Nhật ký',
+    description: 'Xem từng lượt truy cập kèm địa chỉ IP và mã định danh khách, dữ liệu tự lưu trên máy chủ',
+    href: '/admin/visitors',
+    icon: '🧭',
+    features: [
+      'Danh sách từng lượt truy cập: thời điểm, IP, trang, thiết bị, nguồn',
+      'Định danh khách bằng visitor ID lưu trong trình duyệt',
+      'Phân biệt khách mới và khách quay lại',
+      'Xếp hạng khách vào nhiều nhất kèm số IP đã dùng',
+      'Tìm theo IP / visitor ID / đường dẫn',
+      'Không qua Google nên ad-blocker không chặn được',
+    ],
+  },
+  {
     title: 'Quản lý Cầu Thủ',
     short: 'Cầu thủ',
     description: 'Quản lý thông tin đội hình, cập nhật dữ liệu cầu thủ từ file Excel hoặc thủ công',

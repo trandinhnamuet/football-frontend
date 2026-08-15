@@ -2,8 +2,10 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import Link from 'next/link';
 import AdminGuard from '../../components/AdminGuard';
 import type { Overview, RangeKey } from '../../lib/ga';
+import { BarList, Kpi, axisTick, dayLabel, duration, nf } from '../../components/admin/StatsUi';
 import './analytics.css';
 
 const KEY = 'lffc_admin_pw';
@@ -22,105 +24,6 @@ const SERIES = [
   { key: 'sessions', label: 'Phiên', color: 'var(--an-series-2)' },
   { key: 'pageViews', label: 'Lượt xem trang', color: 'var(--an-series-3)' },
 ] as const;
-
-const nf = new Intl.NumberFormat('vi-VN');
-
-/* Intl compact tiếng Việt cho ra "1 N" (nghìn) — khó đọc trên trục. Dùng "k". */
-function axisTick(value: number) {
-  if (value >= 1000) return `${(value / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 1 })}k`;
-  return nf.format(value);
-}
-
-function duration(seconds: number) {
-  const total = Math.round(seconds);
-  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
-}
-
-function dayLabel(iso: string) {
-  const [, month, day] = iso.split('-');
-  return `${day}/${month}`;
-}
-
-function Delta({ current, previous, vs, lowerIsBetter = false }: { current: number; previous: number; vs: string; lowerIsBetter?: boolean }) {
-  if (!previous) {
-    return (
-      <div className="an-delta">
-        <span>—</span>
-        <span className="an-vs">chưa có dữ liệu kỳ trước</span>
-      </div>
-    );
-  }
-  const change = (current - previous) / previous;
-  const rising = change > 0;
-  const good = lowerIsBetter ? !rising : rising;
-  const flat = Math.abs(change) < 0.005;
-
-  return (
-    <div className={`an-delta ${flat ? '' : good ? 'up' : 'down'}`}>
-      <span>
-        {flat ? '±' : rising ? '↑' : '↓'} {Math.abs(change * 100).toFixed(1)}%
-      </span>
-      <span className="an-vs">so với {vs}</span>
-    </div>
-  );
-}
-
-function Kpi({
-  label,
-  value,
-  current,
-  previous,
-  vs,
-  lowerIsBetter,
-}: {
-  label: string;
-  value: string;
-  current: number;
-  previous: number;
-  vs: string;
-  lowerIsBetter?: boolean;
-}) {
-  return (
-    <div className="an-kpi">
-      <div className="an-kpi-label">{label}</div>
-      <div className="an-kpi-value">{value}</div>
-      <Delta current={current} previous={previous} vs={vs} lowerIsBetter={lowerIsBetter} />
-    </div>
-  );
-}
-
-interface BarRow {
-  label: string;
-  sub?: string;
-  value: number;
-}
-
-function BarList({ rows, unit }: { rows: BarRow[]; unit: string }) {
-  if (rows.length === 0) return <div className="an-empty">Chưa có dữ liệu trong kỳ này</div>;
-  const max = Math.max(...rows.map((r) => r.value), 1);
-  const total = rows.reduce((sum, r) => sum + r.value, 0);
-
-  return (
-    <div className="an-bars">
-      {rows.map((row) => (
-        <div
-          key={row.label + (row.sub ?? '')}
-          className="an-bar"
-          style={{ ['--an-bar-w' as string]: `${(row.value / max) * 100}%` }}
-        >
-          <div className="an-bar-label">
-            {row.label}
-            {row.sub && <small>{row.sub}</small>}
-          </div>
-          <div className="an-bar-value">
-            {nf.format(row.value)} {unit}
-            {total > 0 && <em>{Math.round((row.value / total) * 100)}%</em>}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 interface TooltipPayload {
   dataKey?: string | number;
@@ -209,6 +112,9 @@ function AnalyticsScreen() {
             </div>
           </div>
           <div className="an-head-actions">
+            <Link className="an-btn" href="/admin/visitors">
+              Nhật ký truy cập
+            </Link>
             {data && (
               <span className="an-live">
                 <span className="an-dot" />
