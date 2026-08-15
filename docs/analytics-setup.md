@@ -42,9 +42,10 @@ Cloud, tài khoản Ads) sẽ gắn vào một cá nhân. Người đó nghỉ v
 thoại, hay chỉ đơn giản là mất máy — công ty mất quyền truy cập, và Google gần
 như không có đường khôi phục cho tình huống đó.
 
-**Vì sao không dùng Google Workspace:** Workspace bắt trỏ bản ghi MX của
-`trecome.vn` về Google, sẽ phá mail server iRedMail công ty đang tự vận hành trên
-`103.28.33.163`. Không đáng đánh đổi.
+**Vì sao không dùng Google Workspace:** tốn ~6–7 USD/người/tháng cho thứ mà công
+ty đã tự vận hành được bằng iRedMail trên `103.28.33.163`. (Workspace *không* bắt
+đổi MX như nhiều người tưởng — nó xác minh domain bằng bản ghi TXT và cho tắt
+dịch vụ Gmail để giữ mail server riêng. Lý do bỏ qua thuần tuý là chi phí.)
 
 ### Lần đầu: tạo Google Account cho địa chỉ này
 
@@ -61,6 +62,33 @@ Google Account **không bắt buộc phải là Gmail** — tạo được từ 
 > Hộp thư đã được cấu hình sẵn để **nhận ngay** thư từ Google — greylisting đã
 > được tắt riêng cho luồng `@google.com` và `@.google.com`. Nếu mã vẫn chưa về sau
 > 1–2 phút, kiểm tra thư mục Spam trước khi bấm gửi lại.
+
+#### Nếu gặp "This phone number has been used too many times"
+
+Google giới hạn số tài khoản mà một số điện thoại được dùng để xác minh, và hạn
+mức reset rất chậm (tính bằng tháng). Cách xử lý:
+
+- **Đừng để nó chặn tiến độ.** Tạo GA4 property + Cloud project bằng một tài khoản
+  Google sẵn có, chạy tracking trước. Khi có `it@trecome.vn` thì thêm nó làm
+  **Administrator** (Admin → Property access management), Cloud project chuyển
+  quyền qua IAM, rồi gỡ tài khoản cũ. Không mất dữ liệu, không phải làm lại.
+- **Mua SIM riêng cho công ty** (~50–70k) — đây mới là lời giải lâu dài chứ không
+  phải chữa cháy. Số cá nhân gắn vào tài khoản dùng chung thì người đó nghỉ việc
+  hay đổi số là mất đường khôi phục, đúng cái rủi ro checklist bên trên nói tới.
+  Cắm SIM vào một máy cũ để ở văn phòng, dùng làm recovery phone luôn.
+- Trước khi mua SIM có thể thử nhanh: đổi sang mạng 4G thay vì wifi văn phòng,
+  hoặc tạo tài khoản từ **Settings → Add account** trên máy Android — một số flow
+  Google không hỏi số điện thoại. Tỉ lệ ăn thua không cao nhưng mất 2 phút.
+
+> ⚠️ **Không** dùng dịch vụ nhận SMS ảo/online. Google nhận diện được phần lớn dải
+> số đó và khoá tài khoản về sau — mất tài khoản khi đã dựng GA property và Cloud
+> project lên đó thì thiệt hơn nhiều so với tiền một cái SIM. Số ảo cũng dùng chung
+> với người lạ, ai cũng gửi được yêu cầu khôi phục mật khẩu vào đó.
+
+> **Ghi chú về Google Workspace:** Workspace xác minh sở hữu domain bằng bản ghi
+> **TXT**, không bắt buộc đổi MX — vẫn có thể tắt dịch vụ Gmail và giữ nguyên
+> iRedMail. Sở dĩ không chọn Workspace là vì chi phí ~6–7 USD/người/tháng, chứ
+> không phải vì nó phá mail server.
 
 ### Bắt buộc làm ngay sau khi tạo xong
 
