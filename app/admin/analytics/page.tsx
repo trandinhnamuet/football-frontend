@@ -243,6 +243,17 @@ function AnalyticsScreen() {
 
         {!data && !error && <div className="an-skeleton" style={{ height: 340 }} />}
 
+        {/* GA4 giữ realtime và báo cáo tổng hợp ở hai kho khác nhau. Realtime có
+            ngay, báo cáo phải chờ GA xử lý. Không nói rõ thì nhìn "đang online:
+            5" cạnh "người dùng: 0" rất giống hỏng. */}
+        {data && data.timeseries.length === 0 && (
+          <div className="an-note">
+            <strong>Báo cáo tổng hợp chưa có dữ liệu.</strong> Số &quot;đang online&quot; phía trên lấy từ Realtime
+            API nên đúng ngay, còn các chỉ số theo ngày phải chờ GA4 xử lý — thường 4–24 giờ với property mới tạo,
+            Google ghi tối đa 48 giờ. Chưa cần làm gì cả.
+          </div>
+        )}
+
         {data && (
           <>
             <div className="an-kpis">

@@ -347,6 +347,17 @@
   padding: 1px 5px;
 }
 
+/* Thông báo giải thích, không phải lỗi — dùng tông cam thương hiệu. */
+.an-note {
+  background: rgba(255, 107, 26, 0.09);
+  border: 1px solid rgba(255, 107, 26, 0.35);
+  padding: 14px 18px;
+  color: var(--ink);
+  font-size: 13.5px;
+  line-height: 1.65;
+  margin-bottom: 18px;
+}
+
 .an-skeleton {
   background: var(--soft);
   border: 1px solid var(--line);
