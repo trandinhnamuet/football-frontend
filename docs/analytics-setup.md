@@ -22,8 +22,15 @@ nhúng, `/admin/analytics` báo "chưa cấu hình". Không có nguy cơ site l�
 **Hạn chế cần biết trước:**
 
 - **Ad-blocker chặn ~10–25% lượt truy cập ở VN.** Số GA4 luôn thấp hơn thực tế.
-  Vì vậy trecome.vn chạy thêm Vercel Analytics (đo ở phía edge, không bị chặn) để
-  đối chiếu. Chênh lệch giữa hai con số chính là phần GA4 đang hụt.
+  Cả hai site đều tự host trên VPS nên muốn biết hụt bao nhiêu thì đối chiếu với
+  access log của nginx — log ghi mọi request, ad-blocker không can thiệp được:
+
+  ```bash
+  # số lượt xem trang thật của www.trecome.vn hôm nay, đã loại bot và tài nguyên tĩnh
+  grep "$(date '+%d/%b/%Y')" /var/log/nginx/access.log \
+    | grep -v '/_next/\|\.css\|\.js\|\.svg\|\.png\|\.woff' \
+    | grep -vi 'bot\|crawl\|spider' | wc -l
+  ```
 - **Lưu dữ liệu chi tiết mặc định chỉ 2 tháng.** Phải tự đổi lên 14 tháng — xem
   bước 7. Báo cáo tổng hợp thì giữ lâu hơn.
 - **Số liệu trễ 24–48h mới ổn định.** Realtime có ngay, nhưng báo cáo ngày hôm nay
@@ -246,40 +253,51 @@ Bốn biến, giống nhau ở cả hai site:
 > ⚠️ `NEXT_PUBLIC_GA_ID` được **nhúng cứng vào bundle lúc build**. Đổi giá trị này
 > thì phải **build lại**, restart không đủ.
 
-### trecome.vn (Vercel)
+Cả hai site đều tự host trên VPS `103.28.33.163` và đọc env từ **`.env.local`**
+(không phải `.env.production`).
 
-1. Vercel Dashboard → project → **Settings → Environment Variables**.
-2. Thêm cả 4 biến, tick môi trường **Production** (và Preview nếu muốn test trước).
-3. **Deployments → Redeploy** bản mới nhất (bắt buộc, vì `NEXT_PUBLIC_*` nhúng lúc build).
+### trecome.vn — pm2 `trecome-nextjs`, cổng 3006
 
-Ngoài ra vào tab **Analytics** của project bật **Web Analytics** — đây là lớp đo
-thứ hai (Vercel Analytics), độc lập với GA4 và không cần biến môi trường nào.
+Đã điền đủ 4 biến từ 2026-08-15. Nếu cần đổi:
 
-### lonfantafc.com (VPS 103.28.33.163)
+```bash
+ssh root@103.28.33.163
+cd /root/trecome-nextjs
+nano .env.local
+npm run build                          # BẮT BUỘC — NEXT_PUBLIC_GA_ID nhúng lúc build
+pm2 restart trecome-nextjs --update-env
+```
 
-Server đọc env từ **`.env.local`** (không phải `.env.production`). Bốn khoá đã
-được thêm sẵn vào file đó dưới dạng rỗng, `ADMIN_PASSWORD` đã điền sẵn bằng giá
-trị lấy từ `/root/football-backend/.env`. Chỉ cần điền 3 khoá GA còn lại:
+> trecome.vn từng chạy trên Vercel, đã chuyển về VPS ngày 2026-08-15 vì
+> serverless function của Vercel chạy khác region với edge nên route server-side
+> mất ~1.1s đo từ VN (tự host: ~0.07s). Chi tiết trong `trecome-server/server-state.md`.
+
+### lonfantafc.com — pm2 `football-frontend`, cổng 3004
+
+Đã điền đủ 4 biến từ 2026-08-15. Nếu cần đổi:
 
 ```bash
 ssh root@103.28.33.163
 cd /root/football-frontend
-nano .env.local               # điền NEXT_PUBLIC_GA_ID, GA_PROPERTY_ID, GA_SERVICE_ACCOUNT_KEY
+nano .env.local
 bash /root/deploy-fe.sh       # pull + build + pm2 restart
-```
-
-Hoặc làm tay:
-
-```bash
-pm2 stop football-frontend    # giải phóng RAM, VPS chỉ có 3.8GB
-npm run build                 # BẮT BUỘC — NEXT_PUBLIC_GA_ID nhúng lúc build
-pm2 restart football-frontend --update-env
-pm2 logs football-frontend --lines 30
 ```
 
 `ADMIN_PASSWORD` ở frontend phải **trùng** `ADMIN_PASSWORD` trong
 `/root/football-backend/.env` — màn hình analytics dùng chung mật khẩu với các
 trang admin còn lại.
+
+### Giá trị đang dùng
+
+| | trecome.vn | lonfantafc.com |
+|---|---|---|
+| `NEXT_PUBLIC_GA_ID` | `G-ZH6Y0L07QD` | `G-WC5QTXMQJ0` |
+| `GA_PROPERTY_ID` | `550034057` | `550028447` |
+| `GA_SERVICE_ACCOUNT_KEY` | chung một service account `analytics-reader@trecome-analytics.iam.gserviceaccount.com` | |
+| `ADMIN_PASSWORD` | xem `trecome-server/server-state.md` | trùng backend |
+
+> Máy chỉ có 3.8GB RAM và đã chạy iRedMail + 3 app Node. Đã tạo swap 2GB
+> (`/swapfile`) để `next build` không bị OOM — đừng xoá.
 
 ---
 
