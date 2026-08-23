@@ -16,7 +16,7 @@ export default function Header() {
 
   const navLinks = [
     { href: '/about', labelKey: 'nav.intro' },
-    { href: '/#squad', labelKey: 'nav.squad' },
+    { href: '/players', labelKey: 'nav.squad' },
     { href: '/#news', labelKey: 'nav.news' },
     { href: '/#schedule', labelKey: 'nav.schedule' },
     { href: '/gallery', labelKey: 'nav.gallery' },
