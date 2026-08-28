@@ -4,7 +4,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import AdminGuard from '../../components/AdminGuard';
-import { BarList, Kpi, axisTick, dayLabel, nf } from '../../components/admin/StatsUi';
+import {
+  BarList,
+  Kpi,
+  axisTick,
+  dateTimeFmt,
+  dayLabel,
+  nf,
+  stampFmt,
+  timeFmt,
+} from '../../components/admin/StatsUi';
 import type { VisitRange, VisitStats } from '../../lib/visits';
 import '../analytics/analytics.css';
 import './visitors.css';
@@ -23,16 +32,6 @@ const SERIES = [
   { key: 'visits', label: 'Lượt truy cập', color: 'var(--an-series-1)' },
   { key: 'visitors', label: 'Khách duy nhất', color: 'var(--an-series-2)' },
 ] as const;
-
-const dt = new Intl.DateTimeFormat('vi-VN', {
-  day: '2-digit',
-  month: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit',
-});
-
-const fullDt = new Intl.DateTimeFormat('vi-VN', { dateStyle: 'short', timeStyle: 'short' });
 
 /** visitor_id là UUID 36 ký tự, dài quá thì bảng không đọc nổi — lấy 8 ký tự đầu. */
 const shortId = (id: string) => id.slice(0, 8);
@@ -151,7 +150,7 @@ function VisitorsScreen() {
             <h1>Nhật ký truy cập</h1>
             <div className="an-sub">
               Dữ liệu tự thu thập, lưu trên máy chủ của mình — không qua Google, không bị ad-blocker chặn
-              {data && ` · cập nhật ${new Date(data.updatedAt).toLocaleTimeString('vi-VN')}`}
+              {data && ` · cập nhật ${timeFmt.format(new Date(data.updatedAt))}`}
             </div>
           </div>
           <div className="an-head-actions">
@@ -310,8 +309,8 @@ function VisitorsScreen() {
                             {v.ipCount > 1 && <small>{v.ipCount} IP khác nhau</small>}
                           </td>
                           <td className="dim">{v.device || '—'}</td>
-                          <td className="dim">{fullDt.format(new Date(v.firstSeen))}</td>
-                          <td className="dim">{fullDt.format(new Date(v.lastSeen))}</td>
+                          <td className="dim">{dateTimeFmt.format(new Date(v.firstSeen))}</td>
+                          <td className="dim">{dateTimeFmt.format(new Date(v.lastSeen))}</td>
                           <td className="wrap dim">{v.lastPath}</td>
                         </tr>
                       ))}
@@ -354,7 +353,7 @@ function VisitorsScreen() {
                       <tbody>
                         {data.recent.map((v) => (
                           <tr key={v.id}>
-                            <td className="dim">{dt.format(new Date(v.createdAt))}</td>
+                            <td className="dim">{stampFmt.format(new Date(v.createdAt))}</td>
                             <td className="mono">{v.ip}</td>
                             <td className="mono" title={v.visitorId}>
                               {shortId(v.visitorId)}{' '}

@@ -4,6 +4,40 @@
 
 export const nf = new Intl.NumberFormat('vi-VN');
 
+/**
+ * Mọi màn hình thống kê đọc theo **giờ Việt Nam**, ghim cứng chứ không theo múi
+ * giờ của máy người xem. Lý do: GA4 property đặt Asia/Saigon và MariaDB chạy
+ * Asia/Ho_Chi_Minh, nên nếu để trình duyệt tự quy đổi thì mở dashboard từ một
+ * máy đặt múi giờ khác sẽ ra số khác — hai màn hình lệch nhau vô cớ.
+ */
+export const VN_TZ = 'Asia/Ho_Chi_Minh';
+
+/** 14:03:27 */
+export const timeFmt = new Intl.DateTimeFormat('vi-VN', {
+  timeZone: VN_TZ,
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+});
+
+/** 16/08 14:03:27 — cho bảng từng lượt truy cập */
+export const stampFmt = new Intl.DateTimeFormat('vi-VN', {
+  timeZone: VN_TZ,
+  day: '2-digit',
+  month: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+});
+
+/** 16/08/2026 14:03 — cho cột lần đầu / lần cuối */
+export const dateTimeFmt = new Intl.DateTimeFormat('vi-VN', {
+  timeZone: VN_TZ,
+  dateStyle: 'short',
+  timeStyle: 'short',
+});
+
+
 /** Intl compact tiếng Việt cho ra "1 N" (nghìn) — khó đọc trên trục. Dùng "k". */
 export function axisTick(value: number) {
   if (value >= 1000) return `${(value / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 1 })}k`;

@@ -42,8 +42,10 @@ function pool(): mysql.Pool {
       waitForConnections: true,
       // MariaDB trên VPS chạy Asia/Ho_Chi_Minh nên cột DATETIME lưu giờ +07.
       // Khai báo đúng ở đây thì mysql2 mới dựng được Date đúng mốc thời gian;
-      // để mặc định 'Z' là lệch đúng 7 tiếng. Cũng nhờ vậy `DATE(created_at)`
-      // gom theo ngày Việt Nam, hợp với người đọc báo cáo.
+      // để mặc định 'Z' là lệch đúng 7 tiếng.
+      // Lưu ý: chỉ đúng cho DATETIME. Cột kiểu DATE mà để mysql2 tự dựng Date
+      // thì thành 00:00+07 = 17:00 UTC hôm trước, nên phần gom theo ngày dùng
+      // DATE_FORMAT trả thẳng chuỗi thay vì để nó chuyển đổi.
       timezone: '+07:00',
     });
   }
@@ -212,14 +214,21 @@ export interface VisitStats {
   updatedAt: string;
 }
 
-/** Điều kiện thời gian dùng chung cho mọi truy vấn bên dưới. */
+/**
+ * Điều kiện thời gian dùng chung cho mọi truy vấn bên dưới.
+ *
+ * Mốc là CURDATE() chứ không phải NOW(), tức cắt theo **ngày lịch giờ Việt Nam**
+ * (MariaDB chạy Asia/Ho_Chi_Minh). Cố ý khớp cách GA4 hiểu `NdaysAgo..today` để
+ * hai màn hình /admin/analytics và /admin/visitors so được với nhau; dùng NOW()
+ * thì thành cửa sổ trượt N×24h và hai bên lệch nhau.
+ */
 function rangeClause(range: VisitRange): { sql: string; params: (string | number)[] } {
   const site = siteKey();
   const days = VISIT_RANGES[range].days;
   if (days === null) return { sql: 'site = ?', params: [site] };
   if (days === 0) return { sql: 'site = ? AND DATE(created_at) = CURDATE()', params: [site] };
   return {
-    sql: 'site = ? AND created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)',
+    sql: 'site = ? AND created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)',
     params: [site, days],
   };
 }
@@ -264,7 +273,7 @@ export async function getVisitStats(
         params
       ),
       q(
-        `SELECT DATE(created_at) AS d, COUNT(*) AS visits, COUNT(DISTINCT visitor_id) AS visitors
+        `SELECT DATE_FORMAT(created_at, '%Y-%m-%d') AS d, COUNT(*) AS visits, COUNT(DISTINCT visitor_id) AS visitors
            FROM visits WHERE ${where}
           GROUP BY d ORDER BY d`,
         params
@@ -331,7 +340,7 @@ export async function getVisitStats(
       returningVisits: Math.max(0, visits - newVisitors),
     },
     daily: (daily as Row[]).map((r) => ({
-      date: iso(r.d).slice(0, 10),
+      date: str(r.d),
       visits: num(r.visits),
       visitors: num(r.visitors),
     })),
