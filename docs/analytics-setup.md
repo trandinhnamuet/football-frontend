@@ -401,9 +401,28 @@ mysql --defaults-extra-file=/root/.my.webstats.cnf -e \
 
 ### Hai cái bẫy đã dính, đừng lặp lại
 
-**Múi giờ.** MariaDB chạy `Asia/Ho_Chi_Minh` nên `DATETIME` lưu giờ +07. Pool
-mysql2 phải khai `timezone: '+07:00'`. Để `'Z'` là lệch đúng 7 tiếng, và bug này
-chỉ lộ ra khi nhìn màn hình chứ test API không thấy.
+**Múi giờ — dính hai lần, hai kiểu khác nhau.**
+
+1. `DATETIME` lưu giờ +07 (MariaDB chạy `Asia/Ho_Chi_Minh`), nên pool mysql2 phải
+   khai `timezone: '+07:00'`. Để `'Z'` là **mọi mốc giờ lệch 7 tiếng**.
+2. Nhưng cột kiểu **`DATE`** thì đừng để mysql2 tự chuyển: nó dựng thành
+   `00:00+07` = `17:00 UTC hôm trước`, `toISOString().slice(0,10)` ra ngày hôm
+   trước, làm **cả trục ngày lùi 1 ngày**. Vì vậy phần gom theo ngày dùng
+   `DATE_FORMAT(created_at, '%Y-%m-%d')` trả thẳng chuỗi.
+
+Cả hai bug đều **không lộ ra khi test API** — số trả về trông hợp lệ. Lần một
+phát hiện nhờ chụp màn hình, lần hai nhờ đối chiếu với GA4. Cách kiểm chắc chắn:
+so `daily[]` của API với `SELECT DATE_FORMAT(created_at,'%Y-%m-%d'), COUNT(*)`
+đếm thẳng trong DB.
+
+**Ranh giới kỳ phải khớp GA4.** Kỳ cắt theo `CURDATE()` (ngày lịch giờ Việt Nam),
+không phải `NOW()`. GA4 hiểu "7 ngày" là `7daysAgo..today` = **8 ngày lịch**;
+dùng `NOW()` thành cửa sổ trượt 7×24h và hai màn hình đếm lệch nhau dù cùng chọn
+một mốc. GA4 property đang đặt `Asia/Saigon` (= `Asia/Ho_Chi_Minh`, +07, không
+DST) nên hai bên cùng hệ quy chiếu.
+
+**Hiển thị ghim cứng `Asia/Ho_Chi_Minh`** (`StatsUi.tsx`), không để trình duyệt
+tự quy đổi — mở dashboard từ máy đặt múi giờ khác vẫn ra đúng số.
 
 **Giả mạo IP.** IP lấy từ `X-Real-IP` do nginx đặt, **không** lấy phần tử đầu của
 `X-Forwarded-For` — đoạn đó client tự khai. Điều này chỉ an toàn khi cổng ứng
