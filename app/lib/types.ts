@@ -130,6 +130,39 @@ export function fmtDate(iso: string): string {
   return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getFullYear()}`;
 }
 
+/** Local midnight of a date string, so comparisons ignore the time of day. */
+export function dayStart(iso: string): number {
+  const d = new Date(iso);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+export function daysUntil(iso: string): number {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  return Math.round((dayStart(iso) - now.getTime()) / 86400000);
+}
+
+/** Match day ends at 22:00 local, not midnight — kick-off is 17:30. */
+export const MATCH_DAY_END_HOUR = 22;
+
+/**
+ * A match counts as played once its day is over — the is_upcoming flag and the
+ * presence of a score are deliberately ignored, so a fixture nobody has filled
+ * the result in for still lands in the results column. A match today stays the
+ * featured next match until 22:00, then moves to the results column.
+ */
+export function isMatchPast(m: Pick<Match, 'date'>): boolean {
+  return Date.now() >= dayStart(m.date) + MATCH_DAY_END_HOUR * 3600000;
+}
+
+/** Past matches still missing a result — what the admin dashboard warns about. */
+export function matchesMissingResult(matches: Match[]): Match[] {
+  return matches
+    .filter(m => isMatchPast(m) && !m.result)
+    .sort((a, b) => dayStart(b.date) - dayStart(a.date) || b.week - a.week);
+}
+
 export function initials(p: Player): string {
   return ((p.first_name?.[0] || '') + (p.last_name?.[0] || '')).toUpperCase();
 }

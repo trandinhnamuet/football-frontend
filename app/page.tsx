@@ -7,7 +7,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import BannerSlider from './components/BannerSlider';
 import MemorialSlider from './components/MemorialSlider';
-import { Player, Article, Match, RecommendedVideo, FANTA, ROLES, fmtDate } from './lib/types';
+import { Player, Article, Match, RecommendedVideo, FANTA, ROLES, fmtDate, dayStart, daysUntil, isMatchPast } from './lib/types';
 import { api } from './lib/api';
 import { useApp } from './contexts/AppContext';
 import { DEFAULT_PLAYER_AVATAR_URL } from './lib/assets';
@@ -19,14 +19,6 @@ const DEFAULT_AVATAR = DEFAULT_PLAYER_AVATAR_URL;
 function resolveImg(url: string | null | undefined): string {
   if (!url) return '';
   return url.startsWith('/uploads') ? `${BASE}${url}` : url;
-}
-
-function daysUntil(iso: string): number {
-  const target = new Date(iso);
-  const now = new Date();
-  target.setHours(0, 0, 0, 0);
-  now.setHours(0, 0, 0, 0);
-  return Math.round((target.getTime() - now.getTime()) / 86400000);
 }
 
 function toYoutubeEmbed(url: string): string {
@@ -70,8 +62,7 @@ export default function HomePage() {
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
-  const [played, setPlayed] = useState<Match[]>([]);
-  const [upcoming, setUpcoming] = useState<Match[]>([]);
+  const [matches, setMatches] = useState<Match[]>([]);
   const [videoHighlight, setVideoHighlight] = useState<{ youtube_url: string; title: string; title_en: string; is_active: boolean; channel_url?: string } | null>(null);
   const [aboutData, setAboutData] = useState<{ banner_image_url: string } | null>(null);
   const [recommendations, setRecommendations] = useState<RecommendedVideo[]>([]);
@@ -102,15 +93,13 @@ export default function HomePage() {
       Promise.all([
         api.getPlayers(),
         api.getArticles(),
-        api.getPlayed(),
-        api.getUpcoming(),
+        api.getMatches(),
         api.getVideoHighlight(),
         api.getAboutPage(),
-      ]).then(([p, a, pl, up, vh, ab]) => {
+      ]).then(([p, a, ms, vh, ab]) => {
         setPlayers(p);
         setArticles(a);
-        setPlayed(pl);
-        setUpcoming(up);
+        setMatches(ms);
         setVideoHighlight(vh);
         setAboutData(ab);
       }).catch(() => {});
@@ -161,6 +150,17 @@ export default function HomePage() {
   const squadVisible = players.slice(safeSquadPage * squadPageSize, (safeSquadPage + 1) * squadPageSize);
 
   const roleLabel = (role: string) => ROLES[role]?.[lang] || role;
+
+  // The schedule columns are split by DATE, not by the is_upcoming flag: once a
+  // match date has passed it belongs in "Kết quả gần đây" even if nobody has
+  // filled the score in yet, and anything still to come is upcoming — the first
+  // of those is always the featured "Trận kế tiếp".
+  const upcoming = matches
+    .filter(m => !isMatchPast(m))
+    .sort((a, b) => dayStart(a.date) - dayStart(b.date) || a.week - b.week);
+  const played = matches
+    .filter(isMatchPast)
+    .sort((a, b) => dayStart(b.date) - dayStart(a.date) || b.week - a.week);
 
   return (
     <div style={{ background: 'var(--bg)', color: 'var(--ink)', fontFamily: '"Space Grotesk", system-ui, sans-serif' }}>
@@ -399,16 +399,23 @@ export default function HomePage() {
             <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, color: FANTA, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 14 }}>◆ {t('schedule.recentResults')}</div>
             {played.length === 0 ? (
               <div style={{ color: 'var(--muted)', fontSize: 14, padding: '20px 0' }}>—</div>
-            ) : [...played].reverse().slice(0, 6).map(m => (
+            ) : played.slice(0, 6).map(m => (
               <div key={m.id} className="schedule-row" style={{ background: 'var(--card)', padding: '10px 12px', marginBottom: 8, display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, alignItems: 'center', fontSize: 12 }}>
                 <div style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}>
                   <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 13, textTransform: 'uppercase' }}>{m.opponent}</div>
                   <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 1 }}>{fmtDate(m.date)}</div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
-                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 15, color: 'var(--ink)', fontWeight: 600, minWidth: 32, textAlign: 'center' }}>{m.score}</div>
-                  <div style={{ width: 22, height: 22, background: m.result === 'W' ? FANTA : m.result === 'D' ? 'var(--muted)' : '#aa2222', color: m.result === 'W' ? '#0a0a0a' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 10, flexShrink: 0 }}>{m.result}</div>
-                </div>
+                {/* A past match with no score yet still shows up here, marked as pending. */}
+                {m.result ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 15, color: 'var(--ink)', fontWeight: 600, minWidth: 32, textAlign: 'center' }}>{m.score || `${m.goals_for} - ${m.goals_against}`}</div>
+                    <div style={{ width: 22, height: 22, background: m.result === 'W' ? FANTA : m.result === 'D' ? 'var(--muted)' : '#aa2222', color: m.result === 'W' ? '#0a0a0a' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 10, flexShrink: 0 }}>{m.result}</div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ border: '1px dashed var(--muted)', color: 'var(--muted)', padding: '2px 8px', fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{t('schedule.awaitingResult')}</div>
+                  </div>
+                )}
                 <div style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'right' }}>
                   <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 13, textTransform: 'uppercase' }}>Lon Fanta</div>
                 </div>

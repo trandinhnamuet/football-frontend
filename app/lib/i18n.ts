@@ -82,6 +82,7 @@ const vi = {
     vs: 'GẶP',
     countdownDays: 'ngày',
     countdownToday: 'Hôm nay!',
+    awaitingResult: 'Chờ kết quả',
   },
   video: {
     label: 'VIDEO',
@@ -199,6 +200,7 @@ const en = {
     vs: 'VS',
     countdownDays: 'days',
     countdownToday: 'Today!',
+    awaitingResult: 'Result pending',
   },
   video: {
     label: 'VIDEO',

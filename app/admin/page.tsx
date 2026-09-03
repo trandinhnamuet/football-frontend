@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import AdminGuard from '../components/AdminGuard';
-import { FANTA } from '../lib/types';
+import { FANTA, Match, fmtDate, matchesMissingResult } from '../lib/types';
 import { api } from '../lib/api';
 import { adminSections } from '../lib/adminNav';
 import { useApp } from '../contexts/AppContext';
@@ -12,6 +12,7 @@ const BLACK = 'var(--bg)';
 const CARD = 'var(--card)';
 const INK = 'var(--ink)';
 const MUTED = 'var(--muted)';
+const LINE = 'var(--line)';
 // Text sitting on a FANTA-orange fill stays dark in both themes.
 const ON_FANTA = '#0a0a0a';
 
@@ -96,6 +97,102 @@ function ThemeDefaultControl() {
   );
 }
 
+// Matches whose date has passed but whose score nobody filled in yet. The Excel
+// sync only writes a result once the score cell in the sheet is filled, so a
+// match stays listed here until someone enters the score — in the sheet (then
+// hit sync) or by hand in Quản lý lịch thi đấu.
+function PendingResultsNotice() {
+  const [pending, setPending] = useState<Match[] | null>(null);
+  const [syncing, setSyncing] = useState(false);
+  const [msg, setMsg] = useState('');
+
+  async function load() {
+    try {
+      setPending(matchesMissingResult(await api.getMatches()));
+    } catch {
+      setPending([]);
+    }
+  }
+
+  useEffect(() => { load(); }, []);
+
+  async function handleSync() {
+    setSyncing(true);
+    setMsg('');
+    try {
+      const res = await api.triggerSync(true);
+      setMsg(res.message || (res.synced ? 'Đã đồng bộ' : 'Dữ liệu không thay đổi'));
+      await load();
+    } catch (e: any) {
+      setMsg('Lỗi đồng bộ: ' + (e.message || ''));
+    } finally {
+      setSyncing(false);
+      setTimeout(() => setMsg(''), 6000);
+    }
+  }
+
+  // Nothing to nag about (or still loading) — stay out of the way.
+  if (!pending || pending.length === 0) return null;
+
+  const WARN = '#e0a020';
+
+  return (
+    <div style={{ background: CARD, border: `1px solid ${WARN}55`, borderLeft: `4px solid ${WARN}`, padding: '18px 22px', marginBottom: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+        <div style={{ minWidth: 260, flex: 1 }}>
+          <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, color: WARN, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            ⚠️ {pending.length} trận đã thi đấu nhưng chưa có kết quả
+          </div>
+          <p style={{ color: MUTED, fontSize: 13, margin: '6px 0 0', maxWidth: 620 }}>
+            Các trận này đã qua ngày thi đấu và đang hiện ở cột “Kết quả gần đây” trên trang chủ với nhãn “Chờ kết quả”.
+            Nhập tỷ số vào Google Sheet rồi bấm “Đồng bộ từ Excel”, hoặc sửa trực tiếp trong Quản lý lịch thi đấu.
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: 10, flexShrink: 0, flexWrap: 'wrap' }}>
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            style={{
+              background: 'transparent', color: WARN, border: `1px solid ${WARN}`,
+              padding: '8px 18px', fontFamily: 'Anton, sans-serif', fontSize: 14,
+              letterSpacing: '0.04em', textTransform: 'uppercase',
+              cursor: syncing ? 'default' : 'pointer', opacity: syncing ? 0.6 : 1,
+            }}
+          >
+            {syncing ? 'Đang đồng bộ...' : '⟳ Đồng bộ từ Excel'}
+          </button>
+          <Link
+            href="/admin/schedule-management"
+            style={{
+              background: FANTA, color: ON_FANTA, textDecoration: 'none',
+              padding: '8px 18px', fontFamily: 'Anton, sans-serif', fontSize: 14,
+              letterSpacing: '0.04em', textTransform: 'uppercase',
+            }}
+          >
+            Nhập kết quả →
+          </Link>
+        </div>
+      </div>
+
+      <ul style={{ margin: '14px 0 0', padding: 0, listStyle: 'none', display: 'grid', gap: 6 }}>
+        {pending.map(m => (
+          <li key={m.id} style={{ display: 'flex', alignItems: 'baseline', gap: 10, fontSize: 13, color: INK, flexWrap: 'wrap' }}>
+            <span style={{ fontFamily: 'Anton, sans-serif', fontSize: 14, color: WARN, minWidth: 34 }}>W{m.week}</span>
+            <span style={{ color: MUTED, minWidth: 84 }}>{fmtDate(m.date)}</span>
+            <span style={{ fontFamily: 'Anton, sans-serif', fontSize: 14, textTransform: 'uppercase' }}>{m.opponent}</span>
+          </li>
+        ))}
+      </ul>
+
+      {msg && (
+        <div style={{ marginTop: 14, padding: '10px 14px', background: 'var(--hover-bg)', border: `1px solid ${LINE}`, fontSize: 13, color: INK }}>
+          {msg}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AdminPage() {
   return (
     <AdminGuard>
@@ -110,6 +207,7 @@ export default function AdminPage() {
         </header>
 
         <main style={{ padding: '48px' }}>
+          <PendingResultsNotice />
           <ThemeDefaultControl />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 24 }}>
             {adminSections.map((section) => (

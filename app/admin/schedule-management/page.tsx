@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import AdminGuard from '../../components/AdminGuard';
 import AdminHeader from '../../components/AdminHeader';
-import { Match, FANTA, fmtDate } from '../../lib/types';
+import { Match, FANTA, fmtDate, isMatchPast } from '../../lib/types';
 import { api } from '../../lib/api';
 
 const BLACK = 'var(--bg)';
@@ -396,7 +396,9 @@ function ScheduleManagementContent() {
                 <div style={{ fontSize: 13 }}>{m.time || '17:30'}</div>
                 <div>
                   <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 16, textTransform: 'uppercase' }}>{m.opponent}</div>
-                  {m.is_upcoming && <div style={{ fontSize: 10, color: FANTA, letterSpacing: '0.1em', marginTop: 2 }}>SẮP TỚI</div>}
+                  {isMatchPast(m)
+                    ? !m.result && <div style={{ fontSize: 10, color: '#e0a020', letterSpacing: '0.1em', marginTop: 2 }}>CHỜ KẾT QUẢ</div>
+                    : <div style={{ fontSize: 10, color: FANTA, letterSpacing: '0.1em', marginTop: 2 }}>SẮP TỚI</div>}
                 </div>
                 <div style={{ fontSize: 12, color: MUTED }}>{m.venue}</div>
                 <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18 }}>{m.score || (m.is_upcoming ? '—' : `${m.goals_for}-${m.goals_against}`)}</div>
