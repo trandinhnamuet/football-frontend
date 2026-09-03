@@ -52,7 +52,7 @@ export default function AboutPage() {
         ) : (
           <div style={{ position: 'absolute', inset: 0, background: '#111' }} />
         )}
-        <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+        <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
           <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s01')}</div>
           <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 96px)', lineHeight: 0.9, textTransform: 'uppercase', letterSpacing: '0.01em', color: '#fff', textAlign: 'center', padding: '0 24px' }}>
             Lon Fanta FC

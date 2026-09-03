@@ -29,14 +29,14 @@ export default async function NewsPage() {
       <Header />
       <main className="mob-p-main" style={{ padding: '48px 48px 80px' }}>
         <div style={{ marginBottom: 40 }}>
-          <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>
+          <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 24 }}>
             <Link href="/" style={{ color: MUTED, textDecoration: 'none' }}>← Trang chủ</Link>
             {' '}/ Tin tức
           </div>
           <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(56px, 8vw, 96px)', lineHeight: 0.92, letterSpacing: '0.01em', textTransform: 'uppercase', margin: 0 }}>
             TIN TỨC <span style={{ color: FANTA }}>& BÀO</span>
           </h1>
-          <p style={{ color: MUTED, fontSize: 15, marginTop: 12 }}>{articles.length} bài viết</p>
+          <p style={{ color: MUTED, fontSize: 15, marginTop: 28 }}>{articles.length} bài viết</p>
         </div>
 
         {articles.length === 0 ? (

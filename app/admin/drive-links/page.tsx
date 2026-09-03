@@ -162,7 +162,7 @@ export default function DriveLinksAdminPage() {
               <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(36px, 6vw, 72px)', lineHeight: 0.92, textTransform: 'uppercase', margin: 0 }}>
                 QUẢN LÝ <span style={{ color: FANTA }}>ẢNH DRIVE</span>
               </h1>
-              <p style={{ color: MUTED, fontSize: 14, marginTop: 10 }}>Quản lý danh sách link ảnh Google Drive. Tick public để hiển thị trên trang gallery.</p>
+              <p style={{ color: MUTED, fontSize: 14, marginTop: 20 }}>Quản lý danh sách link ảnh Google Drive. Tick public để hiển thị trên trang gallery.</p>
             </div>
             <div style={{ display: 'flex', gap: 12 }}>
               <Link href="/gallery" target="_blank" style={{ padding: '10px 20px', background: 'transparent', border: `1px solid ${FANTA}44`, color: FANTA, textDecoration: 'none', fontSize: 13, fontFamily: 'inherit', textTransform: 'uppercase', letterSpacing: '0.06em' }}>

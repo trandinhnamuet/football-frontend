@@ -33,7 +33,7 @@ export default function ScoringPage() {
         <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(56px, 8vw, 96px)', lineHeight: 0.88, textTransform: 'uppercase', letterSpacing: '0.01em', margin: 0 }}>
           CÁCH TÍNH<br /><span style={{ color: FANTA }}>ĐIỂM</span>
         </h1>
-        <p style={{ color: 'var(--muted)', fontSize: 16, marginTop: 16, maxWidth: 540, lineHeight: 1.6 }}>
+        <p style={{ color: 'var(--muted)', fontSize: 16, marginTop: 28, maxWidth: 540, lineHeight: 1.6 }}>
           Mỗi cầu thủ trong mùa giải được tính điểm dựa trên đóng góp thực tế trên sân — bàn thắng, kiến tạo, và điểm danh đều có giá trị.
         </p>
 

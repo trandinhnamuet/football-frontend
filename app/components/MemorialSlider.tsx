@@ -98,7 +98,7 @@ export default function MemorialSlider() {
             fontSize: isMobile ? 22 : 'clamp(28px, 3vw, 44px)',
             lineHeight: 0.95,
             textTransform: 'uppercase',
-            margin: '5px 0 0',
+            margin: '10px 0 0',
           }}>
             {t('memorial.title')}
           </h2>

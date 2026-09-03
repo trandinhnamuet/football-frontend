@@ -226,11 +226,11 @@ function BannerSlidesContent() {
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>Quản trị Banner</div>
+            <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 16 }}>Quản trị Banner</div>
             <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(36px, 5vw, 60px)', lineHeight: 0.92, textTransform: 'uppercase', margin: 0 }}>
               BANNER <span style={{ color: FANTA }}>ẢNH CHẠY</span>
             </h1>
-            <p style={{ color: MUTED, fontSize: 14, marginTop: 8 }}>Thêm / sửa / xóa ảnh hiển thị dưới header trang chủ (Man of the week, khoảnh khắc...)</p>
+            <p style={{ color: MUTED, fontSize: 14, marginTop: 18 }}>Thêm / sửa / xóa ảnh hiển thị dưới header trang chủ (Man of the week, khoảnh khắc...)</p>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button onClick={addSlide} disabled={busy} style={{ background: 'rgba(255,107,26,0.12)', color: FANTA, border: `1px solid ${FANTA}66`, padding: '12px 22px', fontFamily: 'Anton, sans-serif', fontSize: 15, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer' }}>

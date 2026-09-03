@@ -416,11 +416,11 @@ function PlayerManagementContent() {
       <main style={{ padding: '40px 48px 80px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 36, flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>Quản trị đội hình</div>
+            <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 16 }}>Quản trị đội hình</div>
             <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 56, lineHeight: 0.92, letterSpacing: '0.01em', textTransform: 'uppercase', margin: 0 }}>
               QUẢN LÝ <span style={{ color: FANTA }}>CẦU THỦ</span>
             </h1>
-            <p style={{ color: MUTED, fontSize: 14, marginTop: 8 }}>Thêm/sửa/xóa thủ công · Import từ Sheet thông tin · Điểm đồng bộ từ Sheet thống kê</p>
+            <p style={{ color: MUTED, fontSize: 14, marginTop: 18 }}>Thêm/sửa/xóa thủ công · Import từ Sheet thông tin · Điểm đồng bộ từ Sheet thống kê</p>
           </div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <button onClick={() => setAddingPlayer(true)} style={{ background: 'var(--hover-bg)', color: INK, border: `1px solid ${LINE}`, padding: '14px 22px', fontFamily: 'Anton, sans-serif', fontSize: 15, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer' }}>

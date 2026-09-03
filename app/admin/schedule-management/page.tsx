@@ -317,11 +317,11 @@ function ScheduleManagementContent() {
       <main style={{ padding: '40px 48px 80px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 36 }}>
           <div>
-            <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>Quản trị lịch thi đấu</div>
+            <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 16 }}>Quản trị lịch thi đấu</div>
             <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 56, lineHeight: 0.92, letterSpacing: '0.01em', textTransform: 'uppercase', margin: 0 }}>
               LỊCH <span style={{ color: FANTA }}>THI ĐẤU</span>
             </h1>
-            <p style={{ color: MUTED, fontSize: 14, marginTop: 8 }}>Quản lý kết quả và lịch thi đấu sắp tới</p>
+            <p style={{ color: MUTED, fontSize: 14, marginTop: 18 }}>Quản lý kết quả và lịch thi đấu sắp tới</p>
           </div>
           <button
             onClick={() => setModal({ mode: 'create', data: { ...emptyMatch, week: matches.length + 1 } })}

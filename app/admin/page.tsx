@@ -202,7 +202,7 @@ export default function AdminPage() {
             <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 8vw, 96px)', lineHeight: 0.92, letterSpacing: '0.01em', textTransform: 'uppercase', margin: 0 }}>
               QUẢN LÝ <span style={{ color: FANTA }}>ADMIN</span>
             </h1>
-            <p style={{ color: MUTED, fontSize: 15, marginTop: 12 }}>Tổng hợp các công cụ quản lý dữ liệu đội bóng</p>
+            <p style={{ color: MUTED, fontSize: 15, marginTop: 26 }}>Tổng hợp các công cụ quản lý dữ liệu đội bóng</p>
           </div>
         </header>
 

@@ -59,13 +59,13 @@ export default function GalleryPage() {
     <div style={{ background: 'var(--bg)', color: 'var(--ink)', fontFamily: '"Space Grotesk", system-ui, sans-serif', minHeight: '100vh' }}>
       {/* Header */}
       <header className="mob-gallery-hdr" style={{ padding: '48px 48px 32px', borderBottom: `1px solid ${FANTA}33` }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
           <Link href="/" style={{ color: FANTA, textDecoration: 'none', fontSize: 14, fontWeight: 600 }}>← Trang chủ</Link>
         </div>
         <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 8vw, 96px)', lineHeight: 0.92, textTransform: 'uppercase', margin: 0 }}>
           GALLERY <span style={{ color: FANTA }}>ẢNH</span>
         </h1>
-        <p style={{ color: 'var(--muted)', fontSize: 15, marginTop: 12 }}>
+        <p style={{ color: 'var(--muted)', fontSize: 15, marginTop: 28 }}>
           Khoảnh khắc đáng nhớ của Lon Fanta FC
         </p>
       </header>

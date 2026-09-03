@@ -214,7 +214,7 @@ export default function I18nManagementPage() {
           <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(36px, 6vw, 72px)', lineHeight: 0.92, textTransform: 'uppercase', margin: 0 }}>
             QUẢN LÝ <span style={{ color: FANTA }}>NGÔN NGỮ</span>
           </h1>
-            <p style={{ color: MUTED, fontSize: 14, marginTop: 12 }}>
+            <p style={{ color: MUTED, fontSize: 14, marginTop: 20 }}>
               Chỉnh sửa nội dung hiển thị tiếng Việt &amp; tiếng Anh. Thay đổi <strong style={{ color: FANTA }}>áp dụng ngay cho tất cả người dùng</strong>.
             </p>
         </header>

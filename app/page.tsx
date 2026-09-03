@@ -250,10 +250,10 @@ export default function HomePage() {
               </div>
               <div>
                 <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>{t('hero.mvp')}</div>
-                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 6vw, 80px)', lineHeight: 0.9, textTransform: 'uppercase', letterSpacing: '0.01em', marginTop: 10 }}>
+                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 6vw, 80px)', lineHeight: 0.9, textTransform: 'uppercase', letterSpacing: '0.01em', marginTop: 18 }}>
                   {top1.first_name} {top1.last_name}
                 </div>
-                <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', marginTop: 14, fontSize: 12, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', marginTop: 22, fontSize: 12, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                   <span>#{top1.num} {roleLabel(top1.role)}</span>
                   <span>"{top1.nick}"</span>
                   <span>{t('hero.goals')} {top1.stat_goals} · {t('hero.assists')} {top1.stat_assists}</span>
@@ -322,7 +322,7 @@ export default function HomePage() {
       <section id="schedule" className="mob-p-section" style={{ padding: '80px 48px' }}>
         <div style={{ marginBottom: 36 }}>
           <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s04')}</div>
-          <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 12 }}>{t('schedule.title')}</h2>
+          <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 18 }}>{t('schedule.title')}</h2>
         </div>
 
         {/* Featured next match */}
@@ -511,7 +511,7 @@ export default function HomePage() {
         <div className="mob-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 36 }}>
           <div>
             <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s03')}</div>
-            <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 12 }}>{t('news.title')}</h2>
+            <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 18 }}>{t('news.title')}</h2>
           </div>
           <Link href="/news" className="btn-view-all" style={{ background: FANTA, color: '#0a0a0a', padding: '14px 24px', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
             {t('news.viewAll')}
@@ -568,7 +568,7 @@ export default function HomePage() {
         <section id="video" className="mob-p-section" style={{ padding: '74px 48px', background: 'var(--bg)', borderTop: `1px solid ${FANTA}33` }}>
           <div style={{ marginBottom: 33 }}>
             <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>■ {t('video.label')}</div>
-            <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(37px, 4.6vw, 66px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 11 }}>
+            <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(37px, 4.6vw, 66px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 17 }}>
               {lang === 'en' && videoHighlight?.title_en ? videoHighlight.title_en : (videoHighlight?.title || t('video.fallbackTitle'))}
             </h2>
           </div>
@@ -657,7 +657,7 @@ export default function HomePage() {
         <div className="mob-cta-inner" style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 40 }}>
           <div>
             <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>{t('cta.label')}</div>
-            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 8 }}>
+            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 18 }}>
               <div>{t('cta.title1')}</div>
               <div style={{ marginTop: 20 }}>{t('cta.title2')}</div>
             </div>
