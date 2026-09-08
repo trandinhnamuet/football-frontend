@@ -320,6 +320,16 @@ function ScheduleManagementContent() {
     : filter === 'upcoming' ? matches.filter(m => m.is_upcoming)
     : matches.filter(m => !m.is_upcoming);
 
+  // Trận mới thường đá cùng giờ với trận gần nhất, nên điền sẵn giờ đó.
+  const lastMatchTime = useMemo(() => {
+    const withTime = matches.filter(m => m.time);
+    if (withTime.length === 0) return emptyMatch.time;
+    const latest = [...withTime].sort((a, b) =>
+      a.date < b.date ? 1 : a.date > b.date ? -1 : b.week - a.week,
+    )[0];
+    return latest.time || emptyMatch.time;
+  }, [matches]);
+
   // Mặc định: trận mới nhất trước. Cùng ngày thì tuần lớn hơn lên trước.
   const defaultOrder = useMemo(
     () => [...byFilter].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.week - a.week)),
@@ -361,7 +371,7 @@ function ScheduleManagementContent() {
             <p style={{ color: MUTED, fontSize: 14, marginTop: 18 }}>Quản lý kết quả và lịch thi đấu sắp tới</p>
           </div>
           <button
-            onClick={() => setModal({ mode: 'create', data: { ...emptyMatch, week: matches.length + 1 } })}
+            onClick={() => setModal({ mode: 'create', data: { ...emptyMatch, week: matches.length + 1, time: lastMatchTime } })}
             style={{ background: FANTA, color: ON_FANTA, border: 'none', padding: '14px 28px', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}
           >
             + Thêm trận

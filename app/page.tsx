@@ -383,15 +383,18 @@ export default function HomePage() {
             {upcoming.length <= 1 ? (
               <div style={{ color: 'var(--muted)', fontSize: 14, padding: '20px 0' }}>{t('schedule.noUpcoming')}</div>
             ) : upcoming.slice(1).map(m => (
-              <div key={m.id} className="schedule-row" style={{ background: 'var(--card)', padding: '14px 18px', marginBottom: 16, display: 'grid', gridTemplateColumns: '136px 1fr', gap: 18, alignItems: 'stretch', borderLeft: `3px solid ${FANTA}`, minHeight: 136 }}>
+              <div key={m.id} className="schedule-row mob-upnext-row" style={{ background: 'var(--card)', padding: '14px 18px', marginBottom: 16, display: 'grid', gridTemplateColumns: '136px 1fr auto', gap: 18, alignItems: 'stretch', borderLeft: `3px solid ${FANTA}`, minHeight: 136 }}>
                 <div style={{ width: 136, height: 136, background: '#0a0a0a', backgroundImage: m.image_url ? `url(${resolveImg(m.image_url)})` : 'none', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   {!m.image_url && <JerseyNumber n={m.week} size={36} color={FANTA} />}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 8 }}>
+                {/* Đối thủ + sân bên trái, ngày & giờ dồn sang phải cho đỡ trống */}
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 8, minWidth: 0 }}>
                   <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{m.opponent}</div>
-                  <div style={{ fontSize: 16, color: 'var(--muted)' }}>{fmtDate(m.date)}</div>
                   <div style={{ fontSize: 16, color: 'var(--muted)' }}>{m.venue}{m.venue ? ' · ' : ''}{pitchLabel(m.pitch_size, lang)}</div>
-                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, color: FANTA, marginTop: 6 }}>{m.time || '17:30'}</div>
+                </div>
+                <div className="mob-upnext-when" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end', gap: 6, textAlign: 'right', paddingLeft: 8 }}>
+                  <div style={{ fontSize: 16, color: 'var(--muted)', whiteSpace: 'nowrap' }}>{fmtDate(m.date)}</div>
+                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 32, color: FANTA, lineHeight: 1 }}>{m.time || '17:30'}</div>
                 </div>
               </div>
             ))}

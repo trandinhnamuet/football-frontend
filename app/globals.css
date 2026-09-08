@@ -461,6 +461,10 @@ input, textarea, select, button {
 
   /* --- Schedule --- */
   .mob-schedule-cols { grid-template-columns: 1fr !important; gap: 24px !important; }
+  /* Ảnh nhỏ lại trên mobile để cột ngày/giờ bên phải vẫn đủ chỗ, không bị xuống dòng */
+  .mob-upnext-row { grid-template-columns: 96px 1fr auto !important; gap: 12px !important; }
+  .mob-upnext-row > div:first-child { width: 96px !important; height: 96px !important; }
+  .mob-upnext-when > div:last-child { font-size: 26px !important; }
 
   /* --- CTA section --- */
   .mob-cta-inner { flex-direction: column !important; align-items: flex-start !important; gap: 20px !important; }
