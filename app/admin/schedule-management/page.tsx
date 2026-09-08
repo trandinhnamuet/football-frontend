@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import AdminGuard from '../../components/AdminGuard';
 import AdminHeader from '../../components/AdminHeader';
-import { Match, FANTA, fmtDate, isMatchPast } from '../../lib/types';
+import { Match, FANTA, PITCH_SIZES, fmtDate, isMatchPast } from '../../lib/types';
 import { api } from '../../lib/api';
 
 const BLACK = 'var(--bg)';
@@ -38,6 +38,7 @@ const emptyMatch = {
   is_upcoming: true,
   time: '17:30',
   image_url: '',
+  pitch_size: 7,
 };
 
 type MatchForm = typeof emptyMatch;
@@ -154,6 +155,24 @@ function MatchModal({ initial, mode, onSave, onClose }: MatchModalProps) {
                 style={{ width: 18, height: 18, cursor: 'pointer', accentColor: FANTA }}
               />
               <label htmlFor="is_upcoming" style={{ ...labelStyle, marginBottom: 0, cursor: 'pointer' }}>Trận sắp tới (chưa đá)</label>
+            </div>
+          </div>
+
+          {/* Pitch size */}
+          <div>
+            <label style={labelStyle}>Loại sân</label>
+            <div style={{ display: 'flex', gap: 24, paddingTop: 4 }}>
+              {PITCH_SIZES.map(n => (
+                <label key={n} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14 }}>
+                  <input
+                    type="checkbox"
+                    checked={form.pitch_size === n}
+                    onChange={() => setForm(f => ({ ...f, pitch_size: n }))}
+                    style={{ width: 18, height: 18, cursor: 'pointer', accentColor: FANTA }}
+                  />
+                  Sân {n}
+                </label>
+              ))}
             </div>
           </div>
 
@@ -291,6 +310,7 @@ function ScheduleManagementContent() {
         is_upcoming: m.is_upcoming,
         time: m.time || '17:30',
         image_url: m.image_url || '',
+        pitch_size: m.pitch_size || 7,
       },
     });
   }
@@ -400,7 +420,7 @@ function ScheduleManagementContent() {
                     ? !m.result && <div style={{ fontSize: 10, color: '#e0a020', letterSpacing: '0.1em', marginTop: 2 }}>CHỜ KẾT QUẢ</div>
                     : <div style={{ fontSize: 10, color: FANTA, letterSpacing: '0.1em', marginTop: 2 }}>SẮP TỚI</div>}
                 </div>
-                <div style={{ fontSize: 12, color: MUTED }}>{m.venue}</div>
+                <div style={{ fontSize: 12, color: MUTED }}>{m.venue}{m.venue ? ' · ' : ''}Sân {m.pitch_size || 7}</div>
                 <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18 }}>{m.score || (m.is_upcoming ? '—' : `${m.goals_for}-${m.goals_against}`)}</div>
                 <div>
                   {m.result ? (

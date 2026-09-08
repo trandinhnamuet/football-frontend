@@ -63,6 +63,16 @@ export interface Match {
   is_upcoming: boolean;
   time: string;
   image_url: string | null;
+  /** Loại sân: 5, 7 hoặc 11 người. */
+  pitch_size: number;
+}
+
+export const PITCH_SIZES = [5, 7, 11] as const;
+
+/** "Sân 7 người" / "7-a-side" */
+export function pitchLabel(n: number | null | undefined, lang: 'vi' | 'en'): string {
+  const size = n || 7;
+  return lang === 'en' ? `${size}-a-side` : `Sân ${size} người`;
 }
 
 export interface TeamStats {

@@ -7,7 +7,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import BannerSlider from './components/BannerSlider';
 import MemorialSlider from './components/MemorialSlider';
-import { Player, Article, Match, RecommendedVideo, FANTA, ROLES, fmtDate, dayStart, daysUntil, isMatchPast } from './lib/types';
+import { Player, Article, Match, RecommendedVideo, FANTA, ROLES, fmtDate, dayStart, daysUntil, isMatchPast, pitchLabel } from './lib/types';
 import { api } from './lib/api';
 import { useApp } from './contexts/AppContext';
 import { DEFAULT_PLAYER_AVATAR_URL } from './lib/assets';
@@ -363,12 +363,13 @@ export default function HomePage() {
                     <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 72px)', color: FANTA, marginTop: 6 }}>{next.time || '17:30'}</div>
                     <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 4 }}>{t('schedule.kickoff')}</div>
                   </div>
-                  {next.venue && (
-                    <div>
-                      <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>📍 {t('schedule.venue')}</div>
+                  <div>
+                    <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>📍 {t('schedule.venue')}</div>
+                    {next.venue && (
                       <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(36px, 5vw, 52px)', marginTop: 6, textTransform: 'uppercase' }}>{next.venue}</div>
-                    </div>
-                  )}
+                    )}
+                    <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 4 }}>{pitchLabel(next.pitch_size, lang)}</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -389,7 +390,7 @@ export default function HomePage() {
                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 8 }}>
                   <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{m.opponent}</div>
                   <div style={{ fontSize: 16, color: 'var(--muted)' }}>{fmtDate(m.date)}</div>
-                  <div style={{ fontSize: 16, color: 'var(--muted)' }}>{m.venue}</div>
+                  <div style={{ fontSize: 16, color: 'var(--muted)' }}>{m.venue}{m.venue ? ' · ' : ''}{pitchLabel(m.pitch_size, lang)}</div>
                   <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, color: FANTA, marginTop: 6 }}>{m.time || '17:30'}</div>
                 </div>
               </div>
