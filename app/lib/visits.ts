@@ -191,6 +191,23 @@ export interface VisitorRow {
   device: string | null;
 }
 
+/** Lọc riêng cho bảng "Khách quay lại nhiều nhất". */
+export interface TopVisitorFilter {
+  /** Khớp visitor_id, IP hoặc đường dẫn. */
+  q: string;
+  /** Ngày đầu (YYYY-MM-DD), tính theo ngày lịch giờ Việt Nam. */
+  from: string | null;
+  /** Ngày cuối (YYYY-MM-DD), bao gồm cả ngày này. */
+  to: string | null;
+}
+
+const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Chỉ nhận đúng dạng YYYY-MM-DD, tránh chuỗi lạ lọt vào câu SQL. */
+export function isDayString(value: string | null | undefined): value is string {
+  return typeof value === 'string' && DAY_RE.test(value);
+}
+
 export interface VisitStats {
   range: VisitRange;
   summary: {
@@ -207,6 +224,10 @@ export interface VisitStats {
   devices: { name: string; value: number }[];
   browsers: { name: string; value: number }[];
   topVisitors: VisitorRow[];
+  /** Tổng số khách khớp bộ lọc của bảng khách quay lại (bảng chỉ lấy top 20). */
+  topVisitorTotal: number;
+  /** Bộ lọc đang áp cho bảng khách quay lại, đã chuẩn hoá. */
+  topVisitorFilter: TopVisitorFilter;
   recent: VisitRow[];
   recentTotal: number;
   page: number;
@@ -245,10 +266,40 @@ export const PAGE_SIZE = 50;
 export async function getVisitStats(
   range: VisitRange,
   page: number,
-  search: string
+  search: string,
+  topFilter: Partial<TopVisitorFilter> = {}
 ): Promise<VisitStats> {
   const { sql: where, params } = rangeClause(range);
   const db = pool();
+
+  // Bảng "Khách quay lại nhiều nhất" có bộ lọc riêng: chọn ngày là chốt hẳn
+  // khoảng ngày đó, không phụ thuộc khoảng thời gian đang chọn ở đầu trang —
+  // để tra được một ngày cũ mà không phải đổi chip thời gian.
+  const topQ = (topFilter.q ?? '').trim();
+  const topFrom = isDayString(topFilter.from) ? topFilter.from : null;
+  const topTo = isDayString(topFilter.to) ? topFilter.to : null;
+
+  let topWhere = where;
+  let topParams = [...params];
+  if (topFrom || topTo) {
+    const parts = ['site = ?'];
+    const p: (string | number)[] = [siteKey()];
+    if (topFrom) {
+      parts.push('created_at >= ?');
+      p.push(`${topFrom} 00:00:00`);
+    }
+    if (topTo) {
+      // < ngày kế tiếp: bao trọn ngày cuối mà vẫn dùng được index trên created_at.
+      parts.push('created_at < DATE_ADD(?, INTERVAL 1 DAY)');
+      p.push(topTo);
+    }
+    topWhere = parts.join(' AND ');
+    topParams = p;
+  }
+  const topSearchSql = topQ ? ' AND (ip LIKE ? OR visitor_id LIKE ? OR path LIKE ?)' : '';
+  const topSearchParams = topQ ? [`%${topQ}%`, `%${topQ}%`, `%${topQ}%`] : [];
+  const topWhereFull = `${topWhere}${topSearchSql}`;
+  const topParamsFull = [...topParams, ...topSearchParams];
 
   // Ô tìm kiếm lọc theo IP, visitor_id hoặc đường dẫn — chỉ áp cho bảng
   // "lượt truy cập gần nhất", các biểu đồ tổng quan vẫn giữ nguyên toàn kỳ.
@@ -261,7 +312,18 @@ export async function getVisitStats(
   const q = <T = Row[]>(sql: string, p: unknown[] = []) =>
     db.query(sql, p).then(([rows]) => rows as T);
 
-  const [summary, daily, paths, referrers, devices, browsers, visitors, recent, recentCount] =
+  const [
+    summary,
+    daily,
+    paths,
+    referrers,
+    devices,
+    browsers,
+    visitors,
+    visitorCount,
+    recent,
+    recentCount,
+  ] =
     await Promise.all([
       q(
         `SELECT COUNT(*) AS visits,
@@ -308,9 +370,13 @@ export async function getVisitStats(
                 MAX(created_at) AS lastSeen,
                 SUBSTRING_INDEX(GROUP_CONCAT(path ORDER BY created_at DESC), ',', 1) AS lastPath,
                 SUBSTRING_INDEX(GROUP_CONCAT(device ORDER BY created_at DESC), ',', 1) AS device
-           FROM visits WHERE ${where}
+           FROM visits WHERE ${topWhereFull}
           GROUP BY visitor_id ORDER BY visits DESC, lastSeen DESC LIMIT 20`,
-        params
+        topParamsFull
+      ),
+      q(
+        `SELECT COUNT(DISTINCT visitor_id) AS total FROM visits WHERE ${topWhereFull}`,
+        topParamsFull
       ),
       q(
         `SELECT id, created_at, ip, visitor_id, session_id, is_new_visitor, path, title,
@@ -358,6 +424,8 @@ export async function getVisitStats(
       lastPath: str(r.lastPath),
       device: str(r.device) || null,
     })),
+    topVisitorTotal: num((visitorCount as Row[])[0]?.total),
+    topVisitorFilter: { q: topQ, from: topFrom, to: topTo },
     recent: (recent as Row[]).map((r) => ({
       id: num(r.id),
       createdAt: iso(r.created_at),

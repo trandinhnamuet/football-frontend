@@ -37,6 +37,33 @@ const SERIES = [
 /** visitor_id là UUID 36 ký tự, dài quá thì bảng không đọc nổi — lấy 8 ký tự đầu. */
 const shortId = (id: string) => id.slice(0, 8);
 
+/** Mọi tham số của một lượt gọi /api/visitors. */
+interface LoadArgs {
+  range: VisitRange;
+  page: number;
+  /** Ô tìm của bảng "Từng lượt truy cập". */
+  q: string;
+  /** Ô tìm của bảng "Khách quay lại nhiều nhất". */
+  vq: string;
+  /** Ngày đầu của bộ lọc bảng khách quay lại (YYYY-MM-DD, rỗng là không lọc). */
+  vfrom: string;
+  /** Ngày cuối của bộ lọc đó, bao gồm cả ngày này. */
+  vto: string;
+}
+
+/** 'YYYY-MM-DD' → '06/09/2026' */
+function dayVi(day: string): string {
+  const [y, m, d] = day.split('-');
+  return d && m && y ? `${d}/${m}/${y}` : day;
+}
+
+/** Hôm nay theo giờ máy người dùng, dạng YYYY-MM-DD cho input type=date. */
+function todayValue(): string {
+  const n = new Date();
+  const p = (v: number) => String(v).padStart(2, '0');
+  return `${n.getFullYear()}-${p(n.getMonth() + 1)}-${p(n.getDate())}`;
+}
+
 /** Referrer chỉ cần biết đến từ đâu, không cần cả query string. */
 function refLabel(ref: string | null) {
   if (!ref) return null;
@@ -81,16 +108,23 @@ function VisitorsScreen() {
   const [range, setRange] = useState<VisitRange>('7d');
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  // Bảng "Khách quay lại nhiều nhất" có bộ lọc riêng, độc lập với chip thời gian.
+  const [vSearch, setVSearch] = useState('');
+  const [vFrom, setVFrom] = useState('');
+  const [vTo, setVTo] = useState('');
   const [data, setData] = useState<VisitStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const load = useCallback(async (key: VisitRange, pageNo: number, q: string) => {
+  const load = useCallback(async (args: LoadArgs) => {
     setLoading(true);
     setError('');
     try {
-      const params = new URLSearchParams({ range: key, page: String(pageNo) });
-      if (q.trim()) params.set('q', q.trim());
+      const params = new URLSearchParams({ range: args.range, page: String(args.page) });
+      if (args.q.trim()) params.set('q', args.q.trim());
+      if (args.vq.trim()) params.set('vq', args.vq.trim());
+      if (args.vfrom) params.set('vfrom', args.vfrom);
+      if (args.vto) params.set('vto', args.vto);
       const res = await fetch(`/api/visitors?${params}`, {
         cache: 'no-store',
         headers: { 'x-admin-password': localStorage.getItem(KEY) || '' },
@@ -114,8 +148,13 @@ function VisitorsScreen() {
     }
   }, []);
 
+  // Gom mọi tham số đang chọn để mỗi lần gọi API là một ảnh chụp đầy đủ.
+  function currentArgs(): LoadArgs {
+    return { range, page, q: search, vq: vSearch, vfrom: vFrom, vto: vTo };
+  }
+
   useEffect(() => {
-    load('7d', 1, '');
+    load({ range: '7d', page: 1, q: '', vq: '', vfrom: '', vto: '' });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -126,19 +165,52 @@ function VisitorsScreen() {
     if (debounce.current) clearTimeout(debounce.current);
     debounce.current = setTimeout(() => {
       setPage(1);
-      load(range, 1, value);
+      load({ ...currentArgs(), page: 1, q: value });
     }, 400);
+  }
+
+  // Ô tìm của bảng khách quay lại — cũng chờ 400ms, dùng timer riêng để hai ô
+  // tìm không huỷ lượt gọi của nhau.
+  const vDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+  function onVisitorSearch(value: string) {
+    setVSearch(value);
+    if (vDebounce.current) clearTimeout(vDebounce.current);
+    vDebounce.current = setTimeout(() => {
+      load({ ...currentArgs(), vq: value });
+    }, 400);
+  }
+
+  function setVisitorDay(which: 'from' | 'to', value: string) {
+    const next = { vfrom: which === 'from' ? value : vFrom, vto: which === 'to' ? value : vTo };
+    if (which === 'from') setVFrom(value);
+    else setVTo(value);
+    load({ ...currentArgs(), ...next });
+  }
+
+  /** Chọn nhanh một ngày: đặt cả hai đầu về đúng ngày đó. */
+  function pickVisitorDay(day: string) {
+    setVFrom(day);
+    setVTo(day);
+    load({ ...currentArgs(), vfrom: day, vto: day });
+  }
+
+  function clearVisitorFilter() {
+    setVSearch('');
+    setVFrom('');
+    setVTo('');
+    if (vDebounce.current) clearTimeout(vDebounce.current);
+    load({ ...currentArgs(), vq: '', vfrom: '', vto: '' });
   }
 
   function pickRange(key: VisitRange) {
     setRange(key);
     setPage(1);
-    load(key, 1, search);
+    load({ ...currentArgs(), range: key, page: 1 });
   }
 
   function goPage(next: number) {
     setPage(next);
-    load(range, next, search);
+    load({ ...currentArgs(), page: next });
   }
 
   const totalPages = data ? Math.max(1, Math.ceil(data.recentTotal / data.pageSize)) : 1;
@@ -180,7 +252,7 @@ function VisitorsScreen() {
             <Link className="an-btn" href="/admin/analytics">
               Xem thống kê GA4
             </Link>
-            <button className="an-btn" onClick={() => load(range, page, search)} disabled={loading}>
+            <button className="an-btn" onClick={() => load(currentArgs())} disabled={loading}>
               {loading ? 'Đang tải…' : 'Làm mới'}
             </button>
           </div>
@@ -303,9 +375,57 @@ function VisitorsScreen() {
 
             <div className="an-card" style={{ marginBottom: 12 }}>
               <h2>Khách quay lại nhiều nhất</h2>
-              <div className="an-hint">Xếp theo số lượt truy cập trong kỳ · top 20</div>
+              <div className="an-hint">
+                {vFrom || vTo
+                  ? vFrom && vTo && vFrom === vTo
+                    ? `Chỉ tính riêng ngày ${dayVi(vFrom)}`
+                    : `Chỉ tính ${vFrom ? `từ ${dayVi(vFrom)}` : 'từ đầu'} ${vTo ? `đến ${dayVi(vTo)}` : 'đến nay'}`
+                  : 'Xếp theo số lượt truy cập trong kỳ'}
+                {' · top 20'}
+                {data.topVisitorTotal > 0 && ` / ${nf.format(data.topVisitorTotal)} khách khớp`}
+              </div>
+
+              <div className="an-toolbar">
+                <input
+                  className="an-search"
+                  value={vSearch}
+                  onChange={(e) => onVisitorSearch(e.target.value)}
+                  placeholder="Tìm theo visitor ID, IP hoặc đường dẫn…"
+                />
+                <label className="an-field">
+                  <span>Từ ngày</span>
+                  <input
+                    className="an-date"
+                    type="date"
+                    value={vFrom}
+                    max={vTo || undefined}
+                    onChange={(e) => setVisitorDay('from', e.target.value)}
+                  />
+                </label>
+                <label className="an-field">
+                  <span>Đến ngày</span>
+                  <input
+                    className="an-date"
+                    type="date"
+                    value={vTo}
+                    min={vFrom || undefined}
+                    onChange={(e) => setVisitorDay('to', e.target.value)}
+                  />
+                </label>
+                <button className="an-btn" onClick={() => pickVisitorDay(todayValue())} disabled={loading}>
+                  Hôm nay
+                </button>
+                {(vSearch || vFrom || vTo) && (
+                  <button className="an-btn" onClick={clearVisitorFilter} disabled={loading}>
+                    Xoá lọc
+                  </button>
+                )}
+              </div>
+
               {data.topVisitors.length === 0 ? (
-                <div className="an-empty">Chưa có dữ liệu trong kỳ này</div>
+                <div className="an-empty">
+                  {vSearch || vFrom || vTo ? 'Không có khách nào khớp bộ lọc' : 'Chưa có dữ liệu trong kỳ này'}
+                </div>
               ) : (
                 <div className="an-tablewrap">
                   <table className="an-table">

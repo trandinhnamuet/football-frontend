@@ -109,3 +109,32 @@
 }
 
 .an-pager .spacer { flex: 1; }
+
+/* ── Bộ lọc riêng của bảng "Khách quay lại nhiều nhất" ──────────────────── */
+.an-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.an-date {
+  background: var(--input-bg);
+  border: 1px solid var(--line);
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  outline: none;
+  /* Cho trình duyệt vẽ icon lịch theo đúng nền đang dùng, nếu không thì
+     icon tối trên nền tối gần như mất hẳn. */
+  color-scheme: light;
+}
+
+[data-theme='dark'] .an-date { color-scheme: dark; }
+
+.an-date:focus { border-color: #ff6b1a; }

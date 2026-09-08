@@ -1,6 +1,6 @@
 import { timingSafeEqual } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
-import { StatsConfigError, getVisitStats, isConfigured, isVisitRange } from '@/app/lib/visits';
+import { StatsConfigError, getVisitStats, isConfigured, isDayString, isVisitRange } from '@/app/lib/visits';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -35,8 +35,17 @@ export async function GET(request: NextRequest) {
   const page = Math.max(1, Number(params.get('page')) || 1);
   const search = params.get('q') ?? '';
 
+  // Bộ lọc riêng của bảng "Khách quay lại nhiều nhất".
+  const vFrom = params.get('vfrom');
+  const vTo = params.get('vto');
+  const topFilter = {
+    q: params.get('vq') ?? '',
+    from: isDayString(vFrom) ? vFrom : null,
+    to: isDayString(vTo) ? vTo : null,
+  };
+
   try {
-    return NextResponse.json(await getVisitStats(range, page, search));
+    return NextResponse.json(await getVisitStats(range, page, search, topFilter));
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Lỗi không xác định';
     console.error('Visitors API error:', error);
