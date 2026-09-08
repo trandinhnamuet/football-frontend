@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import AdminGuard from '../../components/AdminGuard';
 import AdminHeader from '../../components/AdminHeader';
 import { Match, FANTA, PITCH_SIZES, fmtDate, isMatchPast } from '../../lib/types';
+import { useTableSort } from '../../lib/useTableSort';
 import { api } from '../../lib/api';
 
 const BLACK = 'var(--bg)';
@@ -315,9 +316,25 @@ function ScheduleManagementContent() {
     });
   }
 
-  const filtered = filter === 'ALL' ? matches
+  const byFilter = filter === 'ALL' ? matches
     : filter === 'upcoming' ? matches.filter(m => m.is_upcoming)
     : matches.filter(m => !m.is_upcoming);
+
+  // Mặc định: trận mới nhất trước. Cùng ngày thì tuần lớn hơn lên trước.
+  const defaultOrder = useMemo(
+    () => [...byFilter].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.week - a.week)),
+    [byFilter],
+  );
+
+  const { sorted: filtered, sortProps, indicator } = useTableSort(defaultOrder, {
+    week: m => m.week,
+    date: m => m.date,
+    time: m => m.time || '17:30',
+    opponent: m => m.opponent,
+    venue: m => `${m.venue || ''} ${m.pitch_size || 7}`,
+    score: m => (m.score ? m.score : m.is_upcoming ? null : m.goals_for - m.goals_against),
+    result: m => m.result,
+  });
 
   const resultColor: Record<string, string> = { W: '#1f8a5b', D: '#888', L: '#aa2222' };
 
@@ -378,13 +395,13 @@ function ScheduleManagementContent() {
             {/* Table header */}
             <div style={{ display: 'grid', gridTemplateColumns: '50px 60px 80px 100px 1fr 1fr 80px 80px 120px', gap: 12, padding: '12px 20px', borderBottom: `1px solid ${LINE}`, fontSize: 10, color: MUTED, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 700 }}>
               <div>Ảnh</div>
-              <div>Tuần</div>
-              <div>Ngày</div>
-              <div>Giờ</div>
-              <div>Đối thủ</div>
-              <div>Sân</div>
-              <div>Tỷ số</div>
-              <div>KQ</div>
+              <div {...sortProps('week')}>Tuần{indicator('week')}</div>
+              <div {...sortProps('date')}>Ngày{indicator('date')}</div>
+              <div {...sortProps('time')}>Giờ{indicator('time')}</div>
+              <div {...sortProps('opponent')}>Đối thủ{indicator('opponent')}</div>
+              <div {...sortProps('venue')}>Sân{indicator('venue')}</div>
+              <div {...sortProps('score')}>Tỷ số{indicator('score')}</div>
+              <div {...sortProps('result')}>KQ{indicator('result')}</div>
               <div>Thao tác</div>
             </div>
 

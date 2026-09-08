@@ -6,6 +6,7 @@ import AdminGuard from '../../components/AdminGuard';
 import { FANTA } from '../../lib/types';
 import { translations } from '../../lib/i18n';
 import { api } from '../../lib/api';
+import { useTableSort } from '../../lib/useTableSort';
 
 const BLACK = 'var(--bg)';
 const CARD = 'var(--card)';
@@ -128,6 +129,12 @@ export default function I18nManagementPage() {
       return key.toLowerCase().includes(q) || vi.includes(q) || en.includes(q);
     });
   }, [search, allKeys, viData, enData]);
+
+  const { sorted: visibleKeys, sortProps, indicator } = useTableSort(filtered, {
+    key: k => k.key,
+    vi: k => getByKey(viData, k.key),
+    en: k => getByKey(enData, k.key),
+  });
 
   function startEdit(key: string) {
     setEditingKey(key);
@@ -266,9 +273,9 @@ export default function I18nManagementPage() {
               borderBottom: `1px solid ${LINE}`, fontSize: 11,
               color: FANTA, letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 700,
             }}>
-              <span>Key</span>
-              <span>Tiếng Việt</span>
-              <span>English</span>
+              <span {...sortProps('key')}>Key{indicator('key')}</span>
+              <span {...sortProps('vi')}>Tiếng Việt{indicator('vi')}</span>
+              <span {...sortProps('en')}>English{indicator('en')}</span>
               <span>Thao tác</span>
             </div>
 
@@ -278,7 +285,7 @@ export default function I18nManagementPage() {
               </div>
             )}
 
-            {filtered.map(({ key }, idx) => {
+            {visibleKeys.map(({ key }, idx) => {
               const isEditing = editingKey === key;
               return (
                 <div

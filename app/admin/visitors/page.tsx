@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTableSort } from '../../lib/useTableSort';
 import Link from 'next/link';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import AdminGuard from '../../components/AdminGuard';
@@ -141,6 +142,28 @@ function VisitorsScreen() {
   }
 
   const totalPages = data ? Math.max(1, Math.ceil(data.recentTotal / data.pageSize)) : 1;
+
+  // Sort chạy trên dữ liệu đang hiển thị: bảng "Khách quay lại" là top 20 của kỳ,
+  // bảng "Từng lượt truy cập" là trang hiện tại (mỗi trang một lần sort).
+  const top = useTableSort(data?.topVisitors ?? [], {
+    visitorId: v => v.visitorId,
+    visits: v => v.visits,
+    lastIp: v => v.lastIp,
+    device: v => v.device,
+    firstSeen: v => v.firstSeen,
+    lastSeen: v => v.lastSeen,
+    lastPath: v => v.lastPath,
+  });
+
+  const recent = useTableSort(data?.recent ?? [], {
+    createdAt: v => v.createdAt,
+    ip: v => v.ip,
+    visitorId: v => v.visitorId,
+    path: v => v.path,
+    device: v => `${v.device || ''} ${v.browser || ''} ${v.os || ''}`,
+    referrer: v => refLabel(v.referrer) || '',
+    screen: v => v.screen,
+  });
 
   return (
     <div className="an-root">
@@ -288,17 +311,17 @@ function VisitorsScreen() {
                   <table className="an-table">
                     <thead>
                       <tr>
-                        <th>Visitor ID</th>
-                        <th>Lượt</th>
-                        <th>IP gần nhất</th>
-                        <th>Thiết bị</th>
-                        <th>Lần đầu</th>
-                        <th>Lần cuối</th>
-                        <th>Trang cuối</th>
+                        <th {...top.sortProps('visitorId')}>Visitor ID{top.indicator('visitorId')}</th>
+                        <th {...top.sortProps('visits')}>Lượt{top.indicator('visits')}</th>
+                        <th {...top.sortProps('lastIp')}>IP gần nhất{top.indicator('lastIp')}</th>
+                        <th {...top.sortProps('device')}>Thiết bị{top.indicator('device')}</th>
+                        <th {...top.sortProps('firstSeen')}>Lần đầu{top.indicator('firstSeen')}</th>
+                        <th {...top.sortProps('lastSeen')}>Lần cuối{top.indicator('lastSeen')}</th>
+                        <th {...top.sortProps('lastPath')}>Trang cuối{top.indicator('lastPath')}</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {data.topVisitors.map((v) => (
+                      {top.sorted.map((v) => (
                         <tr key={v.visitorId}>
                           <td className="mono" title={v.visitorId}>
                             {shortId(v.visitorId)}
@@ -341,17 +364,17 @@ function VisitorsScreen() {
                     <table className="an-table">
                       <thead>
                         <tr>
-                          <th>Thời điểm</th>
-                          <th>IP</th>
-                          <th>Visitor</th>
-                          <th>Trang</th>
-                          <th>Thiết bị</th>
-                          <th>Nguồn</th>
-                          <th>Màn hình</th>
+                          <th {...recent.sortProps('createdAt')}>Thời điểm{recent.indicator('createdAt')}</th>
+                          <th {...recent.sortProps('ip')}>IP{recent.indicator('ip')}</th>
+                          <th {...recent.sortProps('visitorId')}>Visitor{recent.indicator('visitorId')}</th>
+                          <th {...recent.sortProps('path')}>Trang{recent.indicator('path')}</th>
+                          <th {...recent.sortProps('device')}>Thiết bị{recent.indicator('device')}</th>
+                          <th {...recent.sortProps('referrer')}>Nguồn{recent.indicator('referrer')}</th>
+                          <th {...recent.sortProps('screen')}>Màn hình{recent.indicator('screen')}</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {data.recent.map((v) => (
+                        {recent.sorted.map((v) => (
                           <tr key={v.id}>
                             <td className="dim">{stampFmt.format(new Date(v.createdAt))}</td>
                             <td className="mono">{v.ip}</td>

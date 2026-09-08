@@ -5,6 +5,7 @@ import Link from 'next/link';
 import AdminGuard from '../../components/AdminGuard';
 import { FANTA } from '../../lib/types';
 import { api } from '../../lib/api';
+import { useTableSort } from '../../lib/useTableSort';
 import type { DriveLink } from '../../lib/types';
 
 const BLACK = 'var(--bg)';
@@ -12,6 +13,15 @@ const CARD = 'var(--card)';
 const INK = 'var(--ink)';
 const MUTED = 'var(--muted)';
 const LINE = 'var(--line)';
+
+/** "12/03/2026 · 14:05" — ngày trước cho dễ quét mắt, giờ để phân biệt link thêm cùng ngày. */
+function fmtDateTime(value: string | null | undefined): string {
+  if (!value) return '—';
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return '—';
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} · ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
 
 const EMPTY_FORM = { title: '', url: '', description: '', is_public: true, sort_order: 0 };
 const KEY = 'lffc_admin_pw';
@@ -49,6 +59,15 @@ export default function DriveLinksAdminPage() {
       setLoading(false);
     }
   }
+
+  const { sorted: rows, sortProps, indicator } = useTableSort(links, {
+    id: l => l.id,
+    title: l => l.title,
+    url: l => l.url,
+    sort_order: l => l.sort_order,
+    is_public: l => l.is_public,
+    created_at: l => l.created_at,
+  });
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -249,16 +268,17 @@ export default function DriveLinksAdminPage() {
           {/* Table */}
           <div style={{ background: CARD, border: `1px solid ${FANTA}22` }}>
             <div style={{
-              display: 'grid', gridTemplateColumns: '40px 1fr 2fr 100px 80px 120px',
+              display: 'grid', gridTemplateColumns: '40px 1fr 1.6fr 90px 80px 130px 120px',
               padding: '12px 16px', background: `${FANTA}15`,
               borderBottom: `1px solid ${LINE}`, fontSize: 11,
               color: FANTA, letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700, alignItems: 'center',
             }}>
-              <span>#</span>
-              <span>Tiêu đề</span>
-              <span>File ID</span>
-              <span>Thứ tự</span>
-              <span>Public</span>
+              <span {...sortProps('id')}>#{indicator('id')}</span>
+              <span {...sortProps('title')}>Tiêu đề{indicator('title')}</span>
+              <span {...sortProps('url')}>File ID{indicator('url')}</span>
+              <span {...sortProps('sort_order')}>Thứ tự{indicator('sort_order')}</span>
+              <span {...sortProps('is_public')}>Public{indicator('is_public')}</span>
+              <span {...sortProps('created_at')}>Ngày thêm{indicator('created_at')}</span>
               <span>Thao tác</span>
             </div>
 
@@ -268,11 +288,11 @@ export default function DriveLinksAdminPage() {
               </div>
             )}
 
-            {links.map((link, idx) => (
+            {rows.map((link, idx) => (
               <div
                 key={link.id}
                 style={{
-                  display: 'grid', gridTemplateColumns: '40px 1fr 2fr 100px 80px 120px',
+                  display: 'grid', gridTemplateColumns: '40px 1fr 1.6fr 90px 80px 130px 120px',
                   padding: '12px 16px', borderBottom: `1px solid ${LINE}`,
                   alignItems: 'center', background: idx % 2 === 0 ? 'transparent' : `${FANTA}05`,
                 }}
@@ -299,6 +319,9 @@ export default function DriveLinksAdminPage() {
                   >
                     {link.is_public ? '● ON' : '○ OFF'}
                   </button>
+                </div>
+                <div style={{ fontSize: 12, color: MUTED }} title={link.created_at || ''}>
+                  {fmtDateTime(link.created_at)}
                 </div>
                 <div style={{ display: 'flex', gap: 6 }}>
                   <button
