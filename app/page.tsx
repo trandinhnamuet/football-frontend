@@ -7,7 +7,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import BannerSlider from './components/BannerSlider';
 import MemorialSlider from './components/MemorialSlider';
-import { Player, Article, Match, RecommendedVideo, FANTA, ROLES, fmtDate, dayStart, daysUntil, isMatchPast, pitchLabel } from './lib/types';
+import { Player, Article, Match, RecommendedVideo, FANTA, ROLES, fmtDate, dayStart, daysUntil, isMatchPast, pitchLabel, resultLabel } from './lib/types';
 import { api } from './lib/api';
 import { useApp } from './contexts/AppContext';
 import { DEFAULT_PLAYER_AVATAR_URL } from './lib/assets';
@@ -15,6 +15,15 @@ import { DEFAULT_PLAYER_AVATAR_URL } from './lib/assets';
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const SQUAD_PAGE_SIZE = 5;
 const DEFAULT_AVATAR = DEFAULT_PLAYER_AVATAR_URL;
+
+// Huy hiệu kết quả. 'S' là trận chia đôi đá nội bộ — không thắng/hòa/thua nên
+// mang màu riêng thay vì rơi vào màu thua.
+const RESULT_BADGE: Record<string, { bg: string; fg: string }> = {
+  W: { bg: FANTA, fg: '#0a0a0a' },
+  D: { bg: 'var(--muted)', fg: '#fff' },
+  L: { bg: '#aa2222', fg: '#fff' },
+  S: { bg: '#2a6fdb', fg: '#fff' },
+};
 
 function resolveImg(url: string | null | undefined): string {
   if (!url) return '';
@@ -413,7 +422,7 @@ export default function HomePage() {
                 {m.result ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
                     <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 15, color: 'var(--ink)', fontWeight: 600, minWidth: 32, textAlign: 'center' }}>{m.score || `${m.goals_for} - ${m.goals_against}`}</div>
-                    <div style={{ width: 22, height: 22, background: m.result === 'W' ? FANTA : m.result === 'D' ? 'var(--muted)' : '#aa2222', color: m.result === 'W' ? '#0a0a0a' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 10, flexShrink: 0 }}>{m.result}</div>
+                    <div title={resultLabel(m.result, lang)} style={{ width: 22, height: 22, background: RESULT_BADGE[m.result]?.bg || 'var(--muted)', color: RESULT_BADGE[m.result]?.fg || '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 10, flexShrink: 0 }}>{m.result}</div>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

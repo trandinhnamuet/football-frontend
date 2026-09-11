@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import AdminGuard from '../../components/AdminGuard';
 import AdminHeader from '../../components/AdminHeader';
-import { Match, FANTA, PITCH_SIZES, fmtDate, isMatchPast } from '../../lib/types';
+import { Match, FANTA, PITCH_SIZES, MATCH_RESULTS, SPLIT_RESULT, fmtDate, isMatchPast, resultLabel } from '../../lib/types';
 import { useTableSort } from '../../lib/useTableSort';
 import { api } from '../../lib/api';
 
@@ -16,6 +16,8 @@ const LINE = 'var(--line)';
 // Text sitting on a FANTA-orange fill stays dark in both themes — light text on
 // orange fails contrast.
 const ON_FANTA = '#0a0a0a';
+// Chia đôi dùng màu xanh dương để tách hẳn khỏi thắng/hòa/thua.
+const RESULT_COLOR: Record<string, string> = { W: '#1f8a5b', D: '#888', L: '#aa2222', S: '#2a6fdb' };
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 
 function resolveImg(url: string): string {
@@ -217,9 +219,9 @@ function MatchModal({ initial, mode, onSave, onClose }: MatchModalProps) {
                   <label style={labelStyle}>Kết quả</label>
                   <select style={inputStyle} value={form.result} onChange={set('result')}>
                     <option value="">— Chọn —</option>
-                    <option value="W">Thắng (W)</option>
-                    <option value="D">Hòa (D)</option>
-                    <option value="L">Thua (L)</option>
+                    {MATCH_RESULTS.map(r => (
+                      <option key={r.code} value={r.code}>{r.vi} ({r.code})</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -227,6 +229,12 @@ function MatchModal({ initial, mode, onSave, onClose }: MatchModalProps) {
                 <label style={labelStyle}>Tỷ số (hiển thị)</label>
                 <input style={inputStyle} value={form.score} onChange={set('score')} placeholder="vd: 3 - 1" />
               </div>
+              {form.result === SPLIT_RESULT && (
+                <div style={{ fontSize: 12, color: MUTED, lineHeight: 1.5, borderLeft: `3px solid ${RESULT_COLOR.S}`, paddingLeft: 12 }}>
+                  Trận chia đôi là đội tự tách hai bên đá với nhau, nên không tính thắng/hòa/thua.
+                  Tỷ số vẫn hiển thị được, nhưng bàn ghi/bàn thủng không cộng vào hiệu số của đội.
+                </div>
+              )}
             </>
           )}
 
@@ -346,8 +354,6 @@ function ScheduleManagementContent() {
     result: m => m.result,
   });
 
-  const resultColor: Record<string, string> = { W: '#1f8a5b', D: '#888', L: '#aa2222' };
-
   return (
     <div style={{ background: BLACK, color: INK, minHeight: '100vh', fontFamily: '"Space Grotesk", system-ui, sans-serif' }}>
       {modal && (
@@ -429,7 +435,7 @@ function ScheduleManagementContent() {
                   padding: '8px 20px',
                   borderBottom: i < filtered.length - 1 ? `1px solid var(--input-bg)` : 'none',
                   alignItems: 'center',
-                  borderLeft: `3px solid ${m.is_upcoming ? FANTA : (resultColor[m.result] || 'transparent')}`,
+                  borderLeft: `3px solid ${m.is_upcoming ? FANTA : (RESULT_COLOR[m.result] || 'transparent')}`,
                   background: i % 2 === 0 ? 'transparent' : 'var(--soft)',
                 }}
               >
@@ -451,7 +457,7 @@ function ScheduleManagementContent() {
                 <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18 }}>{m.score || (m.is_upcoming ? '—' : `${m.goals_for}-${m.goals_against}`)}</div>
                 <div>
                   {m.result ? (
-                    <div style={{ width: 28, height: 28, background: resultColor[m.result] || '#555', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 14 }}>
+                    <div title={resultLabel(m.result)} style={{ width: 28, height: 28, background: RESULT_COLOR[m.result] || '#555', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 14 }}>
                       {m.result}
                     </div>
                   ) : (

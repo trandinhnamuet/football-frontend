@@ -57,11 +57,14 @@ export default function DashboardPage() {
 
   const roleColors: Record<string, string> = { GK: '#aa3333', DEF: '#2a6fdb', MID: '#1f8a5b', FWD: FANTA };
 
+  // Chia đôi chỉ chiếm ô KPI khi thực sự có trận nội bộ — mùa không có thì giữ
+  // nguyên 6 ô như cũ.
   const kpis = teamStats ? [
     { label: 'Trận đã đá', value: teamStats.played },
     { label: 'Thắng', value: teamStats.wins },
     { label: 'Hòa', value: teamStats.draws },
     { label: 'Thua', value: teamStats.losses },
+    ...(teamStats.splits ? [{ label: 'Chia đôi', value: teamStats.splits }] : []),
     { label: 'Bàn ghi', value: teamStats.gf },
     { label: 'Bàn thủng', value: teamStats.ga },
   ] : [];
@@ -93,7 +96,7 @@ export default function DashboardPage() {
 
         {/* KPIs */}
         {kpis.length > 0 && (
-          <div className="mob-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 14, marginBottom: 40 }}>
+          <div className="mob-kpi-grid" style={{ display: 'grid', gridTemplateColumns: `repeat(${kpis.length}, 1fr)`, gap: 14, marginBottom: 40 }}>
             {kpis.map(k => (
               <div key={k.label} style={{ background: CARD, border: `1px solid ${LINE}`, padding: '20px 20px' }}>
                 <div style={{ fontSize: 11, color: MUTED, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 600 }}>{k.label}</div>
