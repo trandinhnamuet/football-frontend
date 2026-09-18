@@ -66,6 +66,29 @@ input, textarea, select, button {
   font-family: inherit;
 }
 
+/* Native widgets (select popups, date pickers, scrollbars) are drawn by the OS.
+   Without `color-scheme` the browser paints them light, so a <select> whose
+   inline style sets a pale theme colour ends up with near-invisible <option>
+   text in dark mode. Telling the browser which scheme is active fixes the whole
+   family at once; the explicit <option> colours cover the browsers that keep
+   inheriting the select's own colour into the popup. */
+:root { color-scheme: light; }
+[data-theme="dark"] { color-scheme: dark; }
+
+select option {
+  background: var(--card);
+  color: var(--ink);
+}
+
+/* ── Prose panels with a hardcoded background ────────────────────────────────
+   Bài viết được dán vào dưới dạng HTML thô nên hay có khung màu cứng, không
+   đổi theo theme. `normalizeProse` (app/lib/prose.ts) gắn class cho các khung
+   đó, còn đây là màu chữ đọc được tương ứng: khung sáng cần chữ tối kể cả ở
+   dark mode, và ngược lại. Không dùng !important để tác giả vẫn đặt được màu
+   chữ riêng cho từng phần tử bên trong. */
+.lf-light-panel { color: #24201c; }
+.lf-dark-panel { color: #f0ece4; }
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }

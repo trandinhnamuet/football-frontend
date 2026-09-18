@@ -65,6 +65,7 @@ export default function DashboardPage() {
     { label: 'Hòa', value: teamStats.draws },
     { label: 'Thua', value: teamStats.losses },
     ...(teamStats.splits ? [{ label: 'Chia đôi', value: teamStats.splits }] : []),
+    ...(teamStats.cancelled ? [{ label: 'Trận hủy', value: teamStats.cancelled }] : []),
     { label: 'Bàn ghi', value: teamStats.gf },
     { label: 'Bàn thủng', value: teamStats.ga },
   ] : [];

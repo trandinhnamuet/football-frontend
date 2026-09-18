@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { FANTA } from '../lib/types';
+import { normalizeProse } from '../lib/prose';
 import { api } from '../lib/api';
 import { useApp } from '../contexts/AppContext';
 
@@ -73,7 +74,7 @@ export default function AboutPage() {
         {content ? (
           <div
             className="about-content"
-            dangerouslySetInnerHTML={{ __html: content }}
+            dangerouslySetInnerHTML={{ __html: normalizeProse(content) }}
             style={{ fontSize: 17, lineHeight: 1.75, color: 'var(--muted)' }}
           />
         ) : (

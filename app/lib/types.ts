@@ -72,17 +72,21 @@ export const PITCH_SIZES = [5, 7, 11] as const;
 /**
  * Mã kết quả trận đấu. 'S' (split) là trận chia đôi đội đá nội bộ: cả hai bên
  * đều là mình nên không có thắng/hòa/thua, và bàn thắng/bàn thủng cũng không
- * cộng vào tổng của đội.
+ * cộng vào tổng của đội. 'C' (cancelled) là trận bị hủy vì lý do bất khả kháng
+ * (mưa bão, sân hỏng, đối thủ bỏ trận...): không có tỷ số và không tính vào
+ * bất cứ thống kê nào.
  */
-export type MatchResult = 'W' | 'D' | 'L' | 'S';
+export type MatchResult = 'W' | 'D' | 'L' | 'S' | 'C';
 
 export const SPLIT_RESULT: MatchResult = 'S';
+export const CANCELLED_RESULT: MatchResult = 'C';
 
 export const MATCH_RESULTS: { code: MatchResult; vi: string; en: string }[] = [
   { code: 'W', vi: 'Thắng', en: 'Win' },
   { code: 'D', vi: 'Hòa', en: 'Draw' },
   { code: 'L', vi: 'Thua', en: 'Loss' },
   { code: 'S', vi: 'Chia đôi (đá nội bộ)', en: 'Split squad (internal)' },
+  { code: 'C', vi: 'Hủy (bất khả kháng)', en: 'Cancelled (force majeure)' },
 ];
 
 export function resultLabel(code: string, lang: 'vi' | 'en' = 'vi'): string {
@@ -103,6 +107,8 @@ export interface TeamStats {
   losses: number;
   /** Số trận chia đôi đá nội bộ — nằm ngoài thắng/hòa/thua và gf/ga. */
   splits: number;
+  /** Số trận bị hủy vì lý do bất khả kháng — không tính vào played/gf/ga. */
+  cancelled: number;
   gf: number;
   ga: number;
 }

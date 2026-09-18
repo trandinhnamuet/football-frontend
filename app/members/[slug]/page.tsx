@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { MemorialPost, FANTA, fmtDate } from '../../lib/types';
+import { normalizeProse } from '../../lib/prose';
 
 const BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 const BLACK = 'var(--bg)';
@@ -67,7 +68,7 @@ export default async function MemberPage({ params }: { params: Promise<{ slug: s
         {post.content && (
           <div
             style={{ fontSize: 16, lineHeight: 1.8, color: 'var(--prose)' }}
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: normalizeProse(post.content) }}
           />
         )}
       </main>

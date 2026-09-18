@@ -83,6 +83,7 @@ const vi = {
     countdownDays: 'ngày',
     countdownToday: 'Hôm nay!',
     awaitingResult: 'Chờ kết quả',
+    cancelled: 'Trận hủy',
   },
   video: {
     label: 'VIDEO',
@@ -201,6 +202,7 @@ const en = {
     countdownDays: 'days',
     countdownToday: 'Today!',
     awaitingResult: 'Result pending',
+    cancelled: 'Cancelled',
   },
   video: {
     label: 'VIDEO',

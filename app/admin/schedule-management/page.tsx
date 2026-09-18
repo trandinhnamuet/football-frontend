@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import AdminGuard from '../../components/AdminGuard';
 import AdminHeader from '../../components/AdminHeader';
-import { Match, FANTA, PITCH_SIZES, MATCH_RESULTS, SPLIT_RESULT, fmtDate, isMatchPast, resultLabel } from '../../lib/types';
+import { Match, FANTA, PITCH_SIZES, MATCH_RESULTS, SPLIT_RESULT, CANCELLED_RESULT, fmtDate, isMatchPast, resultLabel } from '../../lib/types';
 import { useTableSort } from '../../lib/useTableSort';
 import { api } from '../../lib/api';
 
@@ -16,8 +16,8 @@ const LINE = 'var(--line)';
 // Text sitting on a FANTA-orange fill stays dark in both themes — light text on
 // orange fails contrast.
 const ON_FANTA = '#0a0a0a';
-// Chia đôi dùng màu xanh dương để tách hẳn khỏi thắng/hòa/thua.
-const RESULT_COLOR: Record<string, string> = { W: '#1f8a5b', D: '#888', L: '#aa2222', S: '#2a6fdb' };
+// Chia đôi dùng màu xanh dương và hủy dùng màu tím để tách hẳn khỏi thắng/hòa/thua.
+const RESULT_COLOR: Record<string, string> = { W: '#1f8a5b', D: '#888', L: '#aa2222', S: '#2a6fdb', C: '#7b4fa8' };
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 
 function resolveImg(url: string): string {
@@ -80,6 +80,17 @@ function MatchModal({ initial, mode, onSave, onClose }: MatchModalProps) {
       : e.target.type === 'number' ? +e.target.value : e.target.value;
     setForm(f => ({ ...f, [k]: val }));
   };
+
+  const cancelled = form.result === CANCELLED_RESULT;
+
+  // Chọn "Hủy" thì xóa luôn tỷ số đã nhập trước đó — trận không đá thì không
+  // được để lại số liệu cũ trong DB.
+  function handleResultChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const result = e.target.value;
+    setForm(f => result === CANCELLED_RESULT
+      ? { ...f, result, score: '', goals_for: 0, goals_against: 0 }
+      : { ...f, result });
+  }
 
   async function handleSave() {
     if (!form.opponent.trim()) { setError('Nhập tên đối thủ'); return; }
@@ -206,33 +217,43 @@ function MatchModal({ initial, mode, onSave, onClose }: MatchModalProps) {
           {/* Score fields (for played matches) */}
           {!form.is_upcoming && (
             <>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
-                <div>
-                  <label style={labelStyle}>Bàn ghi (GF)</label>
-                  <input style={inputStyle} type="number" min={0} value={form.goals_for} onChange={set('goals_for')} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Bàn thủng (GA)</label>
-                  <input style={inputStyle} type="number" min={0} value={form.goals_against} onChange={set('goals_against')} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Kết quả</label>
-                  <select style={inputStyle} value={form.result} onChange={set('result')}>
-                    <option value="">— Chọn —</option>
-                    {MATCH_RESULTS.map(r => (
-                      <option key={r.code} value={r.code}>{r.vi} ({r.code})</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
               <div>
-                <label style={labelStyle}>Tỷ số (hiển thị)</label>
-                <input style={inputStyle} value={form.score} onChange={set('score')} placeholder="vd: 3 - 1" />
+                <label style={labelStyle}>Kết quả</label>
+                <select style={inputStyle} value={form.result} onChange={handleResultChange}>
+                  <option value="">— Chọn —</option>
+                  {MATCH_RESULTS.map(r => (
+                    <option key={r.code} value={r.code}>{r.vi} ({r.code})</option>
+                  ))}
+                </select>
               </div>
+              {/* Trận hủy không được đá nên không có bàn thắng lẫn tỷ số để nhập. */}
+              {!cancelled && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 2fr', gap: 16 }}>
+                  <div>
+                    <label style={labelStyle}>Bàn ghi (GF)</label>
+                    <input style={inputStyle} type="number" min={0} value={form.goals_for} onChange={set('goals_for')} />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Bàn thủng (GA)</label>
+                    <input style={inputStyle} type="number" min={0} value={form.goals_against} onChange={set('goals_against')} />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Tỷ số (hiển thị)</label>
+                    <input style={inputStyle} value={form.score} onChange={set('score')} placeholder="vd: 3 - 1" />
+                  </div>
+                </div>
+              )}
               {form.result === SPLIT_RESULT && (
                 <div style={{ fontSize: 12, color: MUTED, lineHeight: 1.5, borderLeft: `3px solid ${RESULT_COLOR.S}`, paddingLeft: 12 }}>
                   Trận chia đôi là đội tự tách hai bên đá với nhau, nên không tính thắng/hòa/thua.
                   Tỷ số vẫn hiển thị được, nhưng bàn ghi/bàn thủng không cộng vào hiệu số của đội.
+                </div>
+              )}
+              {cancelled && (
+                <div style={{ fontSize: 12, color: MUTED, lineHeight: 1.5, borderLeft: `3px solid ${RESULT_COLOR.C}`, paddingLeft: 12 }}>
+                  Trận hủy vì lý do bất khả kháng (mưa bão, sân hỏng, đối thủ bỏ trận...).
+                  Trận này không có tỷ số và không tính vào bất cứ thống kê nào: không phải trận đã đá,
+                  không vào thắng/hòa/thua, không vào bàn ghi/bàn thủng.
                 </div>
               )}
             </>
@@ -350,7 +371,7 @@ function ScheduleManagementContent() {
     time: m => m.time || '17:30',
     opponent: m => m.opponent,
     venue: m => `${m.venue || ''} ${m.pitch_size || 7}`,
-    score: m => (m.score ? m.score : m.is_upcoming ? null : m.goals_for - m.goals_against),
+    score: m => (m.result === CANCELLED_RESULT ? null : m.score ? m.score : m.is_upcoming ? null : m.goals_for - m.goals_against),
     result: m => m.result,
   });
 
@@ -454,7 +475,9 @@ function ScheduleManagementContent() {
                     : <div style={{ fontSize: 10, color: FANTA, letterSpacing: '0.1em', marginTop: 2 }}>SẮP TỚI</div>}
                 </div>
                 <div style={{ fontSize: 12, color: MUTED }}>{m.venue}{m.venue ? ' · ' : ''}Sân {m.pitch_size || 7}</div>
-                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18 }}>{m.score || (m.is_upcoming ? '—' : `${m.goals_for}-${m.goals_against}`)}</div>
+                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18 }}>
+                  {m.result === CANCELLED_RESULT ? '—' : m.score || (m.is_upcoming ? '—' : `${m.goals_for}-${m.goals_against}`)}
+                </div>
                 <div>
                   {m.result ? (
                     <div title={resultLabel(m.result)} style={{ width: 28, height: 28, background: RESULT_COLOR[m.result] || '#555', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 14 }}>
