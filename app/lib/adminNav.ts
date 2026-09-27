@@ -168,4 +168,18 @@ export const adminSections: AdminSection[] = [
       'Xóa bài viết',
     ],
   },
+  {
+    title: 'Đăng Tin Tuyển Quân',
+    short: 'Tuyển quân',
+    description: 'Đăng tin tuyển thành viên khi đội thiếu người (vd: thiếu thủ môn), hiển thị ở trang /recruitment và dải thông báo trên trang chủ',
+    href: '/admin/recruitment-management',
+    icon: '📣',
+    features: [
+      'Tạo tin tuyển theo vị trí (GK / DEF / MID / FWD / mọi vị trí) và số lượng cần',
+      'Mô tả yêu cầu bằng tiếng Việt & Anh (hỗ trợ HTML)',
+      'Thông tin liên hệ: tên, số điện thoại, link Zalo/Facebook',
+      'Đặt hạn nộp hoặc để mở đến khi tuyển đủ',
+      'Đóng / mở lại tin, tải ảnh minh hoạ, xóa tin',
+    ],
+  },
 ];

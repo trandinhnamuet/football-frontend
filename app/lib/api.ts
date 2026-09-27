@@ -1,4 +1,4 @@
-import { Player, Article, MemorialPost, Match, TeamStats, DriveLink, VideoHighlight, RecommendedVideo, BannerSlide } from './types';
+import { Player, Article, MemorialPost, RecruitmentPost, Match, TeamStats, DriveLink, VideoHighlight, RecommendedVideo, BannerSlide } from './types';
 
 export const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 const BASE = API_BASE;
@@ -154,6 +154,39 @@ export const api = {
       body: form,
     });
     if (r.status === 401) { handleUnauthorized(); throw new Error('Unauthorized'); }
+    return r.json() as Promise<{ url: string }>;
+  },
+
+  // Recruitment (tuyển quân)
+  getRecruitmentPosts: () => fetchJSON<RecruitmentPost[]>('/api/recruitment'),
+  getRecruitmentPost: (idOrSlug: number | string) => fetchJSON<RecruitmentPost>(`/api/recruitment/${idOrSlug}`),
+  createRecruitmentPost: (data: Partial<RecruitmentPost>, password: string) =>
+    fetchJSON<RecruitmentPost>('/api/recruitment', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: { 'x-admin-password': password },
+    }),
+  updateRecruitmentPost: (id: number, data: Partial<RecruitmentPost>, password: string) =>
+    fetchJSON<RecruitmentPost>(`/api/recruitment/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+      headers: { 'x-admin-password': password },
+    }),
+  deleteRecruitmentPost: (id: number, password: string) =>
+    fetchJSON(`/api/recruitment/${id}`, {
+      method: 'DELETE',
+      headers: { 'x-admin-password': password },
+    }),
+  uploadRecruitmentImage: async (file: File, password: string) => {
+    const form = new FormData();
+    form.append('image', file);
+    const r = await fetch(`${BASE}/api/recruitment/upload-image`, {
+      method: 'POST',
+      headers: { 'x-admin-password': password },
+      body: form,
+    });
+    if (r.status === 401) { handleUnauthorized(); throw new Error('Unauthorized'); }
+    if (!r.ok) throw new Error(await r.text() || `HTTP ${r.status}`);
     return r.json() as Promise<{ url: string }>;
   },
 
