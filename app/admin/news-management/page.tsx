@@ -5,7 +5,7 @@ import Link from 'next/link';
 import AdminGuard from '../../components/AdminGuard';
 import AdminHeader from '../../components/AdminHeader';
 import ArticleImageLibrary, { absoluteUrl } from '../../components/ArticleImageLibrary';
-import { Article, FANTA, fmtDate } from '../../lib/types';
+import { Article, ArticleKind, ARTICLE_KINDS, FANTA, fmtDate, isAnnouncement, announcementIsActive } from '../../lib/types';
 import { api } from '../../lib/api';
 import { compressImage, formatBytes } from '../../lib/imageCompress';
 
@@ -22,7 +22,13 @@ function getPassword() {
   return typeof window !== 'undefined' ? (localStorage.getItem('lffc_admin_pw') || '') : '';
 }
 
-const emptyForm = { title: '', title_en: '', content: '', content_en: '', excerpt: '', excerpt_en: '', tag: '', tag_en: '', image_url: '', published_at: new Date().toISOString().slice(0, 10) };
+const emptyForm = {
+  title: '', title_en: '', content: '', content_en: '', excerpt: '', excerpt_en: '', tag: '', tag_en: '', image_url: '',
+  published_at: new Date().toISOString().slice(0, 10),
+  kind: 'news' as ArticleKind,
+  is_pinned: false,
+  expires_at: '',
+};
 
 function NewsForm({ initial, onSave, onCancel }: { initial: typeof emptyForm & { id?: number }; onSave: (data: any) => Promise<void>; onCancel: () => void }) {
   const [form, setForm] = useState(initial);
@@ -37,7 +43,7 @@ function NewsForm({ initial, onSave, onCancel }: { initial: typeof emptyForm & {
   // append to the end until the writer has actually placed the caret.
   const caretPlaced = useRef(false);
 
-  const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setForm(f => ({ ...f, [k]: e.target.value }));
+  const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => setForm(f => ({ ...f, [k]: e.target.value }));
 
   function focusContent(which: 'content' | 'content_en') {
     setTarget(which);
@@ -79,7 +85,12 @@ function NewsForm({ initial, onSave, onCancel }: { initial: typeof emptyForm & {
     setSaving(true);
     setError('');
     try {
-      await onSave({ ...form, published_at: form.published_at ? new Date(form.published_at).toISOString() : undefined });
+      await onSave({
+        ...form,
+        published_at: form.published_at ? new Date(form.published_at).toISOString() : undefined,
+        expires_at: form.kind === 'announcement' && form.expires_at ? new Date(form.expires_at).toISOString() : null,
+        is_pinned: form.kind === 'announcement' && form.is_pinned,
+      });
     } catch (e: any) { setError(e.message || 'Lỗi lưu bài'); }
     finally { setSaving(false); }
   }
@@ -127,6 +138,29 @@ function NewsForm({ initial, onSave, onCancel }: { initial: typeof emptyForm & {
       </div>
 
       <ArticleImageLibrary password={getPassword()} onInsert={insertIntoContent} />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, padding: '16px 18px', border: `1px solid ${FANTA}44`, background: 'rgba(255,107,26,0.05)' }}>
+        <div>
+          <label style={labelStyle}>Loại bài</label>
+          <select style={inputStyle} value={form.kind} onChange={set('kind')}>
+            {ARTICLE_KINDS.map(k => <option key={k.code} value={k.code}>{k.vi}</option>)}
+          </select>
+          <div style={{ fontSize: 11, color: MUTED, marginTop: 6 }}>
+            {form.kind === 'announcement'
+              ? 'Hiện ở khối "Thông báo" trên trang chủ và trang /announcements. Hết hạn thì tự rút khỏi trang chủ.'
+              : 'Hiện ở lưới "Tin tức" trên trang chủ và trang /news.'}
+          </div>
+        </div>
+        <div style={{ opacity: form.kind === 'announcement' ? 1 : 0.4 }}>
+          <label style={labelStyle}>Hiệu lực đến (để trống = không hạn)</label>
+          <input type="date" style={inputStyle} value={form.expires_at} onChange={set('expires_at')} disabled={form.kind !== 'announcement'} />
+        </div>
+        <div style={{ opacity: form.kind === 'announcement' ? 1 : 0.4, alignSelf: 'end' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '10px 14px', border: `1px solid ${LINE}`, background: 'var(--input-bg)' }}>
+            <input type="checkbox" checked={form.is_pinned} disabled={form.kind !== 'announcement'} onChange={e => setForm(f => ({ ...f, is_pinned: e.target.checked }))} />
+            <span style={{ fontSize: 14 }}>📌 Ghim lên đầu khối thông báo</span>
+          </label>
+        </div>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 16 }}>
         <div>
           <label style={labelStyle}>Tag (VI)</label>
@@ -233,6 +267,9 @@ function NewsManagementContent() {
                 tag: editing.tag || '', tag_en: editing.tag_en || '',
                 image_url: editing.image_url || '',
                 published_at: editing.published_at?.slice(0, 10) || new Date().toISOString().slice(0, 10),
+                kind: (editing.kind || 'news') as ArticleKind,
+                is_pinned: !!editing.is_pinned,
+                expires_at: editing.expires_at?.slice(0, 10) || '',
                 id: editing.id,
               } : { ...emptyForm }}
               onSave={handleSave}
@@ -252,9 +289,19 @@ function NewsManagementContent() {
             {articles.map(article => (
               <div key={article.id} style={{ background: CARD, padding: '20px 24px', display: 'grid', gridTemplateColumns: '1fr auto', gap: 20, alignItems: 'center', borderLeft: `4px solid ${FANTA}` }}>
                 <div>
-                  <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 6 }}>
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 6, flexWrap: 'wrap' }}>
+                    {isAnnouncement(article) ? (
+                      <span style={{ background: announcementIsActive(article) ? FANTA : LINE, color: announcementIsActive(article) ? ON_FANTA : MUTED, padding: '2px 8px', fontFamily: 'Anton, sans-serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                        📢 Thông báo{article.is_pinned ? ' · Ghim' : ''}{!announcementIsActive(article) ? ' · Hết hạn' : ''}
+                      </span>
+                    ) : (
+                      <span style={{ border: `1px solid ${LINE}`, color: MUTED, padding: '1px 8px', fontFamily: 'Anton, sans-serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Tin tức</span>
+                    )}
                     {article.tag && <span style={{ background: FANTA, color: ON_FANTA, padding: '2px 8px', fontFamily: 'Anton, sans-serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{article.tag}</span>}
-                    <span style={{ fontSize: 12, color: MUTED }}>{fmtDate(article.published_at)}</span>
+                    <span style={{ fontSize: 12, color: MUTED }}>
+                      {fmtDate(article.published_at)}
+                      {isAnnouncement(article) && article.expires_at ? ` · đến ${fmtDate(article.expires_at)}` : ''}
+                    </span>
                   </div>
                   <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, letterSpacing: '0.01em', textTransform: 'uppercase' }}>{article.title}</div>
                   {article.excerpt && <div style={{ fontSize: 13, color: MUTED, marginTop: 4 }}>{article.excerpt.slice(0, 120)}...</div>}

@@ -15,7 +15,8 @@ const ON_FANTA = '#0a0a0a';
 
 async function getArticles(): Promise<Article[]> {
   try {
-    const res = await fetch(`${BASE}/api/articles`, { next: { revalidate: 60 } });
+    // Chỉ tin tức; thông báo có trang riêng /announcements.
+    const res = await fetch(`${BASE}/api/articles?kind=news`, { next: { revalidate: 60 } });
     return res.ok ? res.json() : [];
   } catch { return []; }
 }
@@ -36,7 +37,12 @@ export default async function NewsPage() {
           <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(56px, 8vw, 96px)', lineHeight: 0.92, letterSpacing: '0.01em', textTransform: 'uppercase', margin: 0 }}>
             TIN TỨC <span style={{ color: FANTA }}>& BÀO</span>
           </h1>
-          <p style={{ color: MUTED, fontSize: 15, marginTop: 28 }}>{articles.length} bài viết</p>
+          <div style={{ display: 'flex', gap: 20, alignItems: 'center', flexWrap: 'wrap', marginTop: 28 }}>
+            <p style={{ color: MUTED, fontSize: 15, margin: 0 }}>{articles.length} bài viết</p>
+            <Link href="/announcements" style={{ color: FANTA, fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none' }}>
+              Xem thông báo →
+            </Link>
+          </div>
         </div>
 
         {articles.length === 0 ? (

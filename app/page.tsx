@@ -8,7 +8,7 @@ import Footer from './components/Footer';
 import BannerSlider from './components/BannerSlider';
 import MemorialSlider from './components/MemorialSlider';
 import RecruitmentBanner from './components/RecruitmentBanner';
-import { Player, Article, Match, RecommendedVideo, FANTA, ROLES, CANCELLED_RESULT, fmtDate, dayStart, daysUntil, isMatchPast, pitchLabel, resultLabel } from './lib/types';
+import { Player, Article, Match, RecommendedVideo, FANTA, ROLES, CANCELLED_RESULT, fmtDate, dayStart, daysUntil, isMatchPast, pitchLabel, resultLabel, isAnnouncement, announcementIsActive, sortAnnouncements } from './lib/types';
 import { api } from './lib/api';
 import { useApp } from './contexts/AppContext';
 import { DEFAULT_PLAYER_AVATAR_URL } from './lib/assets';
@@ -73,6 +73,9 @@ export default function HomePage() {
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
+  // Thông báo còn hiệu lực (ghim trước) đi vào khối riêng; lưới tin chỉ còn tin tức.
+  const announcements = sortAnnouncements(articles.filter(a => isAnnouncement(a) && announcementIsActive(a)));
+  const newsArticles = articles.filter(a => !isAnnouncement(a));
   const [matches, setMatches] = useState<Match[]>([]);
   const [videoHighlight, setVideoHighlight] = useState<{ youtube_url: string; title: string; title_en: string; is_active: boolean; channel_url?: string } | null>(null);
   const [aboutData, setAboutData] = useState<{ banner_image_url: string } | null>(null);
@@ -528,6 +531,47 @@ export default function HomePage() {
         )}
       </section>
 
+      {/* ANNOUNCEMENTS — thông báo còn hiệu lực, ghim trước; không có thì ẩn cả khối */}
+      {announcements.length > 0 && (
+        <section id="announcements" className="mob-p-section" style={{ padding: '64px 48px', background: 'var(--bg)', borderTop: `1px solid ${FANTA}33` }}>
+          <div className="mob-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 28 }}>
+            <div>
+              <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s06')}</div>
+              <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 64px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 18 }}>{t('announcements.title')}</h2>
+            </div>
+            <Link href="/announcements" className="btn-view-all" style={{ background: 'transparent', color: FANTA, border: `1px solid ${FANTA}`, padding: '12px 22px', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 15, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              {t('announcements.viewAll')}
+            </Link>
+          </div>
+          <div style={{ display: 'grid', gap: 10 }}>
+            {announcements.slice(0, 5).map(a => (
+              <Link key={a.id} href={`/news/${a.id}`} className="news-card" style={{
+                textDecoration: 'none', color: 'inherit', background: 'var(--card)',
+                borderLeft: `4px solid ${FANTA}`, padding: '18px 22px',
+                display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: 18, alignItems: 'center',
+              }}>
+                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, color: FANTA, lineHeight: 1, minWidth: 28, textAlign: 'center' }}>
+                  {a.is_pinned ? '📌' : '📢'}
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', fontSize: 11, color: 'var(--muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
+                    <span>{fmtDate(a.published_at)}</span>
+                    {a.is_pinned && <span style={{ color: FANTA, fontWeight: 700 }}>{t('announcements.pinned')}</span>}
+                    {a.expires_at && <span>{t('announcements.until')} {fmtDate(a.expires_at)}</span>}
+                    {a.tag && <span style={{ background: FANTA, color: '#0a0a0a', padding: '1px 8px', fontFamily: 'Anton, sans-serif', letterSpacing: '0.08em' }}>{lang === 'en' && a.tag_en ? a.tag_en : a.tag}</span>}
+                  </div>
+                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, lineHeight: 1.25, letterSpacing: '0.01em', textTransform: 'uppercase' }}>
+                    {lang === 'en' && a.title_en ? a.title_en : a.title}
+                  </div>
+                  {a.excerpt && <div style={{ color: 'var(--muted)', fontSize: 13, lineHeight: 1.5, marginTop: 4 }}>{lang === 'en' && a.excerpt_en ? a.excerpt_en : a.excerpt}</div>}
+                </div>
+                <div className="mob-hide" style={{ color: FANTA, fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>→</div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* NEWS */}
       <section id="news" className="mob-p-section" style={{ padding: '80px 48px', background: 'var(--alt-bg)', borderTop: `1px solid ${FANTA}33` }}>
         <div className="mob-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 36 }}>
@@ -539,14 +583,14 @@ export default function HomePage() {
             {t('news.viewAll')}
           </Link>
         </div>
-        {articles.length === 0 ? (
+        {newsArticles.length === 0 ? (
           <div style={{ padding: '60px', textAlign: 'center', color: 'var(--muted)', fontFamily: 'Anton, sans-serif', fontSize: 20, background: 'var(--card)', borderLeft: `4px solid ${FANTA}` }}>
             {t('news.noData')}{' '}
             <Link href="/admin/news-management" style={{ color: FANTA }}>{t('news.addNews')}</Link>
           </div>
         ) : (
           <div className="mob-news-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-            {articles.slice(0, 6).map((article, i) => (
+            {newsArticles.slice(0, 6).map((article, i) => (
               <Link key={article.id} href={`/news/${article.id}`} className="news-card" style={{
                 textDecoration: 'none', color: 'inherit', background: 'var(--card)', overflow: 'hidden', display: 'block',
                 gridRow: i === 0 ? 'span 2' : 'auto',

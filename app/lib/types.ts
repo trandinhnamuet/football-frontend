@@ -32,6 +32,10 @@ export interface Article {
   image_url: string | null;
   tag: string;
   tag_en: string;
+  /** 'news' (tin tức) | 'announcement' (thông báo, có hạn, có thể ghim). */
+  kind: ArticleKind;
+  is_pinned: boolean;
+  expires_at: string | null;
   published_at: string;
 }
 
@@ -48,6 +52,29 @@ export interface MemorialPost {
   tag: string;
   tag_en: string;
   published_at: string;
+}
+
+export type ArticleKind = 'news' | 'announcement';
+
+export const ARTICLE_KINDS: { code: ArticleKind; vi: string; en: string }[] = [
+  { code: 'news', vi: 'Tin tức', en: 'News' },
+  { code: 'announcement', vi: 'Thông báo', en: 'Announcement' },
+];
+
+export function isAnnouncement(a: Pick<Article, 'kind'>): boolean {
+  return a.kind === 'announcement';
+}
+
+/** Thông báo còn hiệu lực: chưa qua ngày hết hạn (nếu có đặt). */
+export function announcementIsActive(a: Pick<Article, 'expires_at'>): boolean {
+  if (!a.expires_at) return true;
+  return Date.now() <= dayStart(a.expires_at) + 24 * 3600000;
+}
+
+/** Ghim trước, rồi mới nhất trước. */
+export function sortAnnouncements(list: Article[]): Article[] {
+  return [...list].sort((a, b) =>
+    Number(!!b.is_pinned) - Number(!!a.is_pinned) || dayStart(b.published_at) - dayStart(a.published_at));
 }
 
 /** Tin tuyển quân: đội thiếu người ở vị trí nào thì đăng một tin. */
