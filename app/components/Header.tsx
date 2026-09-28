@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useApp } from '../contexts/AppContext';
+import { useAuth } from '../contexts/AuthContext';
 import { FANTA_LOGO_URL } from '../lib/assets';
 
 const FANTA = '#FF6B1A';
@@ -12,7 +13,10 @@ const FANTA = '#FF6B1A';
 export default function Header() {
   const pathname = usePathname();
   const { lang, setLang, theme, setTheme, t } = useApp();
+  const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  // Tên ngắn hiện trên header: tên gọi (last_name) của cầu thủ, không thì username.
+  const shortName = user ? (user.player?.last_name || user.display_name || user.username) : '';
 
   const navLinks = [
     { href: '/about', labelKey: 'nav.intro' },
@@ -81,6 +85,20 @@ export default function Header() {
 
           {/* Divider */}
           <span style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.15)', display: 'inline-block' }} />
+
+          {/* Tài khoản thành viên */}
+          {user ? (
+            <>
+              <Link href="/account" className="nav-link" title={t('nav.account')} style={{ color: pathname === '/account' ? '#f4f1ea' : 'inherit', textDecoration: 'none', fontWeight: 600 }}>
+                👤 {shortName}
+              </Link>
+              <button onClick={logout} className="nav-btn" title={t('nav.logout')}>{t('nav.logout')}</button>
+            </>
+          ) : (
+            <Link href="/login" className="nav-link" style={{ color: pathname === '/login' ? '#f4f1ea' : 'inherit', textDecoration: 'none', fontWeight: 600 }}>
+              {t('nav.login')}
+            </Link>
+          )}
 
           {/* Language toggle */}
           <button
@@ -155,7 +173,31 @@ export default function Header() {
               {link.accent ? `● ${t(link.labelKey)}` : t(link.labelKey)}
             </Link>
           ))}
+          {user ? (
+            <Link
+              href="/account"
+              onClick={() => setMenuOpen(false)}
+              className="nav-link-mobile"
+              style={{ color: '#f4f1ea', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.04em', textTransform: 'uppercase', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'block' }}
+            >
+              👤 {shortName}
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              onClick={() => setMenuOpen(false)}
+              className="nav-link-mobile"
+              style={{ color: '#f4f1ea', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.04em', textTransform: 'uppercase', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'block' }}
+            >
+              {t('nav.login')}
+            </Link>
+          )}
           <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+            {user && (
+              <button onClick={() => { logout(); setMenuOpen(false); }} className="nav-btn nav-btn-mobile">
+                {t('nav.logout')}
+              </button>
+            )}
             <button
               onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')}
               className="nav-btn nav-btn-lang nav-btn-mobile"

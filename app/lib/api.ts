@@ -1,4 +1,4 @@
-import { Player, Article, MemorialPost, Match, TeamStats, DriveLink, VideoHighlight, RecommendedVideo, BannerSlide } from './types';
+import { Player, Article, MemorialPost, Match, TeamStats, DriveLink, VideoHighlight, RecommendedVideo, BannerSlide, AuthUser } from './types';
 
 export const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 const BASE = API_BASE;
@@ -8,6 +8,44 @@ export interface ArticleImage {
   url: string;
   size: number;
   uploaded_at: string;
+}
+
+/** Lỗi HTTP có kèm status để caller phân biệt 401 với lỗi mạng. */
+export class ApiError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+  }
+}
+
+export const AUTH_TOKEN_KEY = 'lffc_user_token';
+
+export function getAuthToken(): string {
+  return typeof window !== 'undefined' ? (localStorage.getItem(AUTH_TOKEN_KEY) || '') : '';
+}
+
+function bearer(token?: string): Record<string, string> {
+  const t = token ?? getAuthToken();
+  return t ? { Authorization: `Bearer ${t}` } : {};
+}
+
+// Gọi API phía tài khoản thành viên. Khác fetchJSON ở chỗ 401 KHÔNG được coi là
+// admin hết hạn (không xoá mật khẩu admin đang lưu) — chỉ ném ApiError(401).
+async function authFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, {
+    ...options,
+    headers: { 'Content-Type': 'application/json', ...(options?.headers || {}) },
+  });
+  if (!res.ok) {
+    let message = `HTTP ${res.status}`;
+    try {
+      const body = await res.json();
+      if (body?.message) message = Array.isArray(body.message) ? body.message.join(', ') : String(body.message);
+    } catch {}
+    throw new ApiError(res.status, message);
+  }
+  return res.json();
 }
 
 function handleUnauthorized() {
@@ -156,6 +194,40 @@ export const api = {
     if (r.status === 401) { handleUnauthorized(); throw new Error('Unauthorized'); }
     return r.json() as Promise<{ url: string }>;
   },
+
+  // Auth — tài khoản thành viên
+  login: (username: string, password: string) =>
+    authFetch<{ token: string; user: AuthUser }>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    }),
+  me: (token?: string) => authFetch<AuthUser>('/api/auth/me', { headers: bearer(token) }),
+  changePassword: (current_password: string, new_password: string) =>
+    authFetch<{ token: string; user: AuthUser }>('/api/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ current_password, new_password }),
+      headers: bearer(),
+    }),
+  // Auth — admin quản lý tài khoản
+  getAccounts: (password: string) =>
+    fetchJSON<AuthUser[]>('/api/auth/accounts', { headers: { 'x-admin-password': password } }),
+  syncAccounts: (password: string) =>
+    fetchJSON<{ created: number; total: number }>('/api/auth/accounts/sync', {
+      method: 'POST',
+      headers: { 'x-admin-password': password },
+    }),
+  resetAccountPassword: (id: number, password: string, newPassword?: string) =>
+    fetchJSON<{ ok: boolean; is_default_password: boolean }>(`/api/auth/accounts/${id}/reset-password`, {
+      method: 'POST',
+      body: JSON.stringify({ password: newPassword }),
+      headers: { 'x-admin-password': password },
+    }),
+  updateAccount: (id: number, data: { username?: string; is_active?: boolean; display_name?: string }, password: string) =>
+    fetchJSON<AuthUser>(`/api/auth/accounts/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+      headers: { 'x-admin-password': password },
+    }),
 
   // Matches
   getMatches: () => fetchJSON<Match[]>('/api/matches'),

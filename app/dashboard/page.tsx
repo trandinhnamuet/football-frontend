@@ -8,6 +8,7 @@ import {
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SyncTrigger from '../components/SyncTrigger';
+import RequireAuth from '../components/RequireAuth';
 import { Player, TeamStats, ROLES, FANTA, avatarColor, initials } from '../lib/types';
 import { api } from '../lib/api';
 
@@ -30,7 +31,7 @@ const METRICS: { key: Metric; label: string }[] = [
   { key: 'stat_minutes', label: 'Phút' },
 ];
 
-export default function DashboardPage() {
+function DashboardContent() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [teamStats, setTeamStats] = useState<TeamStats | null>(null);
   const [metric, setMetric] = useState<Metric>('stat_points');
@@ -275,4 +276,9 @@ export default function DashboardPage() {
       <Footer />
     </div>
   );
+}
+
+// Dashboard chỉ dành cho thành viên đã đăng nhập.
+export default function DashboardPage() {
+  return <RequireAuth><DashboardContent /></RequireAuth>;
 }

@@ -50,6 +50,29 @@ export interface MemorialPost {
   published_at: string;
 }
 
+/** Cầu thủ gắn với tài khoản đăng nhập (rút gọn). */
+export interface AuthPlayer {
+  id: number;
+  num: number;
+  first_name: string;
+  last_name: string;
+  role: string | null;
+  nick: string | null;
+  image_url: string | null;
+}
+
+/** Tài khoản thành viên, như backend trả về sau đăng nhập / GET /api/auth/me. */
+export interface AuthUser {
+  id: number;
+  username: string;
+  display_name: string | null;
+  /** Còn dùng mật khẩu mặc định 123123123 — nên nhắc đổi. */
+  is_default_password: boolean;
+  is_active: boolean;
+  last_login_at: string | null;
+  player: AuthPlayer | null;
+}
+
 export interface Match {
   id: number;
   week: number;

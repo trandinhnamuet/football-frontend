@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { AppContextProvider } from './contexts/AppContext';
+import { AuthProvider } from './contexts/AuthContext';
 import GoogleAnalytics from './components/GoogleAnalytics';
 import VisitTracker from './components/VisitTracker';
 
@@ -42,7 +43,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body style={{ margin: 0, padding: 0 }}>
         <AppContextProvider>
-          {children}
+          <AuthProvider>
+            {children}
+          </AuthProvider>
         </AppContextProvider>
         {/* Hai lop do song song: GA4 cho buc tranh tong hop, VisitTracker ghi
             tung luot kem IP va visitor ID vao DB cua minh. */}

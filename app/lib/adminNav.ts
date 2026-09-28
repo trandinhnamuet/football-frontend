@@ -42,6 +42,20 @@ export const adminSections: AdminSection[] = [
     ],
   },
   {
+    title: 'Tài Khoản Cầu Thủ',
+    short: 'Tài khoản',
+    description: 'Tài khoản đăng nhập của từng cầu thủ để xem Dashboard; reset mật khẩu, đổi tên đăng nhập, khoá tài khoản',
+    href: '/admin/accounts',
+    icon: '🔐',
+    features: [
+      'Tự tạo tài khoản cho mọi cầu thủ (mật khẩu mặc định 123123123)',
+      'Tên đăng nhập = họ tên viết liền không dấu',
+      'Reset mật khẩu về mặc định hoặc đặt mật khẩu mới',
+      'Đổi tên đăng nhập, khoá / mở khoá tài khoản',
+      'Xem ai còn dùng mật khẩu mặc định và lần đăng nhập gần nhất',
+    ],
+  },
+  {
     title: 'Quản lý Cầu Thủ',
     short: 'Cầu thủ',
     description: 'Quản lý thông tin đội hình, cập nhật dữ liệu cầu thủ từ file Excel hoặc thủ công',
