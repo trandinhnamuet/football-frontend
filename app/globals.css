@@ -959,3 +959,19 @@ select option {
   /* Nút mở sidebar không bị thanh menu app che */
   html[data-app="1"] .admin-sidebar-toggle { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
 }
+
+/* ── /admin trên mobile: card gọn, 2 cột, chỉ icon + tên ──────────────── */
+@media (max-width: 768px) {
+  .admin-shell main .admin-tool-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+  .admin-tool-card { padding: 14px 10px 12px !important; border-width: 1px !important; }
+  .admin-tool-head {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center;
+    gap: 8px !important;
+    margin-bottom: 0 !important;
+  }
+  .admin-tool-icon { font-size: 28px !important; line-height: 1; }
+  .admin-tool-head h2 { font-size: 15px !important; line-height: 1.15 !important; letter-spacing: 0.02em !important; }
+  .admin-tool-desc, .admin-tool-features, .admin-tool-cta, .admin-tool-notes { display: none !important; }
+}

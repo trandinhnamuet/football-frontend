@@ -2,11 +2,10 @@ import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SyncTrigger from '../components/SyncTrigger';
+import PlayerPhoto from '../components/PlayerPhoto';
 import { Player, FANTA, ROLES } from '../lib/types';
-import { DEFAULT_PLAYER_AVATAR_URL } from '../lib/assets';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-const DEFAULT_AVATAR = DEFAULT_PLAYER_AVATAR_URL;
 const BLACK = 'var(--bg)';
 const CARD = 'var(--card)';
 const INK = 'var(--ink)';
@@ -18,25 +17,6 @@ async function getPlayers(): Promise<Player[]> {
     const res = await fetch(`${BASE}/api/players`, { next: { revalidate: 60 } });
     return res.ok ? res.json() : [];
   } catch { return []; }
-}
-
-// Large player photo — shows the full image (contain), filling empty space
-// with a blurred copy so nothing is ever cropped.
-function PlayerPhoto({ p }: { p: Player }) {
-  const src = p.zoom_image_url || p.image_url;
-  const url = src ? `${BASE}${src}` : DEFAULT_AVATAR;
-  return (
-    <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4', background: '#0a0a0a', overflow: 'hidden' }}>
-      {src && (
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${url})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'blur(22px)', transform: 'scale(1.15)' }} />
-      )}
-      <img
-        src={url}
-        alt={`${p.first_name} ${p.last_name}`}
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
-      />
-    </div>
-  );
 }
 
 const roleColors: Record<string, string> = { GK: '#aa3333', DEF: '#2a6fdb', MID: '#1f8a5b', FWD: FANTA };

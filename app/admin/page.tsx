@@ -209,11 +209,12 @@ export default function AdminPage() {
         <main style={{ padding: '48px' }}>
           <PendingResultsNotice />
           <ThemeDefaultControl />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 24 }}>
+          <div className="admin-tool-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 24 }}>
             {adminSections.map((section) => (
               <Link
                 key={section.href}
                 href={section.href}
+                className="admin-tool-card"
                 style={{
                   textDecoration: 'none',
                   color: 'inherit',
@@ -234,8 +235,8 @@ export default function AdminPage() {
                 }}
               >
                 {/* Header with icon and title */}
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 16 }}>
-                  <div style={{ fontSize: 40 }}>{section.icon}</div>
+                <div className="admin-tool-head" style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 16 }}>
+                  <div className="admin-tool-icon" style={{ fontSize: 40 }}>{section.icon}</div>
                   <div style={{ flex: 1 }}>
                     <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, letterSpacing: '0.02em', textTransform: 'uppercase', margin: 0, color: FANTA }}>
                       {section.title}
@@ -244,12 +245,12 @@ export default function AdminPage() {
                 </div>
 
                 {/* Description */}
-                <p style={{ color: MUTED, fontSize: 14, lineHeight: 1.6, margin: '0 0 20px 0' }}>
+                <p className="admin-tool-desc" style={{ color: MUTED, fontSize: 14, lineHeight: 1.6, margin: '0 0 20px 0' }}>
                   {section.description}
                 </p>
 
                 {/* Features list */}
-                <div style={{ marginTop: 20, paddingTop: 20, borderTop: `1px solid ${FANTA}33` }}>
+                <div className="admin-tool-features" style={{ marginTop: 20, paddingTop: 20, borderTop: `1px solid ${FANTA}33` }}>
                   <div style={{ fontSize: 11, color: FANTA, letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 700, marginBottom: 12 }}>
                     Chức năng chính:
                   </div>
@@ -274,7 +275,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* CTA Button */}
-                <div style={{ marginTop: 24, paddingTop: 20, borderTop: `1px solid ${FANTA}33` }}>
+                <div className="admin-tool-cta" style={{ marginTop: 24, paddingTop: 20, borderTop: `1px solid ${FANTA}33` }}>
                   <div
                     style={{
                       display: 'inline-block',
@@ -297,6 +298,7 @@ export default function AdminPage() {
 
           {/* Info section */}
           <div
+            className="admin-tool-notes"
             style={{
               marginTop: 64,
               padding: 32,
