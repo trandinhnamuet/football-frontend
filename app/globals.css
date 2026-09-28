@@ -838,3 +838,124 @@ select option {
   box-shadow: 0 12px 30px rgba(255, 107, 26, 0.28);
 }
 
+
+/* ── Chế độ app trên mobile (đã đăng nhập) ───────────────────────────────
+   BottomNav đặt html[data-app="1"] khi có người đăng nhập. Chỉ ở màn hình
+   nhỏ mới đổi giao diện: thanh menu dưới, ẩn footer + hamburger. ─────── */
+.app-bottom-nav { display: none; }
+.mob-only { display: none !important; }
+
+@media (max-width: 768px) {
+  .mob-only { display: block !important; }
+
+  html[data-app="1"] body {
+    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+  }
+  html[data-app="1"] footer { display: none !important; }
+  html[data-app="1"] .nav-mobile-btn { display: none !important; }
+
+  html[data-app="1"] .app-bottom-nav {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 60;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    background: #0a0a0a;
+    border-top: 1px solid rgba(255, 107, 26, 0.55);
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+  }
+  .app-bottom-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 2px 4px;
+    color: #a09b94;
+    text-decoration: none;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .app-bottom-tab svg { display: block; }
+  .app-bottom-tab[data-active="true"] { color: #FF6B1A; }
+  .app-bottom-tab:active { color: #f4f1ea; }
+
+  /* Dashboard: các thẻ bớt padding, chart hiển thị ngang */
+  .mob-dash-card { padding: 16px !important; }
+}
+
+/* ── Admin: responsive mobile ────────────────────────────────────────────
+   Các trang admin dùng inline style, nên ở đây khớp theo thuộc tính style
+   mà React render ra (vd. style="grid-template-columns: 1fr 1fr") để một
+   bộ quy tắc phủ được tất cả trang. Bảng rộng (drive links, i18n) giữ
+   nguyên cột và cuộn ngang; form và danh sách xếp một cột. ─────────── */
+@media (max-width: 768px) {
+  /* Thanh trên: logo + link nhỏ lại, cho phép xuống dòng */
+  .admin-shell nav[style*="position: sticky"] {
+    padding: 10px 14px !important;
+    gap: 8px 12px;
+    flex-wrap: wrap;
+  }
+  .admin-shell nav[style*="position: sticky"] > a > div { font-size: 17px !important; }
+  .admin-shell nav[style*="position: sticky"] > div { gap: 12px !important; font-size: 11px !important; flex-wrap: wrap; }
+
+  /* Khung trang: bớt lề, chừa chỗ cho nút mở sidebar ở góc dưới */
+  .admin-shell main { padding: 24px 16px 100px !important; overflow-x: hidden; }
+  .admin-shell header[style] { padding: 24px 16px 0 !important; }
+  .admin-shell h1 { font-size: 32px !important; line-height: 1 !important; overflow-wrap: anywhere; }
+  .admin-shell h2 { font-size: 20px !important; }
+  .admin-shell main img, .admin-shell main iframe, .admin-shell main video { max-width: 100%; }
+
+  /* Hàng tiêu đề (tiêu đề + nút chính) xếp dọc, nút full chiều ngang */
+  .admin-shell main > div[style*="justify-content: space-between"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+  }
+  .admin-shell main > div[style*="justify-content: space-between"] > button { width: 100%; }
+  .admin-shell main button[style*="padding: 14px 28px"] { padding: 12px 18px !important; font-size: 15px !important; }
+
+  /* Mọi flex row trong nội dung được phép xuống dòng thay vì tràn */
+  .admin-shell main [style*="display: flex"] { flex-wrap: wrap; }
+
+  /* Lưới: mặc định 1 cột; ô số liệu nhỏ (3-5 cột) thì 2 cột */
+  .admin-shell main [style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+  .admin-shell main [style*="grid-template-columns: 1fr 1fr 1fr"],
+  .admin-shell main [style*="grid-template-columns: repeat(5, 1fr)"] { grid-template-columns: 1fr 1fr !important; }
+  .admin-shell [style*="minmax(380px"] { grid-template-columns: 1fr !important; }
+
+  /* Bảng rộng: giữ cột, cuộn ngang trong thẻ chứa */
+  .admin-shell main [style*="grid-template-columns: 40px 1fr 1.6fr"] {
+    grid-template-columns: 40px 1fr 1.6fr 90px 80px 130px 120px !important;
+    min-width: 760px;
+  }
+  .admin-shell main [style*="grid-template-columns: 1.5fr 2fr 2fr 100px"] {
+    grid-template-columns: 1.5fr 2fr 2fr 100px !important;
+    min-width: 680px;
+  }
+  .admin-shell main div:has(> [style*="grid-template-columns: 40px 1fr 1.6fr"]),
+  .admin-shell main div:has(> [style*="grid-template-columns: 1.5fr 2fr 2fr 100px"]) {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Bảng lịch thi đấu đã có quy tắc riêng phía trên — giữ nguyên */
+  .admin-schedule-table > div { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)) !important; }
+
+  /* Thẻ / panel bớt padding */
+  .admin-shell main [style*="padding: 32px"] { padding: 16px !important; }
+  .admin-shell main [style*="padding: 28px"] { padding: 16px !important; }
+  .admin-shell main [style*="padding: 20px 24px"] { padding: 14px !important; }
+  .admin-shell main [style*="padding: 16px 22px"] { padding: 14px !important; }
+  .admin-shell main [style*="padding: 18px 22px"] { padding: 14px !important; }
+
+  /* Bảng HTML (nhật ký truy cập) cuộn ngang */
+  .admin-shell .an-tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .admin-shell .an-grid { grid-template-columns: 1fr !important; }
+
+  /* Nút mở sidebar không bị thanh menu app che */
+  html[data-app="1"] .admin-sidebar-toggle { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+}

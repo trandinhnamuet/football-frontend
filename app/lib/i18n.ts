@@ -12,6 +12,7 @@ const vi = {
     login: 'Đăng nhập',
     logout: 'Đăng xuất',
     account: 'Tài khoản',
+    home: 'Trang chủ',
   },
   auth: {
     loginTitle: 'Đăng nhập',
@@ -38,6 +39,11 @@ const vi = {
     changed: 'Đã đổi mật khẩu',
     defaultWarning: 'Bạn đang dùng mật khẩu mặc định. Hãy đổi mật khẩu để người khác không vào được tài khoản của bạn.',
     save: 'Lưu',
+    settings: 'Cài đặt',
+    language: 'Ngôn ngữ',
+    theme: 'Giao diện',
+    dark: 'Tối',
+    light: 'Sáng',
   },
   hero: {
     hashtag: '#ĐamMêBấtTận',
@@ -160,6 +166,7 @@ const en = {
     login: 'Log in',
     logout: 'Log out',
     account: 'Account',
+    home: 'Home',
   },
   auth: {
     loginTitle: 'Log in',
@@ -186,6 +193,11 @@ const en = {
     changed: 'Password changed',
     defaultWarning: 'You are still using the default password. Change it so nobody else can access your account.',
     save: 'Save',
+    settings: 'Settings',
+    language: 'Language',
+    theme: 'Theme',
+    dark: 'Dark',
+    light: 'Light',
   },
   hero: {
     hashtag: '#NeverStopPlaying',

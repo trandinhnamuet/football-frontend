@@ -18,6 +18,13 @@ const INK = 'var(--ink)';
 const MUTED = 'var(--muted)';
 const LINE = 'var(--line)';
 
+/** "Phạm Đình Hải Tú" -> "Hải Tú": đủ phân biệt hai người trùng tên gọi, vừa trục dọc mobile. */
+function shortName(p: Player): string {
+  const parts = (p.first_name || '').trim().split(/\s+/).filter(Boolean);
+  const mid = parts.length > 1 ? parts[parts.length - 1] : parts[0] || '';
+  return `${mid} ${p.last_name || ''}`.trim();
+}
+
 type Metric = 'stat_points' | 'stat_goals' | 'stat_assists' | 'stat_saves' | 'stat_tackles' | 'stat_passes' | 'stat_attendance' | 'stat_minutes';
 
 const METRICS: { key: Metric; label: string }[] = [
@@ -37,6 +44,16 @@ function DashboardContent() {
   const [metric, setMetric] = useState<Metric>('stat_points');
   const [roleFilter, setRoleFilter] = useState<string>('ALL');
   const [loading, setLoading] = useState(true);
+  // Mobile: chart vẽ ngang (tên ở trục dọc) để tên cầu thủ không chồng nhau.
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const sync = () => setIsMobile(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
 
   useEffect(() => {
     Promise.all([api.getPlayers(), api.getTeamStats()])
@@ -49,6 +66,7 @@ function DashboardContent() {
   const sorted = [...filtered].sort((a, b) => (b[metric] as number) - (a[metric] as number));
   const chartData = sorted.slice(0, 20).map(p => ({
     name: `${p.first_name} ${p.last_name}`,
+    short: shortName(p),
     value: p[metric] as number,
     role: p.role,
     num: p.num,
@@ -98,13 +116,48 @@ function DashboardContent() {
 
         {/* KPIs */}
         {kpis.length > 0 && (
-          <div className="mob-kpi-grid" style={{ display: 'grid', gridTemplateColumns: `repeat(${kpis.length}, 1fr)`, gap: 14, marginBottom: 40 }}>
+          <div className="mob-kpi-grid mob-hide" style={{ display: 'grid', gridTemplateColumns: `repeat(${kpis.length}, 1fr)`, gap: 14, marginBottom: 40 }}>
             {kpis.map(k => (
               <div key={k.label} style={{ background: CARD, border: `1px solid ${LINE}`, padding: '20px 20px' }}>
                 <div style={{ fontSize: 11, color: MUTED, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 600 }}>{k.label}</div>
                 <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 48, lineHeight: 0.95, letterSpacing: '0.01em', color: FANTA, marginTop: 6 }}>{k.value}</div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* KPIs — mobile: một thẻ tỉ số gọn thay cho lưới 3 cột */}
+        {teamStats && (
+          <div className="mob-only" style={{ marginBottom: 20 }}>
+            <div style={{ background: CARD, border: `1px solid ${LINE}`, display: 'grid', gridTemplateColumns: '1fr 1.5fr 1.1fr' }}>
+              <div style={{ padding: '14px 12px', borderRight: `1px solid ${LINE}` }}>
+                <div style={{ fontSize: 10, color: MUTED, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 600 }}>Trận đã đá</div>
+                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 34, lineHeight: 1, color: FANTA, marginTop: 6 }}>{teamStats.played}</div>
+              </div>
+              <div style={{ padding: '14px 12px', borderRight: `1px solid ${LINE}` }}>
+                <div style={{ fontSize: 10, color: MUTED, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 600 }}>Thắng · Hòa · Thua</div>
+                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 34, lineHeight: 1, marginTop: 6, display: 'flex', gap: 8, alignItems: 'baseline' }}>
+                  <span style={{ color: '#1f8a5b' }}>{teamStats.wins}</span>
+                  <span style={{ color: MUTED, fontSize: 18 }}>·</span>
+                  <span style={{ color: INK }}>{teamStats.draws}</span>
+                  <span style={{ color: MUTED, fontSize: 18 }}>·</span>
+                  <span style={{ color: '#cc4444' }}>{teamStats.losses}</span>
+                </div>
+              </div>
+              <div style={{ padding: '14px 12px' }}>
+                <div style={{ fontSize: 10, color: MUTED, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 600 }}>Bàn ghi : thủng</div>
+                <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 34, lineHeight: 1, marginTop: 6, whiteSpace: 'nowrap' }}>
+                  <span style={{ color: FANTA }}>{teamStats.gf}</span><span style={{ color: MUTED, fontSize: 20, margin: '0 4px' }}>:</span>{teamStats.ga}
+                </div>
+              </div>
+            </div>
+            {(teamStats.splits > 0 || teamStats.cancelled > 0) && (
+              <div style={{ fontSize: 12, color: MUTED, marginTop: 8, letterSpacing: '0.06em' }}>
+                {teamStats.splits > 0 && <span>Chia đôi: <b style={{ color: INK }}>{teamStats.splits}</b></span>}
+                {teamStats.splits > 0 && teamStats.cancelled > 0 && <span> · </span>}
+                {teamStats.cancelled > 0 && <span>Trận hủy: <b style={{ color: INK }}>{teamStats.cancelled}</b></span>}
+              </div>
+            )}
           </div>
         )}
 
@@ -151,15 +204,15 @@ function DashboardContent() {
         </div>
 
         {/* Bar Chart */}
-        <div style={{ background: CARD, border: `1px solid ${LINE}`, padding: '32px', marginBottom: 24 }}>
-          <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+        <div className="mob-dash-card" style={{ background: CARD, border: `1px solid ${LINE}`, padding: '32px', marginBottom: 24 }}>
+          <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 12 }}>
             <div>
               <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 28, lineHeight: 1, letterSpacing: '0.01em', textTransform: 'uppercase' }}>
                 {METRICS.find(m => m.key === metric)?.label || metric}
               </div>
               <div style={{ fontSize: 13, color: MUTED, marginTop: 6 }}>Top {Math.min(20, sorted.length)} cầu thủ · {filtered.length} tổng</div>
             </div>
-            <div style={{ display: 'flex', gap: 16, fontSize: 12, color: MUTED }}>
+            <div style={{ display: 'flex', gap: 16, fontSize: 12, color: MUTED, flexWrap: 'wrap' }}>
               {Object.entries(roleColors).map(([r, c]) => (
                 <span key={r}><span style={{ display: 'inline-block', width: 10, height: 10, background: c, marginRight: 5 }}></span>{ROLES[r]?.vi || r}</span>
               ))}
@@ -172,7 +225,25 @@ function DashboardContent() {
               Chưa có dữ liệu
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height={400}>
+            <ResponsiveContainer width="100%" height={isMobile ? chartData.length * 30 + 28 : 400}>
+              {isMobile ? (
+                // Thanh ngang, mỗi cầu thủ một dòng: tên đọc thẳng, không xoay, không chồng.
+                <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 36, bottom: 0, left: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.28)" horizontal={false} />
+                  <XAxis type="number" tick={{ fill: MUTED, fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="short" width={92} interval={0} tick={{ fill: MUTED, fontSize: 12, fontFamily: 'Space Grotesk' }} axisLine={false} tickLine={false} />
+                  <Tooltip
+                    contentStyle={{ background: 'var(--card)', border: `1px solid ${FANTA}`, borderRadius: 0, color: 'var(--ink)', fontFamily: 'Space Grotesk' }}
+                    cursor={{ fill: 'rgba(255,107,26,0.08)' }}
+                    labelFormatter={(_label, payload) => payload?.[0]?.payload?.name ?? _label}
+                  />
+                  <Bar dataKey="value" barSize={18} radius={[0, 2, 2, 0]} label={{ position: 'right', fill: MUTED, fontSize: 11, fontFamily: 'Space Grotesk' }}>
+                    {chartData.map((entry, i) => (
+                      <Cell key={i} fill={roleColors[entry.role] || FANTA} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              ) : (
               <BarChart data={chartData} margin={{ top: 0, right: 0, bottom: 60, left: 0 }}>
                 {/* SVG presentation attributes don't resolve var(), so use a
                     mid-grey that reads on both light and dark backgrounds. */}
@@ -195,6 +266,7 @@ function DashboardContent() {
                   ))}
                 </Bar>
               </BarChart>
+              )}
             </ResponsiveContainer>
           )}
         </div>
@@ -202,7 +274,7 @@ function DashboardContent() {
         {/* Split: Leaderboard + Role Dist */}
         <div className="mob-dash-split" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 20 }}>
           {/* Full ranking */}
-          <div style={{ background: CARD, border: `1px solid ${LINE}`, padding: '28px' }}>
+          <div className="mob-dash-card" style={{ background: CARD, border: `1px solid ${LINE}`, padding: '28px' }}>
             <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, letterSpacing: '0.02em', textTransform: 'uppercase', marginBottom: 16 }}>
               Bảng xếp hạng — {METRICS.find(m => m.key === metric)?.label}
             </div>
@@ -234,7 +306,7 @@ function DashboardContent() {
           </div>
 
           {/* Role distribution */}
-          <div style={{ background: CARD, border: `1px solid ${LINE}`, padding: '28px' }}>
+          <div className="mob-dash-card" style={{ background: CARD, border: `1px solid ${LINE}`, padding: '28px' }}>
             <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, letterSpacing: '0.02em', textTransform: 'uppercase', marginBottom: 20 }}>
               Phân bổ vị trí
             </div>

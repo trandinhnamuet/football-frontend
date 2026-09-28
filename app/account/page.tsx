@@ -80,6 +80,41 @@ function ChangePasswordForm() {
   );
 }
 
+// Ngôn ngữ / giao diện: trên mobile chế độ app ẩn hamburger nên đặt ở đây.
+function SettingsCard() {
+  const { t, lang, setLang, theme, setTheme } = useApp();
+  const seg = (active: boolean, label: string, onClick: () => void) => (
+    <button
+      onClick={onClick}
+      style={{ flex: 1, background: active ? FANTA : 'transparent', color: active ? ON_FANTA : INK, border: `1px solid ${active ? FANTA : LINE}`, padding: '10px 14px', fontFamily: 'Anton, sans-serif', fontSize: 15, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: active ? 'default' : 'pointer' }}
+    >
+      {label}
+    </button>
+  );
+  const labelStyle: React.CSSProperties = { fontSize: 11, color: MUTED, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 600, display: 'block', marginBottom: 8 };
+  return (
+    <div style={{ background: CARD, padding: 28, border: `1px solid ${LINE}` }}>
+      <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, textTransform: 'uppercase', color: FANTA, marginBottom: 20 }}>{t('auth.settings')}</div>
+      <div style={{ display: 'grid', gap: 18 }}>
+        <div>
+          <span style={labelStyle}>{t('auth.language')}</span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {seg(lang === 'vi', 'Tiếng Việt', () => setLang('vi'))}
+            {seg(lang === 'en', 'English', () => setLang('en'))}
+          </div>
+        </div>
+        <div>
+          <span style={labelStyle}>{t('auth.theme')}</span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {seg(theme === 'dark', `○ ${t('auth.dark')}`, () => setTheme('dark'))}
+            {seg(theme === 'light', `◑ ${t('auth.light')}`, () => setTheme('light'))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AccountContent() {
   const { user, logout } = useAuth();
   const { t, lang } = useApp();
@@ -128,6 +163,7 @@ function AccountContent() {
             </div>
           </div>
           <ChangePasswordForm />
+          <SettingsCard />
         </div>
       </main>
       <Footer />
