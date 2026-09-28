@@ -50,47 +50,6 @@ export interface MemorialPost {
   published_at: string;
 }
 
-/** Tin tuyển quân: đội thiếu người ở vị trí nào thì đăng một tin. */
-export interface RecruitmentPost {
-  id: number;
-  slug?: string | null;
-  title: string;
-  title_en: string;
-  /** GK | DEF | MID | FWD | ANY */
-  position: string;
-  quantity: number;
-  content: string;
-  content_en: string;
-  excerpt: string;
-  excerpt_en: string;
-  image_url: string | null;
-  contact_name: string;
-  contact_phone: string;
-  contact_link: string;
-  is_open: boolean;
-  published_at: string;
-  expires_at: string | null;
-}
-
-export const RECRUIT_POSITIONS: { code: string; vi: string; en: string }[] = [
-  { code: 'GK', vi: 'Thủ môn', en: 'Goalkeeper' },
-  { code: 'DEF', vi: 'Hậu vệ', en: 'Defender' },
-  { code: 'MID', vi: 'Tiền vệ', en: 'Midfielder' },
-  { code: 'FWD', vi: 'Tiền đạo', en: 'Forward' },
-  { code: 'ANY', vi: 'Mọi vị trí', en: 'Any position' },
-];
-
-export function recruitPositionLabel(code: string, lang: 'vi' | 'en' = 'vi'): string {
-  return RECRUIT_POSITIONS.find(p => p.code === code)?.[lang] || code;
-}
-
-/** Tin còn nhận ứng viên: admin chưa đóng và chưa quá hạn (nếu có đặt hạn). */
-export function recruitIsOpen(p: Pick<RecruitmentPost, 'is_open' | 'expires_at'>): boolean {
-  if (!p.is_open) return false;
-  if (p.expires_at && Date.now() > dayStart(p.expires_at) + 24 * 3600000) return false;
-  return true;
-}
-
 export interface Match {
   id: number;
   week: number;

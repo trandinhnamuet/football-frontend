@@ -7,7 +7,6 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import BannerSlider from './components/BannerSlider';
 import MemorialSlider from './components/MemorialSlider';
-import RecruitmentBanner from './components/RecruitmentBanner';
 import { Player, Article, Match, RecommendedVideo, FANTA, ROLES, CANCELLED_RESULT, fmtDate, dayStart, daysUntil, isMatchPast, pitchLabel, resultLabel } from './lib/types';
 import { api } from './lib/api';
 import { useApp } from './contexts/AppContext';
@@ -182,9 +181,6 @@ export default function HomePage() {
 
       {/* GIỚI THIỆU THÀNH VIÊN — 4x1 desktop, 2x2 mobile */}
       <MemorialSlider />
-
-      {/* TUYỂN QUÂN — chỉ hiện khi có tin đang mở */}
-      <RecruitmentBanner />
 
       {/* BẢNG XẾP HẠNG ĐIỂM — tạm ẩn */}
       {false && (<section className="mob-p-hero" style={{ position: 'relative', overflow: 'hidden', padding: '48px 48px 64px', backgroundImage: 'repeating-linear-gradient(45deg, transparent 0 60px, rgba(255,107,26,0.025) 60px 61px)' }}>

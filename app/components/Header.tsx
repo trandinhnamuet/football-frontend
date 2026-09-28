@@ -20,7 +20,6 @@ export default function Header() {
     { href: '/#news', labelKey: 'nav.news' },
     { href: '/#schedule', labelKey: 'nav.schedule' },
     { href: '/gallery', labelKey: 'nav.gallery' },
-    { href: '/recruitment', labelKey: 'nav.recruit' },
     { href: '/dashboard', labelKey: 'nav.dashboard', accent: true },
   ];
 
