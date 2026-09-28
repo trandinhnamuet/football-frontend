@@ -56,14 +56,12 @@ export const adminSections: AdminSection[] = [
     ],
   },
   {
-    title: 'Tin Tức & Thông Báo',
+    title: 'Quản lý Tin Tức',
     short: 'Tin tức',
-    description: 'Tạo, chỉnh sửa và xuất bản tin tức của đội; đăng thông báo có hạn (lịch đá, chia đôi, quỹ...) hiện riêng trên trang chủ',
+    description: 'Tạo, chỉnh sửa và xuất bản các bài viết, tin tức về đội bóng',
     href: '/admin/news-management',
     icon: '📰',
     features: [
-      'Chọn loại bài: Tin tức (lưới tin) hoặc Thông báo (khối riêng trên trang chủ + /announcements)',
-      'Thông báo: đặt ngày hết hạn để tự rút khỏi trang chủ, ghim lên đầu',
       'Tạo bài viết mới (hỗ trợ tiếng Việt & Anh)',
       'Chỉnh sửa tiêu đề, nội dung, tóm tắt',
       'Tải ảnh bìa cho bài viết',

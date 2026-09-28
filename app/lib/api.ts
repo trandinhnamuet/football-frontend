@@ -84,7 +84,7 @@ export const api = {
     }),
 
   // Articles
-  getArticles: (kind?: 'news' | 'announcement') => fetchJSON<Article[]>(`/api/articles${kind ? `?kind=${kind}` : ''}`),
+  getArticles: () => fetchJSON<Article[]>('/api/articles'),
   getArticle: (id: number) => fetchJSON<Article>(`/api/articles/${id}`),
   createArticle: (data: Partial<Article>, password: string) =>
     fetchJSON<Article>('/api/articles', {
