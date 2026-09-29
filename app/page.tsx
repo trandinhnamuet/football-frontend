@@ -8,7 +8,8 @@ import Footer from './components/Footer';
 import BannerSlider from './components/BannerSlider';
 import FirstOpenPopup from './components/FirstOpenPopup';
 import ScrollToHash from './components/ScrollToHash';
-import { Player, Article, Match, MemorialPost, RecommendedVideo, FANTA, ROLES, CANCELLED_RESULT, fmtDate, dayStart, daysUntil, isMatchPast, pitchLabel, resultLabel, kitColorHex, memberProfileLinks, isImportantActive } from './lib/types';
+import { Player, Article, Match, MemorialPost, RecommendedVideo, FANTA, ROLES, CANCELLED_RESULT, fmtDate, dayStart, daysUntil, isMatchPast, pitchLabel, resultLabel, matchKits, memberProfileLinks, isImportantActive } from './lib/types';
+import KitColors from './components/KitColors';
 import { api } from './lib/api';
 import { useApp } from './contexts/AppContext';
 import { DEFAULT_PLAYER_AVATAR_URL } from './lib/assets';
@@ -352,7 +353,7 @@ export default function HomePage() {
           const next = upcoming[0];
           const d = daysUntil(next.date);
           const countdown = d <= 0 ? t('schedule.countdownToday') : `${d} ${t('schedule.countdownDays')}`;
-          const kitHex = kitColorHex(next.kit_color);
+          const kits = matchKits(next);
           return (
             <div className="mob-nextmatch next-match-card" style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.8fr', gap: 0, marginBottom: 28, background: 'var(--card)', borderLeft: `5px solid ${FANTA}`, overflow: 'hidden' }}>
               {/* Image side */}
@@ -374,11 +375,10 @@ export default function HomePage() {
                     <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, color: 'var(--muted)', textTransform: 'uppercase' }}>{t('schedule.vs')}</div>
                     <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 56px)', textTransform: 'uppercase' }}>{next.opponent}</div>
                   </div>
-                  {next.kit_color && (
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginTop: 14, padding: '6px 12px', background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}44` }}>
+                  {kits.length > 0 && (
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginTop: 14, padding: '6px 12px', background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}44` }}>
                       <span style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>{t('schedule.kit')}</span>
-                      {kitHex && <span aria-hidden style={{ width: 14, height: 14, background: kitHex, border: '1px solid rgba(128,128,128,0.5)' }} />}
-                      <span style={{ fontFamily: 'Anton, sans-serif', fontSize: 16, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{next.kit_color}</span>
+                      <KitColors kits={kits} size={14} fontSize={16} />
                     </div>
                   )}
                 </div>

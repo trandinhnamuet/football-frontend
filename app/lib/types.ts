@@ -101,6 +101,13 @@ export interface Match {
   pitch_size: number;
   /** Màu áo đội mặc trong trận, vd. "Cam" / "Đen". */
   kit_color: string | null;
+  /** Màu áo thứ hai (dự phòng / đổi nếu trùng đối thủ). */
+  kit_color_2: string | null;
+}
+
+/** Danh sách màu áo đã nhập của trận (1 hoặc 2 màu, bỏ ô trống). */
+export function matchKits(m: Pick<Match, 'kit_color' | 'kit_color_2'>): string[] {
+  return [m.kit_color, m.kit_color_2].map(k => (k || '').trim()).filter(Boolean);
 }
 
 /** Gợi ý màu áo trong form admin và màu swatch tương ứng. */

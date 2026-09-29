@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Article, Match, FANTA, fmtDate, daysUntil, pitchLabel, kitColorHex } from '../lib/types';
+import { Article, Match, FANTA, fmtDate, daysUntil, pitchLabel, matchKits } from '../lib/types';
+import KitColors from './KitColors';
 import { useApp } from '../contexts/AppContext';
 import { useAuth } from '../contexts/AuthContext';
 import { smoothScrollToHash } from '../lib/scroll';
@@ -61,7 +62,7 @@ export default function FirstOpenPopup({ ready, nextMatch, important }: Props) {
   if (!open) return null;
 
   const shortName = user?.player?.last_name || user?.display_name || user?.username || '';
-  const kitHex = kitColorHex(nextMatch?.kit_color);
+  const kits = nextMatch ? matchKits(nextMatch) : [];
   const d = nextMatch ? daysUntil(nextMatch.date) : 0;
   const countdown = d <= 0 ? t('schedule.countdownToday') : `${d} ${t('schedule.countdownDays')}`;
   const impTitle = important ? (lang === 'en' && important.title_en ? important.title_en : important.title) : '';
@@ -123,10 +124,9 @@ export default function FirstOpenPopup({ ready, nextMatch, important }: Props) {
                 </div>
                 <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 10, paddingTop: 10, borderTop: '1px solid var(--line)' }}>
                   <div style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{t('schedule.kit')}</div>
-                  {kitHex && <span aria-hidden style={{ width: 18, height: 18, background: kitHex, border: '1px solid rgba(128,128,128,0.5)', flexShrink: 0 }} />}
-                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, textTransform: 'uppercase', letterSpacing: '0.02em', color: nextMatch.kit_color ? 'var(--ink)' : 'var(--muted)' }}>
-                    {nextMatch.kit_color || t('schedule.kitUnset')}
-                  </div>
+                  {kits.length > 0
+                    ? <KitColors kits={kits} size={18} fontSize={20} />
+                    : <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, textTransform: 'uppercase', letterSpacing: '0.02em', color: 'var(--muted)' }}>{t('schedule.kitUnset')}</div>}
                 </div>
               </div>
             </div>

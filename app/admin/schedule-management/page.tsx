@@ -43,6 +43,7 @@ const emptyMatch = {
   image_url: '',
   pitch_size: 7,
   kit_color: '',
+  kit_color_2: '',
 };
 
 type MatchForm = typeof emptyMatch;
@@ -173,22 +174,33 @@ function MatchModal({ initial, mode, onSave, onClose }: MatchModalProps) {
             </div>
           </div>
 
-          {/* Kit colour — anh em biết mang áo gì; hiện ở trận kế tiếp và popup mở app */}
+          {/* Kit colours — một trận có thể cần 2 màu (mang dự phòng / đổi nếu trùng
+              đối thủ); hiện ở trận kế tiếp và popup mở app */}
           <div>
-            <label style={labelStyle}>Màu áo đội mặc trận này</label>
-            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-              {kitColorHex(form.kit_color) && <span aria-hidden style={{ width: 22, height: 22, flexShrink: 0, background: kitColorHex(form.kit_color) as string, border: `1px solid ${LINE}` }} />}
-              <input style={inputStyle} list="kit-color-options" value={form.kit_color} onChange={set('kit_color')} placeholder="vd: Cam, Đen, Trắng..." />
-              <datalist id="kit-color-options">
-                {KIT_COLORS.map(k => <option key={k.name} value={k.name} />)}
-              </datalist>
-            </div>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
-              {KIT_COLORS.slice(0, 6).map(k => (
-                <button key={k.name} type="button" onClick={() => setForm(f => ({ ...f, kit_color: k.name }))} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: form.kit_color === k.name ? 'rgba(255,107,26,0.15)' : 'var(--hover-bg)', border: `1px solid ${form.kit_color === k.name ? FANTA : LINE}`, color: INK, padding: '4px 10px', fontSize: 12, cursor: 'pointer' }}>
-                  <span style={{ width: 12, height: 12, background: k.hex, border: '1px solid rgba(128,128,128,0.5)' }} />{k.name}
-                </button>
-              ))}
+            <label style={labelStyle}>Màu áo đội mặc trận này (tối đa 2 màu)</label>
+            <datalist id="kit-color-options">
+              {KIT_COLORS.map(k => <option key={k.name} value={k.name} />)}
+            </datalist>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              {(['kit_color', 'kit_color_2'] as const).map((key, i) => {
+                const val = form[key];
+                const hex = kitColorHex(val);
+                return (
+                  <div key={key}>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                      <span aria-hidden style={{ width: 22, height: 22, flexShrink: 0, background: hex || 'transparent', border: `1px ${hex ? 'solid' : 'dashed'} ${LINE}` }} />
+                      <input style={inputStyle} list="kit-color-options" value={val} onChange={set(key)} placeholder={i === 0 ? 'Áo 1, vd: Cam' : 'Áo 2 (nếu có), vd: Đen'} />
+                    </div>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
+                      {KIT_COLORS.slice(0, 6).map(k => (
+                        <button key={k.name} type="button" onClick={() => setForm(f => ({ ...f, [key]: f[key] === k.name ? '' : k.name }))} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: val === k.name ? 'rgba(255,107,26,0.15)' : 'var(--hover-bg)', border: `1px solid ${val === k.name ? FANTA : LINE}`, color: INK, padding: '4px 10px', fontSize: 12, cursor: 'pointer' }}>
+                          <span style={{ width: 12, height: 12, background: k.hex, border: '1px solid rgba(128,128,128,0.5)' }} />{k.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -362,6 +374,7 @@ function ScheduleManagementContent() {
         image_url: m.image_url || '',
         pitch_size: m.pitch_size || 7,
         kit_color: m.kit_color || '',
+        kit_color_2: m.kit_color_2 || '',
       },
     });
   }
