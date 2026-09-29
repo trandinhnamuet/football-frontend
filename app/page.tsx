@@ -6,8 +6,9 @@ import { useRouter } from 'next/navigation';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import BannerSlider from './components/BannerSlider';
-import MemorialSlider from './components/MemorialSlider';
-import { Player, Article, Match, RecommendedVideo, FANTA, ROLES, CANCELLED_RESULT, fmtDate, dayStart, daysUntil, isMatchPast, pitchLabel, resultLabel } from './lib/types';
+import FirstOpenPopup from './components/FirstOpenPopup';
+import ScrollToHash from './components/ScrollToHash';
+import { Player, Article, Match, MemorialPost, RecommendedVideo, FANTA, ROLES, CANCELLED_RESULT, fmtDate, dayStart, daysUntil, isMatchPast, pitchLabel, resultLabel, kitColorHex, memberProfileLinks, isImportantActive } from './lib/types';
 import { api } from './lib/api';
 import { useApp } from './contexts/AppContext';
 import { DEFAULT_PLAYER_AVATAR_URL } from './lib/assets';
@@ -75,6 +76,10 @@ export default function HomePage() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [videoHighlight, setVideoHighlight] = useState<{ youtube_url: string; title: string; title_en: string; is_active: boolean; channel_url?: string } | null>(null);
   const [aboutData, setAboutData] = useState<{ banner_image_url: string } | null>(null);
+  const [memorialPosts, setMemorialPosts] = useState<MemorialPost[]>([]);
+  const [important, setImportant] = useState<Article | null>(null);
+  // Đã có dữ liệu lần đầu (kể cả khi lỗi) — popup mở app chờ cờ này.
+  const [dataReady, setDataReady] = useState(false);
   const [recommendations, setRecommendations] = useState<RecommendedVideo[]>([]);
   const [activeVideo, setActiveVideo] = useState<{ url: string; title: string } | null>(null);
 
@@ -106,13 +111,17 @@ export default function HomePage() {
         api.getMatches(),
         api.getVideoHighlight(),
         api.getAboutPage(),
-      ]).then(([p, a, ms, vh, ab]) => {
+        api.getMemorialPosts().catch(() => [] as MemorialPost[]),
+        api.getImportantArticle().catch(() => null),
+      ]).then(([p, a, ms, vh, ab, mp, imp]) => {
         setPlayers(p);
         setArticles(a);
         setMatches(ms);
         setVideoHighlight(vh);
         setAboutData(ab);
-      }).catch(() => {});
+        setMemorialPosts(mp);
+        setImportant(imp);
+      }).catch(() => {}).finally(() => setDataReady(true));
 
     // Load from DB immediately
     loadData();
@@ -161,6 +170,9 @@ export default function HomePage() {
 
   const roleLabel = (role: string) => ROLES[role]?.[lang] || role;
 
+  // Cầu thủ đã có bài giới thiệu → card bấm được, mở /members/<slug>.
+  const profileLinks = memberProfileLinks(players, memorialPosts);
+
   // The schedule columns are split by DATE, not by the is_upcoming flag: once a
   // match date has passed it belongs in "Kết quả gần đây" even if nobody has
   // filled the score in yet, and anything still to come is upcoming — the first
@@ -176,11 +188,11 @@ export default function HomePage() {
     <div style={{ background: 'var(--bg)', color: 'var(--ink)', fontFamily: '"Space Grotesk", system-ui, sans-serif' }}>
       <Header />
 
+      <ScrollToHash />
+      <FirstOpenPopup ready={dataReady} nextMatch={upcoming[0] ?? null} important={important} />
+
       {/* BANNER SLIDER — admin-managed running images (e.g. Man of the week) */}
       <BannerSlider />
-
-      {/* GIỚI THIỆU THÀNH VIÊN — 4x1 desktop, 2x2 mobile */}
-      <MemorialSlider />
 
       {/* BẢNG XẾP HẠNG ĐIỂM — tạm ẩn */}
       {false && (<section className="mob-p-hero" style={{ position: 'relative', overflow: 'hidden', padding: '48px 48px 64px', backgroundImage: 'repeating-linear-gradient(45deg, transparent 0 60px, rgba(255,107,26,0.025) 60px 61px)' }}>
@@ -340,6 +352,7 @@ export default function HomePage() {
           const next = upcoming[0];
           const d = daysUntil(next.date);
           const countdown = d <= 0 ? t('schedule.countdownToday') : `${d} ${t('schedule.countdownDays')}`;
+          const kitHex = kitColorHex(next.kit_color);
           return (
             <div className="mob-nextmatch next-match-card" style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.8fr', gap: 0, marginBottom: 28, background: 'var(--card)', borderLeft: `5px solid ${FANTA}`, overflow: 'hidden' }}>
               {/* Image side */}
@@ -361,6 +374,13 @@ export default function HomePage() {
                     <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, color: 'var(--muted)', textTransform: 'uppercase' }}>{t('schedule.vs')}</div>
                     <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 56px)', textTransform: 'uppercase' }}>{next.opponent}</div>
                   </div>
+                  {next.kit_color && (
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginTop: 14, padding: '6px 12px', background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}44` }}>
+                      <span style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>{t('schedule.kit')}</span>
+                      {kitHex && <span aria-hidden style={{ width: 14, height: 14, background: kitHex, border: '1px solid rgba(128,128,128,0.5)' }} />}
+                      <span style={{ fontFamily: 'Anton, sans-serif', fontSize: 16, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{next.kit_color}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Middle: Spacer */}
@@ -485,8 +505,10 @@ export default function HomePage() {
                 style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}
               >
                 {squadVisible.map(p => {
-                  return (
-                    <div key={p.id} className="squad-card" style={{ background: 'var(--card)', paddingTop: 150, paddingLeft: 16, paddingRight: 16, paddingBottom: 18, position: 'relative', borderLeft: `4px solid ${FANTA}`, overflow: 'visible' }}>
+                  const href = profileLinks[p.id];
+                  const cardStyle: React.CSSProperties = { background: 'var(--card)', paddingTop: 150, paddingLeft: 16, paddingRight: 16, paddingBottom: 18, position: 'relative', borderLeft: `4px solid ${FANTA}`, overflow: 'visible', textDecoration: 'none', color: 'inherit', display: 'block' };
+                  const inner = (
+                    <>
                       {/* Large avatar overflowing the card top */}
                       <div style={{ position: 'absolute', top: -110, left: 16 }}>
                         <img
@@ -500,7 +522,15 @@ export default function HomePage() {
                       <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, letterSpacing: '0.02em', textTransform: 'uppercase', position: 'relative', marginTop: 4 }}>{p.first_name} {p.last_name}</div>
                       <div style={{ fontSize: 11, color: FANTA, letterSpacing: '0.14em', textTransform: 'uppercase', marginTop: 3, fontWeight: 700 }}>#{p.num} · {roleLabel(p.role)}</div>
                       <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4, fontStyle: 'italic' }}>"{p.nick}"</div>
-                    </div>
+                      {href && (
+                        <div style={{ marginTop: 10, fontSize: 11, color: FANTA, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{t('players.profile')}</div>
+                      )}
+                    </>
+                  );
+                  return href ? (
+                    <Link key={p.id} href={href} className="squad-card squad-card-link" style={cardStyle}>{inner}</Link>
+                  ) : (
+                    <div key={p.id} className="squad-card" style={cardStyle}>{inner}</div>
                   );
                 })}
               </div>
@@ -520,63 +550,6 @@ export default function HomePage() {
                 />
               ))}
             </div>
-          </div>
-        )}
-      </section>
-
-      {/* NEWS */}
-      <section id="news" className="mob-p-section" style={{ padding: '80px 48px', background: 'var(--alt-bg)', borderTop: `1px solid ${FANTA}33` }}>
-        <div className="mob-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 36 }}>
-          <div>
-            <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s03')}</div>
-            <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 18 }}>{t('news.title')}</h2>
-          </div>
-          <Link href="/news" className="btn-view-all" style={{ background: FANTA, color: '#0a0a0a', padding: '14px 24px', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-            {t('news.viewAll')}
-          </Link>
-        </div>
-        {articles.length === 0 ? (
-          <div style={{ padding: '60px', textAlign: 'center', color: 'var(--muted)', fontFamily: 'Anton, sans-serif', fontSize: 20, background: 'var(--card)', borderLeft: `4px solid ${FANTA}` }}>
-            {t('news.noData')}{' '}
-            <Link href="/admin/news-management" style={{ color: FANTA }}>{t('news.addNews')}</Link>
-          </div>
-        ) : (
-          <div className="mob-news-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-            {articles.slice(0, 6).map((article, i) => (
-              <Link key={article.id} href={`/news/${article.id}`} className="news-card" style={{
-                textDecoration: 'none', color: 'inherit', background: 'var(--card)', overflow: 'hidden', display: 'block',
-                gridRow: i === 0 ? 'span 2' : 'auto',
-                gridColumn: i === 0 ? 'span 2' : 'auto',
-              }}>
-                <div style={{
-                  aspectRatio: i === 0 ? '16/9' : '3/2',
-                  background: '#0a0a0a',
-                  position: 'relative',
-                  overflow: 'hidden',
-                }}>
-                  {article.image_url ? (
-                    <>
-                      {/* Blurred fill behind, using the same image */}
-                      <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${BASE}${article.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'blur(18px)', transform: 'scale(1.12)' }} />
-                      {/* Full image, never cropped */}
-                      <div className="news-card-img" style={{ position: 'absolute', inset: 0, backgroundImage: `url(${BASE}${article.image_url})`, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
-                    </>
-                  ) : (
-                    <div style={{ position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(135deg, transparent 0 14px, rgba(0,0,0,0.08) 14px 15px)' }} />
-                  )}
-                  {article.tag && (
-                    <div style={{ position: 'absolute', top: 14, left: 14, zIndex: 2, background: FANTA, color: '#0a0a0a', padding: '4px 10px', fontFamily: 'Anton, sans-serif', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                      {article.tag}
-                    </div>
-                  )}
-                </div>
-                <div style={{ padding: i === 0 ? '24px' : '18px' }}>
-                  <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{fmtDate(article.published_at)}</div>
-                  <h3 style={{ fontFamily: 'Anton, sans-serif', fontSize: i === 0 ? 32 : 18, lineHeight: 1.25, letterSpacing: '0.01em', textTransform: 'uppercase', marginTop: 6, marginBottom: 8 }}>{article.title}</h3>
-                  {article.excerpt && <p style={{ color: 'var(--muted)', fontSize: i === 0 ? 14 : 12, lineHeight: 1.55, margin: 0 }}>{article.excerpt}</p>}
-                </div>
-              </Link>
-            ))}
           </div>
         )}
       </section>
@@ -670,8 +643,8 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* CTA Dashboard */}
-      <section className="mob-p-section" style={{ padding: '64px 48px', background: FANTA, color: '#0a0a0a', position: 'relative', overflow: 'hidden' }}>
+      {/* CTA Dashboard — tạm ẩn */}
+      {false && (<section className="mob-p-section" style={{ padding: '64px 48px', background: FANTA, color: '#0a0a0a', position: 'relative', overflow: 'hidden' }}>
         <div className="mob-cta-inner" style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 40 }}>
           <div>
             <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>{t('cta.label')}</div>
@@ -684,7 +657,7 @@ export default function HomePage() {
             {t('cta.btn')}
           </Link>
         </div>
-      </section>
+      </section>)}
 
       {/* ABOUT — moved to bottom */}
       <section id="intro" className="mob-p-section" style={{ padding: '80px 48px', background: 'var(--alt-bg)', borderTop: `1px solid ${FANTA}33` }}>
@@ -732,6 +705,74 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* NEWS */}
+      <section id="news" className="mob-p-section" style={{ padding: '80px 48px', background: 'var(--alt-bg)', borderTop: `1px solid ${FANTA}33` }}>
+        <div className="mob-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 36 }}>
+          <div>
+            <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase' }}>{t('sections.s03')}</div>
+            <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 18 }}>{t('news.title')}</h2>
+          </div>
+          <Link href="/news" className="btn-view-all" style={{ background: FANTA, color: '#0a0a0a', padding: '14px 24px', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            {t('news.viewAll')}
+          </Link>
+        </div>
+        {articles.length === 0 ? (
+          <div style={{ padding: '60px', textAlign: 'center', color: 'var(--muted)', fontFamily: 'Anton, sans-serif', fontSize: 20, background: 'var(--card)', borderLeft: `4px solid ${FANTA}` }}>
+            {t('news.noData')}{' '}
+            <Link href="/admin/news-management" style={{ color: FANTA }}>{t('news.addNews')}</Link>
+          </div>
+        ) : (
+          <div className="mob-news-grid home-news-scroller" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+            {articles.slice(0, 6).map((article, i) => (
+              <Link key={article.id} href={`/news/${article.id}`} className="news-card" style={{
+                textDecoration: 'none', color: 'inherit', background: 'var(--card)', overflow: 'hidden', display: 'block',
+                gridRow: i === 0 ? 'span 2' : 'auto',
+                gridColumn: i === 0 ? 'span 2' : 'auto',
+              }}>
+                <div style={{
+                  aspectRatio: i === 0 ? '16/9' : '3/2',
+                  background: '#0a0a0a',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}>
+                  {article.image_url ? (
+                    <>
+                      {/* Blurred fill behind, using the same image */}
+                      <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${BASE}${article.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'blur(18px)', transform: 'scale(1.12)' }} />
+                      {/* Full image, never cropped */}
+                      <div className="news-card-img" style={{ position: 'absolute', inset: 0, backgroundImage: `url(${BASE}${article.image_url})`, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
+                    </>
+                  ) : (
+                    <div style={{ position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(135deg, transparent 0 14px, rgba(0,0,0,0.08) 14px 15px)' }} />
+                  )}
+                  {article.tag && (
+                    <div style={{ position: 'absolute', top: 14, left: 14, zIndex: 2, background: FANTA, color: '#0a0a0a', padding: '4px 10px', fontFamily: 'Anton, sans-serif', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                      {article.tag}
+                    </div>
+                  )}
+                  {isImportantActive(article) && (
+                    <div style={{ position: 'absolute', top: 14, right: 14, zIndex: 2, background: '#c0262b', color: '#fff', padding: '4px 10px', fontFamily: 'Anton, sans-serif', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                      ! {t('news.important')}
+                    </div>
+                  )}
+                </div>
+                <div style={{ padding: i === 0 ? '24px' : '18px' }}>
+                  <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{fmtDate(article.published_at)}</div>
+                  <h3 style={{ fontFamily: 'Anton, sans-serif', fontSize: i === 0 ? 32 : 18, lineHeight: 1.25, letterSpacing: '0.01em', textTransform: 'uppercase', marginTop: 6, marginBottom: 8 }}>{article.title}</h3>
+                  {article.excerpt && <p style={{ color: 'var(--muted)', fontSize: i === 0 ? 14 : 12, lineHeight: 1.55, margin: 0 }}>{article.excerpt}</p>}
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+        {articles.length > 1 && (
+          <div className="mob-only home-news-hint" style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', textAlign: 'center', marginTop: 12 }}>
+            ← {t('news.swipeHint')} →
+          </div>
+        )}
+      </section>
+
 
       <Footer />
     </div>

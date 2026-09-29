@@ -124,6 +124,8 @@ export const api = {
   // Articles
   getArticles: () => fetchJSON<Article[]>('/api/articles'),
   getArticle: (id: number) => fetchJSON<Article>(`/api/articles/${id}`),
+  /** Thông báo quan trọng đang hiệu lực, hoặc null. */
+  getImportantArticle: () => fetchJSON<{ article: Article | null }>('/api/articles/important').then(r => r.article),
   createArticle: (data: Partial<Article>, password: string) =>
     fetchJSON<Article>('/api/articles', {
       method: 'POST',

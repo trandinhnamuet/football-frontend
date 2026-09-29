@@ -33,6 +33,17 @@ export interface Article {
   tag: string;
   tag_en: string;
   published_at: string;
+  /** Thông báo quan trọng — chỉ một bài được bật tại một thời điểm. */
+  is_important: boolean;
+  /** Ngày cuối còn quan trọng (YYYY-MM-DD), null = không hẹn. */
+  important_until: string | null;
+}
+
+/** Bài quan trọng còn hiệu lực hôm nay (chưa qua ngày hẹn). */
+export function isImportantActive(a: Pick<Article, 'is_important' | 'important_until'>): boolean {
+  if (!a.is_important) return false;
+  if (!a.important_until) return true;
+  return a.important_until.slice(0, 10) >= new Date().toISOString().slice(0, 10);
 }
 
 export interface MemorialPost {
@@ -88,6 +99,70 @@ export interface Match {
   image_url: string | null;
   /** Loại sân: 5, 7 hoặc 11 người. */
   pitch_size: number;
+  /** Màu áo đội mặc trong trận, vd. "Cam" / "Đen". */
+  kit_color: string | null;
+}
+
+/** Gợi ý màu áo trong form admin và màu swatch tương ứng. */
+export const KIT_COLORS: { name: string; hex: string }[] = [
+  { name: 'Cam', hex: '#FF6B1A' },
+  { name: 'Đen', hex: '#141414' },
+  { name: 'Trắng', hex: '#f4f1ea' },
+  { name: 'Xanh dương', hex: '#2a6fdb' },
+  { name: 'Xanh lá', hex: '#1f8a5b' },
+  { name: 'Đỏ', hex: '#c0262b' },
+  { name: 'Vàng', hex: '#f5c518' },
+  { name: 'Tím', hex: '#7b4fa8' },
+  { name: 'Xám', hex: '#8a8a8a' },
+  { name: 'Hồng', hex: '#e75480' },
+];
+
+function stripDiacritics(s: string): string {
+  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
+}
+
+/**
+ * Màu swatch cho tên màu áo nhập tự do ("Áo cam", "xanh duong"...). Trả về
+ * null nếu không nhận ra để chỉ hiện chữ.
+ */
+export function kitColorHex(name: string | null | undefined): string | null {
+  if (!name) return null;
+  const n = stripDiacritics(name).toLowerCase();
+  const hit = KIT_COLORS.find(k => n.includes(stripDiacritics(k.name).toLowerCase()));
+  if (hit) return hit.hex;
+  if (/blue|navy/.test(n)) return '#2a6fdb';
+  if (/green/.test(n)) return '#1f8a5b';
+  if (/black/.test(n)) return '#141414';
+  if (/white/.test(n)) return '#f4f1ea';
+  if (/orange/.test(n)) return '#FF6B1A';
+  if (/red/.test(n)) return '#c0262b';
+  if (/yellow/.test(n)) return '#f5c518';
+  if (/xanh/.test(n)) return '#2a6fdb';
+  return null;
+}
+
+/** "Trần Hữu Giang" → "tran-huu-giang", cùng quy ước với slug bài giới thiệu. */
+export function slugify(s: string): string {
+  return stripDiacritics(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+/** Bỏ dấu + hạ chữ để so khớp tìm kiếm ("Đạt" khớp "dat"). */
+export function searchKey(s: string): string {
+  return stripDiacritics(s).toLowerCase();
+}
+
+/**
+ * Bài giới thiệu của từng cầu thủ, khớp theo slug của họ tên. Trả về map
+ * player.id → đường dẫn /members/<slug>; cầu thủ chưa có bài thì không có.
+ */
+export function memberProfileLinks(players: Pick<Player, 'id' | 'first_name' | 'last_name'>[], posts: Pick<MemorialPost, 'id' | 'slug'>[]): Record<number, string> {
+  const bySlug = new Map(posts.filter(p => p.slug).map(p => [p.slug as string, p]));
+  const out: Record<number, string> = {};
+  for (const p of players) {
+    const slug = slugify(`${p.first_name} ${p.last_name}`);
+    if (bySlug.has(slug)) out[p.id] = `/members/${slug}`;
+  }
+  return out;
 }
 
 export const PITCH_SIZES = [5, 7, 11] as const;

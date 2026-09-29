@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SyncTrigger from '../components/SyncTrigger';
-import { Article, FANTA, fmtDate } from '../lib/types';
+import { Article, FANTA, fmtDate, isImportantActive } from '../lib/types';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const BLACK = 'var(--bg)';
@@ -31,19 +31,19 @@ export default async function NewsPage() {
         <div style={{ marginBottom: 40 }}>
           <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 24 }}>
             <Link href="/" style={{ color: MUTED, textDecoration: 'none' }}>← Trang chủ</Link>
-            {' '}/ Tin tức
+            {' '}/ Thông báo
           </div>
           <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(56px, 8vw, 96px)', lineHeight: 0.92, letterSpacing: '0.01em', textTransform: 'uppercase', margin: 0 }}>
-            TIN TỨC <span style={{ color: FANTA }}>& BÀO</span>
+            THÔNG <span style={{ color: FANTA }}>BÁO</span>
           </h1>
-          <p style={{ color: MUTED, fontSize: 15, marginTop: 28 }}>{articles.length} bài viết</p>
+          <p style={{ color: MUTED, fontSize: 15, marginTop: 28 }}>{articles.length} thông báo</p>
         </div>
 
         {articles.length === 0 ? (
           <div style={{ padding: '80px 40px', textAlign: 'center', background: CARD, borderLeft: `4px solid ${FANTA}` }}>
-            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 32, color: MUTED, textTransform: 'uppercase' }}>Chưa có bài viết nào</div>
+            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 32, color: MUTED, textTransform: 'uppercase' }}>Chưa có thông báo nào</div>
             <Link href="/admin/news-management" style={{ display: 'inline-block', marginTop: 20, background: FANTA, color: ON_FANTA, padding: '14px 28px', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              + Viết bài đầu tiên
+              + Đăng thông báo đầu tiên
             </Link>
           </div>
         ) : (
@@ -60,6 +60,11 @@ export default async function NewsPage() {
                   {article.tag && (
                     <div style={{ position: 'absolute', top: 12, left: 12, background: FANTA, color: ON_FANTA, padding: '3px 10px', fontFamily: 'Anton, sans-serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                       {article.tag}
+                    </div>
+                  )}
+                  {isImportantActive(article) && (
+                    <div style={{ position: 'absolute', top: 12, right: 12, background: '#c0262b', color: '#fff', padding: '3px 10px', fontFamily: 'Anton, sans-serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                      ! Quan trọng
                     </div>
                   )}
                 </div>

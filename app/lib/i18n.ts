@@ -4,7 +4,7 @@ const vi = {
   nav: {
     intro: 'Giới thiệu',
     squad: 'Thành viên',
-    news: 'Tin tức',
+    news: 'Thông báo',
     schedule: 'Lịch thi đấu',
     dashboard: 'Dashboard',
     scoring: 'Cách tính điểm',
@@ -67,7 +67,7 @@ const vi = {
   sections: {
     s01: 'GIỚI THIỆU',
     s02: 'THÀNH VIÊN',
-    s03: 'TIN TỨC',
+    s03: 'THÔNG BÁO',
     s04: 'LỊCH THI ĐẤU',
     s05: 'GIỚI THIỆU THÀNH VIÊN',
   },
@@ -99,10 +99,13 @@ const vi = {
     noData: 'Đang đồng bộ dữ liệu cầu thủ...',
   },
   news: {
-    title: 'Tin tức',
-    viewAll: 'TẤT CẢ TIN →',
-    noData: 'Chưa có tin tức.',
-    addNews: 'Thêm bài viết →',
+    title: 'Thông báo',
+    viewAll: 'TẤT CẢ THÔNG BÁO →',
+    noData: 'Chưa có thông báo.',
+    addNews: 'Thêm thông báo →',
+    important: 'Thông báo quan trọng',
+    readMore: 'Xem chi tiết →',
+    swipeHint: 'Vuốt ngang để xem thêm',
   },
   schedule: {
     title: 'Lịch thi đấu',
@@ -119,6 +122,20 @@ const vi = {
     countdownToday: 'Hôm nay!',
     awaitingResult: 'Chờ kết quả',
     cancelled: 'Trận hủy',
+    kit: 'Màu áo',
+    kitUnset: 'Chưa chốt',
+  },
+  popup: {
+    hello: 'Chào',
+    nextMatch: 'Trận kế tiếp',
+    noMatch: 'Chưa có lịch thi đấu mới',
+    viewSchedule: 'Xem lịch thi đấu',
+    close: 'Đóng',
+  },
+  players: {
+    searchPlaceholder: 'Tìm theo tên hoặc số áo...',
+    noMatch: 'Không tìm thấy cầu thủ nào',
+    profile: 'Hồ sơ →',
   },
   video: {
     label: 'VIDEO',
@@ -158,7 +175,7 @@ const en = {
   nav: {
     intro: 'About',
     squad: 'Members',
-    news: 'News',
+    news: 'Announcements',
     schedule: 'Schedule',
     dashboard: 'Dashboard',
     scoring: 'Scoring',
@@ -221,7 +238,7 @@ const en = {
   sections: {
     s01: 'ABOUT',
     s02: 'MEMBERS',
-    s03: 'NEWS',
+    s03: 'ANNOUNCEMENTS',
     s04: 'SCHEDULE',
     s05: 'MEMBERS',
   },
@@ -253,10 +270,13 @@ const en = {
     noData: 'Syncing player data...',
   },
   news: {
-    title: 'News',
-    viewAll: 'ALL NEWS →',
-    noData: 'No news yet.',
-    addNews: 'Add article →',
+    title: 'Announcements',
+    viewAll: 'ALL ANNOUNCEMENTS →',
+    noData: 'No announcements yet.',
+    addNews: 'Add announcement →',
+    important: 'Important announcement',
+    readMore: 'Read more →',
+    swipeHint: 'Swipe to see more',
   },
   schedule: {
     title: 'Schedule',
@@ -273,6 +293,20 @@ const en = {
     countdownToday: 'Today!',
     awaitingResult: 'Result pending',
     cancelled: 'Cancelled',
+    kit: 'Kit colour',
+    kitUnset: 'TBD',
+  },
+  popup: {
+    hello: 'Hi',
+    nextMatch: 'Next match',
+    noMatch: 'No upcoming fixture yet',
+    viewSchedule: 'View schedule',
+    close: 'Close',
+  },
+  players: {
+    searchPlaceholder: 'Search by name or number...',
+    noMatch: 'No players found',
+    profile: 'Profile →',
   },
   video: {
     label: 'VIDEO',

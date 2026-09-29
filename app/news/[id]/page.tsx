@@ -31,7 +31,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ id: st
       <Header />
       <main className="mob-p-main" style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 48px 80px' }}>
         <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 24 }}>
-          <Link href="/news" style={{ color: MUTED, textDecoration: 'none' }}>← Tin tức</Link>
+          <Link href="/news" style={{ color: MUTED, textDecoration: 'none' }}>← Thông báo</Link>
         </div>
 
         {article.tag && (

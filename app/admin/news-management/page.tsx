@@ -5,7 +5,7 @@ import Link from 'next/link';
 import AdminGuard from '../../components/AdminGuard';
 import AdminHeader from '../../components/AdminHeader';
 import ArticleImageLibrary, { absoluteUrl } from '../../components/ArticleImageLibrary';
-import { Article, FANTA, fmtDate } from '../../lib/types';
+import { Article, FANTA, fmtDate, isImportantActive } from '../../lib/types';
 import { api } from '../../lib/api';
 import { compressImage, formatBytes } from '../../lib/imageCompress';
 
@@ -22,7 +22,7 @@ function getPassword() {
   return typeof window !== 'undefined' ? (localStorage.getItem('lffc_admin_pw') || '') : '';
 }
 
-const emptyForm = { title: '', title_en: '', content: '', content_en: '', excerpt: '', excerpt_en: '', tag: '', tag_en: '', image_url: '', published_at: new Date().toISOString().slice(0, 10) };
+const emptyForm = { title: '', title_en: '', content: '', content_en: '', excerpt: '', excerpt_en: '', tag: '', tag_en: '', image_url: '', published_at: new Date().toISOString().slice(0, 10), is_important: false, important_until: '' };
 
 function NewsForm({ initial, onSave, onCancel }: { initial: typeof emptyForm & { id?: number }; onSave: (data: any) => Promise<void>; onCancel: () => void }) {
   const [form, setForm] = useState(initial);
@@ -79,7 +79,11 @@ function NewsForm({ initial, onSave, onCancel }: { initial: typeof emptyForm & {
     setSaving(true);
     setError('');
     try {
-      await onSave({ ...form, published_at: form.published_at ? new Date(form.published_at).toISOString() : undefined });
+      await onSave({
+        ...form,
+        published_at: form.published_at ? new Date(form.published_at).toISOString() : undefined,
+        important_until: form.is_important && form.important_until ? form.important_until : null,
+      });
     } catch (e: any) { setError(e.message || 'Lỗi lưu bài'); }
     finally { setSaving(false); }
   }
@@ -154,6 +158,26 @@ function NewsForm({ initial, onSave, onCancel }: { initial: typeof emptyForm & {
           )}
         </div>
       </div>
+      {/* Thông báo quan trọng: hiện popup khi mở app trên điện thoại. Chỉ một
+          bài được bật tại một thời điểm — bật ở đây thì server tự tắt bài khác. */}
+      <div style={{ background: 'rgba(255,107,26,0.06)', border: `1px solid ${FANTA}44`, padding: '14px 16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, alignItems: 'center' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            checked={form.is_important}
+            onChange={e => setForm(f => ({ ...f, is_important: e.target.checked }))}
+            style={{ width: 18, height: 18, cursor: 'pointer', accentColor: FANTA }}
+          />
+          <span>
+            <span style={{ ...labelStyle, marginBottom: 2, display: 'block', color: INK }}>Thông báo quan trọng</span>
+            <span style={{ fontSize: 12, color: MUTED }}>Hiện popup khi mở app. Chỉ một bài quan trọng tại một thời điểm — tick bài này thì bài khác tự bỏ.</span>
+          </span>
+        </label>
+        <div>
+          <label style={labelStyle}>Quan trọng đến hết ngày (bỏ trống = không hẹn)</label>
+          <input type="date" style={{ ...inputStyle, opacity: form.is_important ? 1 : 0.5 }} disabled={!form.is_important} value={form.important_until} onChange={set('important_until')} />
+        </div>
+      </div>
       {error && <div style={{ color: '#cc4444', fontSize: 13, padding: '10px 14px', background: 'rgba(204,68,68,0.1)', border: '1px solid rgba(204,68,68,0.3)' }}>{error}</div>}
       <div style={{ display: 'flex', gap: 12 }}>
         <button onClick={submit} disabled={saving} style={{ background: FANTA, color: ON_FANTA, border: 'none', padding: '12px 28px', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
@@ -210,12 +234,12 @@ function NewsManagementContent() {
           <div>
             <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 16 }}>Quản trị nội dung</div>
             <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 56, lineHeight: 0.92, letterSpacing: '0.01em', textTransform: 'uppercase', margin: 0 }}>
-              QUẢN LÝ <span style={{ color: FANTA }}>BÀI VIẾT</span>
+              QUẢN LÝ <span style={{ color: FANTA }}>THÔNG BÁO</span>
             </h1>
           </div>
           {mode === 'list' && (
             <button onClick={() => { setEditing(null); setMode('new'); }} style={{ background: FANTA, color: ON_FANTA, border: 'none', padding: '14px 28px', fontFamily: 'Anton, sans-serif', fontSize: 18, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>
-              + VIẾT BÀI MỚI
+              + THÔNG BÁO MỚI
             </button>
           )}
         </div>
@@ -223,7 +247,7 @@ function NewsManagementContent() {
         {mode !== 'list' && (
           <div style={{ background: CARD, border: `1px solid rgba(255,107,26,0.3)`, padding: '32px', marginBottom: 40 }}>
             <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, textTransform: 'uppercase', marginBottom: 24, color: FANTA }}>
-              {mode === 'new' ? '+ Bài viết mới' : '✎ Chỉnh sửa bài viết'}
+              {mode === 'new' ? '+ Thông báo mới' : '✎ Chỉnh sửa thông báo'}
             </div>
             <NewsForm
               initial={editing ? {
@@ -233,6 +257,8 @@ function NewsManagementContent() {
                 tag: editing.tag || '', tag_en: editing.tag_en || '',
                 image_url: editing.image_url || '',
                 published_at: editing.published_at?.slice(0, 10) || new Date().toISOString().slice(0, 10),
+                is_important: !!editing.is_important,
+                important_until: editing.important_until?.slice(0, 10) || '',
                 id: editing.id,
               } : { ...emptyForm }}
               onSave={handleSave}
@@ -245,7 +271,7 @@ function NewsManagementContent() {
           <div style={{ textAlign: 'center', padding: 60, color: MUTED, fontFamily: 'Anton, sans-serif', fontSize: 24 }}>Đang tải...</div>
         ) : articles.length === 0 ? (
           <div style={{ textAlign: 'center', padding: 60, background: CARD, borderLeft: `4px solid ${FANTA}` }}>
-            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 28, color: MUTED, textTransform: 'uppercase' }}>Chưa có bài viết</div>
+            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 28, color: MUTED, textTransform: 'uppercase' }}>Chưa có thông báo</div>
           </div>
         ) : (
           <div style={{ display: 'grid', gap: 12 }}>
@@ -254,6 +280,11 @@ function NewsManagementContent() {
                 <div>
                   <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 6 }}>
                     {article.tag && <span style={{ background: FANTA, color: ON_FANTA, padding: '2px 8px', fontFamily: 'Anton, sans-serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{article.tag}</span>}
+                    {article.is_important && (
+                      <span style={{ background: isImportantActive(article) ? '#c0262b' : 'var(--hover-bg)', color: isImportantActive(article) ? '#fff' : MUTED, padding: '2px 8px', fontFamily: 'Anton, sans-serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                        {isImportantActive(article) ? '! Quan trọng' : 'Hết quan trọng'}{article.important_until ? ` · đến ${fmtDate(article.important_until)}` : ''}
+                      </span>
+                    )}
                     <span style={{ fontSize: 12, color: MUTED }}>{fmtDate(article.published_at)}</span>
                   </div>
                   <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, letterSpacing: '0.01em', textTransform: 'uppercase' }}>{article.title}</div>

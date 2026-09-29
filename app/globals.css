@@ -975,3 +975,84 @@ select option {
   .admin-tool-head h2 { font-size: 15px !important; line-height: 1.15 !important; letter-spacing: 0.02em !important; }
   .admin-tool-desc, .admin-tool-features, .admin-tool-cta, .admin-tool-notes { display: none !important; }
 }
+
+/* ── Cuộn mượt tới section (header bấm "Lịch thi đấu", link /#schedule) ──
+   JS trong lib/scroll.ts trừ chiều cao header; scroll-margin-top là dự phòng
+   cho trường hợp trình duyệt tự nhảy theo hash. ─────────────────────────── */
+html { scroll-behavior: smooth; }
+section[id] { scroll-margin-top: 80px; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* ── Popup mở app trên mobile: sheet trượt từ dưới lên ──────────────────── */
+@keyframes first-open-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes first-open-sheet-in {
+  from { transform: translateY(40px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.first-open-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: first-open-backdrop-in 0.2s ease both;
+}
+.first-open-sheet {
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  background: var(--bg);
+  color: var(--ink);
+  border-top: 3px solid var(--fanta);
+  padding: 10px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.45);
+  animation: first-open-sheet-in 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.first-open-grip {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+  margin: 0 auto 12px;
+}
+.first-open-important { transition: background 0.18s ease; }
+.first-open-important:active { background: rgba(255, 107, 26, 0.2) !important; }
+
+/* ── Card cầu thủ có bài giới thiệu: bấm được ──────────────────────────── */
+.squad-card-link { cursor: pointer; }
+.player-profile-link { transition: background 0.18s ease, color 0.18s ease; }
+.player-profile-link:hover { background: var(--fanta) !important; color: #0a0a0a !important; }
+
+/* ── Thông báo ở trang chủ: trên mobile vuốt ngang thay vì xếp dọc ─────── */
+@media (max-width: 768px) {
+  .home-news-scroller {
+    display: flex !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 16px;
+    -webkit-overflow-scrolling: touch;
+    gap: 12px !important;
+    /* Tràn ra sát mép màn hình để card kế tiếp ló ra, báo là vuốt được */
+    margin: 0 -16px;
+    padding: 4px 16px 8px;
+    scrollbar-width: none;
+  }
+  .home-news-scroller::-webkit-scrollbar { display: none; }
+  .home-news-scroller > * {
+    flex: 0 0 82%;
+    max-width: 82%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+  /* Card đầu (trên desktop to gấp đôi) về cùng cỡ với các card khác */
+  .home-news-scroller > * > div:first-child { aspect-ratio: 3 / 2 !important; }
+  .home-news-scroller > * > div:last-child { padding: 16px !important; }
+  .home-news-scroller h3 { font-size: 18px !important; }
+  .home-news-scroller p { font-size: 12px !important; }
+}

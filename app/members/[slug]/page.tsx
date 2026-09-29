@@ -34,7 +34,7 @@ export default async function MemberPage({ params }: { params: Promise<{ slug: s
       <main className="mob-p-main" style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 48px 80px' }}>
 
         <div style={{ fontSize: 12, color: MUTED, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 24 }}>
-          <Link href="/#members" style={{ color: MUTED, textDecoration: 'none' }}>← Giới thiệu thành viên</Link>
+          <Link href="/#squad" style={{ color: MUTED, textDecoration: 'none' }}>← Thành viên</Link>
         </div>
 
         {post.tag && (

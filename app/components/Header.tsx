@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { smoothScrollToHash } from '../lib/scroll';
 import { useApp } from '../contexts/AppContext';
 import { useAuth } from '../contexts/AuthContext';
 import { FANTA_LOGO_URL } from '../lib/assets';
@@ -21,11 +22,22 @@ export default function Header() {
   const navLinks = [
     { href: '/about', labelKey: 'nav.intro' },
     { href: '/players', labelKey: 'nav.squad' },
-    { href: '/#news', labelKey: 'nav.news' },
+    { href: '/news', labelKey: 'nav.news' },
     { href: '/#schedule', labelKey: 'nav.schedule' },
     { href: '/gallery', labelKey: 'nav.gallery' },
     { href: '/dashboard', labelKey: 'nav.dashboard', accent: true },
   ];
+
+  // Link dạng /#section: đang ở trang chủ thì cuộn mượt tới section thay vì
+  // nhảy thẳng; ở trang khác thì để Next điều hướng về trang chủ rồi
+  // ScrollToHash (trang chủ) lo phần cuộn.
+  function handleNavClick(href: string, e: React.MouseEvent<HTMLAnchorElement>) {
+    setMenuOpen(false);
+    if (href.startsWith('/#') && pathname === '/') {
+      e.preventDefault();
+      smoothScrollToHash(href.slice(1));
+    }
+  }
 
   const btnStyle: React.CSSProperties = {
     background: 'none',
@@ -72,6 +84,7 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
+              onClick={e => handleNavClick(link.href, e)}
               className="nav-link"
               style={{
                 color: link.accent ? FANTA : (pathname === link.href ? '#f4f1ea' : 'inherit'),
@@ -156,7 +169,7 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              onClick={() => setMenuOpen(false)}
+              onClick={e => handleNavClick(link.href, e)}
               className="nav-link-mobile"
               style={{
                 color: link.accent ? FANTA : '#f4f1ea',
