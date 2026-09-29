@@ -51,7 +51,8 @@ export default function PlayersGrid({ players, profileLinks }: Props) {
       <div className="players-search" style={{ position: 'relative', maxWidth: 480, marginBottom: 40 }}>
         <span aria-hidden style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: MUTED, fontSize: 16, pointerEvents: 'none' }}>⌕</span>
         <input
-          type="search"
+          type="text"
+          inputMode="search"
           value={q}
           onChange={e => setQ(e.target.value)}
           placeholder={t('players.searchPlaceholder')}
