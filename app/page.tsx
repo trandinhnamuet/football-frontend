@@ -88,7 +88,9 @@ export default function HomePage() {
   // tải trang, giữ ổn định khi dữ liệu đồng bộ lại (chỉ chèn thêm người mới).
   const squadOrder = useRef<number[]>([]);
   const [recommendations, setRecommendations] = useState<RecommendedVideo[]>([]);
-  const [activeVideo, setActiveVideo] = useState<{ url: string; title: string } | null>(null);
+  // `fallback` = đang dùng video highlight admin cấu hình vì chưa có đề xuất
+  // từ kênh; đề xuất về sau sẽ thay thế.
+  const [activeVideo, setActiveVideo] = useState<{ url: string; title: string; fallback?: boolean } | null>(null);
 
   // Squad carousel
   const [squadPage, setSquadPage] = useState(0);
@@ -133,6 +135,9 @@ export default function HomePage() {
         setArticles(a);
         setMatches(ms);
         setVideoHighlight(vh);
+        if (vh?.youtube_url && vh.is_active) {
+          setActiveVideo(prev => prev ?? { url: vh.youtube_url, title: vh.title, fallback: true });
+        }
         setAboutData(ab);
         setMemorialPosts(mp);
         setImportant(imp);
@@ -146,7 +151,7 @@ export default function HomePage() {
     // (2nd–6th) appear in the recommendations column.
     api.getVideoRecommendations().then(recs => {
       setRecommendations(recs);
-      setActiveVideo(prev => prev ?? (recs[0] ? { url: recs[0].url, title: recs[0].title } : null));
+      setActiveVideo(prev => (prev && !prev.fallback) ? prev : (recs[0] ? { url: recs[0].url, title: recs[0].title } : prev));
     }).catch(() => {});
 
     // Sync in background; reload only if data changed
