@@ -24,7 +24,7 @@ export default function Header() {
     { href: '/players', labelKey: 'nav.squad' },
     { href: '/news', labelKey: 'nav.news' },
     { href: '/#schedule', labelKey: 'nav.schedule' },
-    { href: '/gallery', labelKey: 'nav.gallery' },
+    { href: '/#video', labelKey: 'nav.highlight' },
     { href: '/dashboard', labelKey: 'nav.dashboard', accent: true },
   ];
 

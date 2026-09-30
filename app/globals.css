@@ -464,6 +464,9 @@ select option {
 
   /* --- Video: YouTube-style layout stacks, recs go full width --- */
   .mob-video-grid { grid-template-columns: 1fr !important; gap: 18px !important; }
+  /* Cột đề xuất bị kéo lên -45px trên desktop để thẳng hàng với player; khi xếp
+     dọc trên mobile thì bỏ đi, kẻo "Video đề xuất" đè lên tên video đang xem. */
+  .mob-video-recs { margin-top: 8px !important; }
   .mob-video-recs > div:nth-child(2) { max-height: none !important; }
 
   /* --- Schedule admin: table stacks on mobile --- */
