@@ -403,7 +403,14 @@ export default function HomePage() {
               <div className="mob-nextmatch-info" style={{ padding: '40px 48px', display: 'grid', gridTemplateRows: 'auto 1fr auto', height: '100%', minWidth: 0 }}>
                 {/* Top: Week & teams */}
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 12, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 12 }}>{t('hero.week')} {next.week}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                    <div style={{ fontSize: 12, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>{t('hero.week')} {next.week}</div>
+                    {featuredIsPast && (
+                      <button onClick={() => setSelectedPast(null)} className="featured-back-btn" style={{ background: 'transparent', border: `1px solid ${FANTA}66`, color: FANTA, padding: '5px 12px', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+                        {upcoming.length > 0 ? t('schedule.backToNext') : t('schedule.closeDetail')}
+                      </button>
+                    )}
+                  </div>
                   <div className="mob-nextmatch-teams" style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
                     <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 56px)', color: FANTA, textTransform: 'uppercase' }}>Lon Fanta FC</div>
                     {featuredIsPast && next.result && !isCancelled ? (
@@ -413,11 +420,6 @@ export default function HomePage() {
                     )}
                     <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 56px)', textTransform: 'uppercase' }}>{next.opponent}</div>
                   </div>
-                  {featuredIsPast && (
-                    <button onClick={() => setSelectedPast(null)} className="featured-back-btn" style={{ marginTop: 14, marginRight: 10, background: 'transparent', border: `1px solid ${FANTA}66`, color: FANTA, padding: '6px 12px', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'inherit' }}>
-                      {upcoming.length > 0 ? t('schedule.backToNext') : t('schedule.closeDetail')}
-                    </button>
-                  )}
                   {kits.length > 0 && (
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginTop: 14, padding: '6px 12px', background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}44` }}>
                       <span style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>{t('schedule.kit')}</span>
