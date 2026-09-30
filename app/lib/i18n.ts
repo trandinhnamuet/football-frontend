@@ -124,6 +124,11 @@ const vi = {
     cancelled: 'Trận hủy',
     kit: 'Màu áo',
     kitUnset: 'Chưa chốt',
+    matchResult: 'Kết quả trận',
+    backToNext: '← Về trận kế tiếp',
+    closeDetail: 'Đóng',
+    tapForDetail: 'Bấm vào trận để xem ảnh & chi tiết',
+    finalScore: 'Tỷ số',
   },
   popup: {
     hello: 'Chào',
@@ -136,6 +141,8 @@ const vi = {
     searchPlaceholder: 'Tìm theo tên hoặc số áo...',
     noMatch: 'Không tìm thấy cầu thủ nào',
     profile: 'Hồ sơ →',
+    hasProfile: 'Có hồ sơ',
+    noProfile: 'Chưa có hồ sơ',
   },
   video: {
     label: 'VIDEO',
@@ -295,6 +302,11 @@ const en = {
     cancelled: 'Cancelled',
     kit: 'Kit colour',
     kitUnset: 'TBD',
+    matchResult: 'Match result',
+    backToNext: '← Back to next match',
+    closeDetail: 'Close',
+    tapForDetail: 'Tap a match to see photo & details',
+    finalScore: 'Score',
   },
   popup: {
     hello: 'Hi',
@@ -307,6 +319,8 @@ const en = {
     searchPlaceholder: 'Search by name or number...',
     noMatch: 'No players found',
     profile: 'Profile →',
+    hasProfile: 'Has profile',
+    noProfile: 'No profile yet',
   },
   video: {
     label: 'VIDEO',

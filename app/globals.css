@@ -1056,3 +1056,13 @@ section[id] { scroll-margin-top: 80px; }
   .home-news-scroller h3 { font-size: 18px !important; }
   .home-news-scroller p { font-size: 12px !important; }
 }
+
+/* ── Kết quả gần đây: hàng bấm được để xem chi tiết trận ở card nổi bật ─── */
+.result-row { -webkit-tap-highlight-color: transparent; }
+.result-row:focus-visible { outline: 2px solid var(--fanta); outline-offset: 2px; }
+.result-row-active { background: var(--alt-bg) !important; }
+.result-row-active:hover { transform: none !important; }
+@keyframes featured-swap { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+#featured-match { animation: featured-swap 0.3s ease both; }
+.featured-back-btn { transition: background 0.18s ease, color 0.18s ease; }
+.featured-back-btn:hover { background: var(--fanta) !important; color: #0a0a0a !important; }

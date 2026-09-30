@@ -10,6 +10,7 @@ import FirstOpenPopup from './components/FirstOpenPopup';
 import ScrollToHash from './components/ScrollToHash';
 import { Player, Article, Match, MemorialPost, RecommendedVideo, FANTA, ROLES, CANCELLED_RESULT, fmtDate, dayStart, daysUntil, isMatchPast, pitchLabel, resultLabel, matchKits, memberProfileLinks, isImportantActive } from './lib/types';
 import KitColors from './components/KitColors';
+import { smoothScrollToHash } from './lib/scroll';
 import { api } from './lib/api';
 import { useApp } from './contexts/AppContext';
 import { DEFAULT_PLAYER_AVATAR_URL } from './lib/assets';
@@ -81,6 +82,11 @@ export default function HomePage() {
   const [important, setImportant] = useState<Article | null>(null);
   // Đã có dữ liệu lần đầu (kể cả khi lỗi) — popup mở app chờ cờ này.
   const [dataReady, setDataReady] = useState(false);
+  // Trận đã qua đang được chọn để xem chi tiết (thay card trận kế tiếp).
+  const [selectedPast, setSelectedPast] = useState<Match | null>(null);
+  // Thứ tự ngẫu nhiên của cầu thủ ở section Thành viên — xáo một lần mỗi lượt
+  // tải trang, giữ ổn định khi dữ liệu đồng bộ lại (chỉ chèn thêm người mới).
+  const squadOrder = useRef<number[]>([]);
   const [recommendations, setRecommendations] = useState<RecommendedVideo[]>([]);
   const [activeVideo, setActiveVideo] = useState<{ url: string; title: string } | null>(null);
 
@@ -115,6 +121,14 @@ export default function HomePage() {
         api.getMemorialPosts().catch(() => [] as MemorialPost[]),
         api.getImportantArticle().catch(() => null),
       ]).then(([p, a, ms, vh, ab, mp, imp]) => {
+        const known = new Set(squadOrder.current);
+        const fresh = p.map(x => x.id).filter(id => !known.has(id));
+        for (let i = fresh.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [fresh[i], fresh[j]] = [fresh[j], fresh[i]];
+        }
+        const present = new Set(p.map(x => x.id));
+        squadOrder.current = [...squadOrder.current.filter(id => present.has(id)), ...fresh];
         setPlayers(p);
         setArticles(a);
         setMatches(ms);
@@ -167,7 +181,9 @@ export default function HomePage() {
   const top3 = board[2];
   const rest = board.slice(3, 12);
   const safeSquadPage = Math.min(squadPage, totalSquadPages - 1);
-  const squadVisible = players.slice(safeSquadPage * squadPageSize, (safeSquadPage + 1) * squadPageSize);
+  const rank = new Map(squadOrder.current.map((id, i) => [id, i]));
+  const shuffledPlayers = [...players].sort((a, b) => (rank.get(a.id) ?? 1e9) - (rank.get(b.id) ?? 1e9));
+  const squadVisible = shuffledPlayers.slice(safeSquadPage * squadPageSize, (safeSquadPage + 1) * squadPageSize);
 
   const roleLabel = (role: string) => ROLES[role]?.[lang] || role;
 
@@ -184,6 +200,15 @@ export default function HomePage() {
   const played = matches
     .filter(isMatchPast)
     .sort((a, b) => dayStart(b.date) - dayStart(a.date) || b.week - a.week);
+  // Card nổi bật: trận đã qua đang chọn (nếu có), không thì trận kế tiếp.
+  const featured: Match | null = selectedPast ?? upcoming[0] ?? null;
+  const featuredIsPast = !!selectedPast;
+
+  function showPastMatch(m: Match) {
+    setSelectedPast(prev => (prev?.id === m.id ? null : m));
+    // Cuộn lên card để trên mobile thấy ngay chi tiết vừa chọn.
+    setTimeout(() => smoothScrollToHash('#featured-match'), 40);
+  }
 
   return (
     <div style={{ background: 'var(--bg)', color: 'var(--ink)', fontFamily: '"Space Grotesk", system-ui, sans-serif' }}>
@@ -348,22 +373,31 @@ export default function HomePage() {
           <h2 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 18 }}>{t('schedule.title')}</h2>
         </div>
 
-        {/* Featured next match */}
-        {upcoming.length > 0 && (() => {
-          const next = upcoming[0];
+        {/* Featured: trận kế tiếp, hoặc trận đã qua đang chọn ở cột kết quả */}
+        {featured && (() => {
+          const next = featured;
           const d = daysUntil(next.date);
           const countdown = d <= 0 ? t('schedule.countdownToday') : `${d} ${t('schedule.countdownDays')}`;
           const kits = matchKits(next);
+          const isCancelled = next.result === CANCELLED_RESULT;
+          const scoreText = next.score || `${next.goals_for} - ${next.goals_against}`;
+          const badge = RESULT_BADGE[next.result];
           return (
-            <div className="mob-nextmatch next-match-card" style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.8fr', gap: 0, marginBottom: 28, background: 'var(--card)', borderLeft: `5px solid ${FANTA}`, overflow: 'hidden' }}>
+            <div id="featured-match" key={next.id} className={`mob-nextmatch next-match-card ${featuredIsPast ? 'featured-past' : ''}`} style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.8fr', gap: 0, marginBottom: 28, background: 'var(--card)', borderLeft: `5px solid ${featuredIsPast ? (badge?.bg || 'var(--muted)') : FANTA}`, overflow: 'hidden', scrollMarginTop: 90 }}>
               {/* Image side */}
               <div className="mob-nextmatch-img" style={{ position: 'relative', minHeight: 380, background: '#0a0a0a', backgroundImage: next.image_url ? `url(${resolveImg(next.image_url)})` : 'repeating-linear-gradient(45deg, transparent 0 30px, rgba(255,107,26,0.06) 30px 31px)', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
                 <div className="nextmatch-badge" style={{ position: 'absolute', top: 18, left: 18, background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 13, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '6px 14px' }}>
-                  ▶ {t('schedule.nextMatch')}
+                  {featuredIsPast ? `◆ ${t('schedule.matchResult')}` : `▶ ${t('schedule.nextMatch')}`}
                 </div>
-                <div className="nextmatch-countdown" style={{ position: 'absolute', bottom: 18, right: 18, background: 'rgba(10,10,10,0.85)', color: FANTA, fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.02em', padding: '8px 16px', textTransform: 'uppercase' }}>
-                  ⏱ {countdown}
-                </div>
+                {featuredIsPast ? (
+                  <div className="nextmatch-countdown" style={{ position: 'absolute', bottom: 18, right: 18, background: isCancelled ? RESULT_BADGE.C.bg : next.result ? (badge?.bg || 'rgba(10,10,10,0.85)') : 'rgba(10,10,10,0.85)', color: isCancelled ? RESULT_BADGE.C.fg : next.result ? (badge?.fg || '#fff') : 'var(--muted)', fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.02em', padding: '8px 16px', textTransform: 'uppercase' }}>
+                    {isCancelled ? t('schedule.cancelled') : next.result ? `${scoreText} · ${resultLabel(next.result, lang)}` : t('schedule.awaitingResult')}
+                  </div>
+                ) : (
+                  <div className="nextmatch-countdown" style={{ position: 'absolute', bottom: 18, right: 18, background: 'rgba(10,10,10,0.85)', color: FANTA, fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.02em', padding: '8px 16px', textTransform: 'uppercase' }}>
+                    ⏱ {countdown}
+                  </div>
+                )}
               </div>
               {/* Info side */}
               <div className="mob-nextmatch-info" style={{ padding: '40px 48px', display: 'grid', gridTemplateRows: 'auto 1fr auto', height: '100%', minWidth: 0 }}>
@@ -372,9 +406,18 @@ export default function HomePage() {
                   <div style={{ fontSize: 12, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 12 }}>{t('hero.week')} {next.week}</div>
                   <div className="mob-nextmatch-teams" style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
                     <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 56px)', color: FANTA, textTransform: 'uppercase' }}>Lon Fanta FC</div>
-                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, color: 'var(--muted)', textTransform: 'uppercase' }}>{t('schedule.vs')}</div>
+                    {featuredIsPast && next.result && !isCancelled ? (
+                      <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(32px, 4vw, 44px)', color: 'var(--ink)', background: 'var(--alt-bg)', padding: '0 14px', border: `1px solid ${badge?.bg || 'var(--line)'}`, whiteSpace: 'nowrap' }}>{scoreText}</div>
+                    ) : (
+                      <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, color: 'var(--muted)', textTransform: 'uppercase' }}>{t('schedule.vs')}</div>
+                    )}
                     <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(40px, 5vw, 56px)', textTransform: 'uppercase' }}>{next.opponent}</div>
                   </div>
+                  {featuredIsPast && (
+                    <button onClick={() => setSelectedPast(null)} className="featured-back-btn" style={{ marginTop: 14, marginRight: 10, background: 'transparent', border: `1px solid ${FANTA}66`, color: FANTA, padding: '6px 12px', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'inherit' }}>
+                      {upcoming.length > 0 ? t('schedule.backToNext') : t('schedule.closeDetail')}
+                    </button>
+                  )}
                   {kits.length > 0 && (
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginTop: 14, padding: '6px 12px', background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}44` }}>
                       <span style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>{t('schedule.kit')}</span>
@@ -430,13 +473,25 @@ export default function HomePage() {
             ))}
           </div>
           <div>
-            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, color: FANTA, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 14 }}>◆ {t('schedule.recentResults')}</div>
+            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, color: FANTA, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>◆ {t('schedule.recentResults')}</div>
+            {played.length > 0 && (
+              <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>{t('schedule.tapForDetail')}</div>
+            )}
             {played.length === 0 ? (
               <div style={{ color: 'var(--muted)', fontSize: 14, padding: '20px 0' }}>—</div>
             ) : played.slice(0, 6).map(m => (
-              <div key={m.id} className="schedule-row" style={{ background: 'var(--card)', padding: '10px 12px', marginBottom: 8, display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, alignItems: 'center', fontSize: 12 }}>
+              <div
+                key={m.id}
+                role="button"
+                tabIndex={0}
+                aria-pressed={selectedPast?.id === m.id}
+                onClick={() => showPastMatch(m)}
+                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showPastMatch(m); } }}
+                className={`schedule-row result-row ${selectedPast?.id === m.id ? 'result-row-active' : ''}`}
+                style={{ background: 'var(--card)', padding: '10px 12px', marginBottom: 8, display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, alignItems: 'center', fontSize: 12, cursor: 'pointer', borderLeft: `3px solid ${selectedPast?.id === m.id ? FANTA : 'transparent'}` }}
+              >
                 <div style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}>
-                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 13, textTransform: 'uppercase' }}>{m.opponent}</div>
+                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 13, textTransform: 'uppercase' }}>{m.image_url ? '📷 ' : ''}{m.opponent}</div>
                   <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 1 }}>{fmtDate(m.date)}</div>
                 </div>
                 {/* A past match with no score yet still shows up here, marked as pending. */}
@@ -519,12 +574,20 @@ export default function HomePage() {
                         />
                       </div>
                       <div style={{ position: 'absolute', top: 8, right: 10, fontFamily: 'Anton, sans-serif', fontSize: 72, lineHeight: 0.85, color: 'rgba(128,128,128,0.08)', letterSpacing: '-0.02em' }}>{p.num}</div>
+                      {/* Dấu hiệu nhỏ góc trên phải: có hồ sơ (cam, đậm) / chưa có (mờ, viền đứt) */}
+                      <div
+                        title={href ? t('players.hasProfile') : t('players.noProfile')}
+                        aria-label={href ? t('players.hasProfile') : t('players.noProfile')}
+                        style={{ position: 'absolute', top: 10, right: 10, width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: href ? FANTA : 'transparent', color: href ? '#0a0a0a' : 'var(--muted)', border: href ? 'none' : '1px dashed var(--muted)', fontSize: 13, lineHeight: 1, opacity: href ? 1 : 0.55 }}
+                      >
+                        {href ? '→' : '·'}
+                      </div>
                       <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, letterSpacing: '0.02em', textTransform: 'uppercase', position: 'relative', marginTop: 4 }}>{p.first_name} {p.last_name}</div>
                       <div style={{ fontSize: 11, color: FANTA, letterSpacing: '0.14em', textTransform: 'uppercase', marginTop: 3, fontWeight: 700 }}>#{p.num} · {roleLabel(p.role)}</div>
                       <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4, fontStyle: 'italic' }}>"{p.nick}"</div>
-                      {href && (
-                        <div style={{ marginTop: 10, fontSize: 11, color: FANTA, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{t('players.profile')}</div>
-                      )}
+                      <div style={{ marginTop: 10, fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: href ? FANTA : 'var(--muted)', opacity: href ? 1 : 0.7 }}>
+                        {href ? `● ${t('players.profile')}` : `○ ${t('players.noProfile')}`}
+                      </div>
                     </>
                   );
                   return href ? (
