@@ -427,14 +427,15 @@ select option {
      stack cleanly with no overlap. */
   .mob-squad-wrap { padding-top: 0 !important; }
   .mob-squad-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
-  .mob-squad-grid > div { padding-top: 14px !important; }
-  .mob-squad-grid > div > div:first-child {
+  /* `> *`: thẻ có hồ sơ là <a> (Link), không phải <div>. */
+  .mob-squad-grid > * { padding-top: 14px !important; min-width: 0; }
+  .mob-squad-grid > * > div:first-child {
     position: static !important;
     top: auto !important;
     left: auto !important;
     margin-bottom: 12px !important;
   }
-  .mob-squad-grid > div > div:first-child img {
+  .mob-squad-grid > * > div:first-child img {
     width: 100% !important;
     height: auto !important;
     aspect-ratio: 1 / 1 !important;
@@ -442,7 +443,9 @@ select option {
 
   /* --- Banner slider --- */
   .banner-slide { aspect-ratio: 1920 / 960 !important; height: auto !important; min-height: 0 !important; }
-  .banner-arrow { width: 34px !important; height: 34px !important; font-size: 20px !important; }
+  /* Mobile vuốt là chính — nút mờ đi để không che ảnh. */
+  .banner-arrow { width: 34px !important; height: 34px !important; font-size: 20px !important; opacity: 0.45; }
+  .banner-arrow:active { opacity: 1; }
   .banner-caption { padding: 0 16px 32px !important; }
   .banner-caption span { font-size: 11px !important; padding: 4px 10px !important; }
   .banner-caption > div { font-size: clamp(28px, 4vw, 48px) !important; }
@@ -1031,33 +1034,37 @@ section[id] { scroll-margin-top: 80px; }
 .player-profile-link { transition: background 0.18s ease, color 0.18s ease; }
 .player-profile-link:hover { background: var(--fanta) !important; color: #0a0a0a !important; }
 
-/* ── Thông báo ở trang chủ: trên mobile vuốt ngang thay vì xếp dọc ─────── */
+/* ── Tin tức ở trang chủ: mobile hiện 4 bài xếp dọc, ảnh trái / chữ phải ─── */
 @media (max-width: 768px) {
-  .home-news-scroller {
+  .home-news-grid {
     display: flex !important;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    scroll-padding: 0 16px;
-    -webkit-overflow-scrolling: touch;
+    flex-direction: column;
     gap: 12px !important;
-    /* Tràn ra sát mép màn hình để card kế tiếp ló ra, báo là vuốt được */
-    margin: 0 -16px;
-    padding: 4px 16px 8px;
-    scrollbar-width: none;
   }
-  .home-news-scroller::-webkit-scrollbar { display: none; }
-  .home-news-scroller > * {
-    flex: 0 0 82%;
-    max-width: 82%;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
+  .home-news-grid > :nth-child(n + 5) { display: none !important; }
+  .home-news-card { flex-direction: row !important; align-items: stretch; }
+  .home-news-card .home-news-media {
+    flex: 0 0 40% !important;
+    aspect-ratio: 4 / 3 !important;
+    align-self: flex-start;
   }
-  /* Card đầu (trên desktop to gấp đôi) về cùng cỡ với các card khác */
-  .home-news-scroller > * > div:first-child { aspect-ratio: 3 / 2 !important; }
-  .home-news-scroller > * > div:last-child { padding: 16px !important; }
-  .home-news-scroller h3 { font-size: 18px !important; }
-  .home-news-scroller p { font-size: 12px !important; }
+  .home-news-card .home-news-body {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px !important;
+  }
+  .home-news-card h3 {
+    font-size: 15px !important;
+    margin: 4px 0 0 !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  /* Thẻ hẹp: bỏ tóm tắt, thu nhãn tag cho khỏi che ảnh */
+  .home-news-card p { display: none; }
+  .home-news-tag { top: 6px !important; left: 6px !important; right: auto !important; font-size: 10px !important; padding: 2px 6px !important; }
+  .home-news-tag + .home-news-tag { top: auto !important; bottom: 6px; }
 }
 
 /* ── Kết quả gần đây: hàng bấm được để xem chi tiết trận ở card nổi bật ─── */
@@ -1069,3 +1076,24 @@ section[id] { scroll-margin-top: 80px; }
 #featured-match { animation: featured-swap 0.3s ease both; }
 .featured-back-btn { transition: background 0.18s ease, color 0.18s ease; }
 .featured-back-btn:hover { background: var(--fanta) !important; color: #0a0a0a !important; }
+
+/* ── Section thông báo ngắn (dưới banner) ────────────────────────────────── */
+.ann-arrow {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 107, 26, 0.1);
+  border: 1px solid rgba(255, 107, 26, 0.27);
+  color: #FF6B1A;
+  font-family: Anton, sans-serif;
+  font-size: 22px;
+  line-height: 1;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.ann-arrow:not(:disabled):hover { background: #FF6B1A; color: #0a0a0a; }
+@media (max-width: 768px) {
+  .ann-section { padding-top: 32px !important; padding-bottom: 32px !important; }
+  .ann-arrow { width: 34px; height: 34px; font-size: 18px; opacity: 0.7; }
+}

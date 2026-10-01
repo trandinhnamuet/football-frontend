@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Article, Match, FANTA, fmtDate, daysUntil, pitchLabel, matchKits } from '../lib/types';
+import { Article, Match, FANTA, fmtDate, daysUntil, pitchLabel, matchKits, articleHref } from '../lib/types';
 import KitColors from './KitColors';
 import { useApp } from '../contexts/AppContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -87,7 +87,7 @@ export default function FirstOpenPopup({ ready, nextMatch, important }: Props) {
         </div>
 
         {important && (
-          <Link href={`/news/${important.id}`} onClick={close} className="first-open-important" style={{ display: 'block', textDecoration: 'none', color: 'inherit', background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}`, padding: '14px 16px', marginBottom: 14 }}>
+          <Link href={articleHref(important)} onClick={close} className="first-open-important" style={{ display: 'block', textDecoration: 'none', color: 'inherit', background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}`, padding: '14px 16px', marginBottom: 14 }}>
             <div style={{ display: 'inline-block', background: FANTA, color: '#0a0a0a', fontFamily: 'Anton, sans-serif', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '3px 8px', marginBottom: 8 }}>
               ! {t('news.important')}
             </div>

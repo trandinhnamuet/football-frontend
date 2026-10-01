@@ -1,4 +1,4 @@
-import { Player, Article, MemorialPost, Match, TeamStats, DriveLink, VideoHighlight, RecommendedVideo, BannerSlide, AuthUser } from './types';
+import { Player, Article, MemorialPost, Match, TeamStats, DriveLink, VideoHighlight, RecommendedVideo, BannerSlide, Announcement, AuthUser } from './types';
 
 export const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 const BASE = API_BASE;
@@ -123,7 +123,7 @@ export const api = {
 
   // Articles
   getArticles: () => fetchJSON<Article[]>('/api/articles'),
-  getArticle: (id: number) => fetchJSON<Article>(`/api/articles/${id}`),
+  getArticle: (idOrSlug: number | string) => fetchJSON<Article>(`/api/articles/${encodeURIComponent(String(idOrSlug))}`),
   /** Thông báo quan trọng đang hiệu lực, hoặc null. */
   getImportantArticle: () => fetchJSON<{ article: Article | null }>('/api/articles/important').then(r => r.article),
   createArticle: (data: Partial<Article>, password: string) =>
@@ -318,6 +318,39 @@ export const api = {
       body: JSON.stringify(data),
       headers: { 'x-admin-password': password },
     }),
+
+  // Announcements (thông báo ngắn trên trang chủ)
+  getAnnouncementsPublic: () => fetchJSON<Announcement[]>('/api/announcements/public'),
+  getAnnouncementsAdmin: () => fetchJSON<Announcement[]>('/api/announcements'),
+  createAnnouncement: (data: Partial<Announcement>, password: string) =>
+    fetchJSON<Announcement>('/api/announcements', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: { 'x-admin-password': password },
+    }),
+  updateAnnouncement: (id: number, data: Partial<Announcement>, password: string) =>
+    fetchJSON<Announcement>(`/api/announcements/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+      headers: { 'x-admin-password': password },
+    }),
+  deleteAnnouncement: (id: number, password: string) =>
+    fetchJSON(`/api/announcements/${id}`, {
+      method: 'DELETE',
+      headers: { 'x-admin-password': password },
+    }),
+  uploadAnnouncementImage: async (file: File, password: string) => {
+    const form = new FormData();
+    form.append('image', file);
+    const r = await fetch(`${BASE}/api/announcements/upload-image`, {
+      method: 'POST',
+      headers: { 'x-admin-password': password },
+      body: form,
+    });
+    if (r.status === 401) { handleUnauthorized(); throw new Error('Unauthorized'); }
+    if (!r.ok) throw new Error(`Upload failed (${r.status})`);
+    return r.json() as Promise<{ url: string }>;
+  },
 
   // Banner Slides
   getBannerSlidesPublic: () => fetchJSON<BannerSlide[]>('/api/banner-slides/public'),

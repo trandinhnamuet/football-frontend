@@ -1,9 +1,11 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { MemorialPost, FANTA, fmtDate } from '../../lib/types';
 import { normalizeProse } from '../../lib/prose';
+import { SITE_NAME, absoluteImage, plainText, truncate } from '../../lib/seo';
 
 const BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 const BLACK = 'var(--bg)';
@@ -19,6 +21,23 @@ async function getPost(slug: string): Promise<MemorialPost | null> {
     if (!res.ok) return null;
     return res.json();
   } catch { return null; }
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPost(slug);
+  if (!post) return { title: `Không tìm thấy | ${SITE_NAME}` };
+  const description = truncate(post.excerpt?.trim() || plainText(post.content) || post.title);
+  const image = absoluteImage(post.image_url);
+  const images = image ? [{ url: image, alt: post.title }] : undefined;
+  const path = `/members/${slug}`;
+  return {
+    title: `${post.title} | ${SITE_NAME}`,
+    description,
+    alternates: { canonical: path },
+    openGraph: { type: 'profile', title: post.title, description, url: path, siteName: SITE_NAME, locale: 'vi_VN', ...(images ? { images } : {}) },
+    twitter: { card: 'summary_large_image', title: post.title, description, ...(images ? { images } : {}) },
+  };
 }
 
 export default async function MemberPage({ params }: { params: Promise<{ slug: string }> }) {

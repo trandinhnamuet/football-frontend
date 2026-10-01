@@ -1,7 +1,10 @@
 import { ImageResponse } from 'next/og';
+import { readFile } from 'fs/promises';
+import { join } from 'path';
+import { getHomeSummary, matchDayLabel, daysToMatch, HomeSummary } from './lib/homeSummary';
 
 // Image metadata — Next auto-emits og:image:type / width / height from these.
-export const alt = 'Lon Fanta FC - Trận đấu sắp tới';
+export const alt = 'Lon Fanta FC — Trận kế tiếp, kết quả & tin mới nhất';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -13,291 +16,126 @@ export const revalidate = 300;
 
 const FANTA = '#ff6b1a';
 const BG = '#0a0a0a';
+const PANEL = '#161616';
+const MUTED = '#8a8a8a';
+const RESULT_COLOR: Record<string, string> = { W: FANTA, D: '#6b6b6b', L: '#aa2222' };
+const RESULT_WORD: Record<string, string> = { W: 'THẮNG', D: 'HÒA', L: 'THUA' };
 
-async function getNextMatch() {
+async function logoDataUrl(): Promise<string | null> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-    // Hard timeout so a slow/cold backend can never stall the image render and
-    // cause the crawler to give up. On timeout we fall back to the generic card.
-    const res = await fetch(`${baseUrl}/api/matches`, {
-      next: { revalidate: 300 }, // Cache for 5 minutes
-      signal: AbortSignal.timeout(2500),
-    });
-    if (!res.ok) return null;
-    const matches = await res.json();
-    const upcoming = matches.filter((m: any) => new Date(m.date) > new Date());
-    return upcoming.length > 0 ? upcoming[0] : null;
-  } catch (e) {
-    return null;
-  }
+    const buf = await readFile(join(process.cwd(), 'public', 'images', 'fanta-logo.png'));
+    return `data:image/png;base64,${buf.toString('base64')}`;
+  } catch { return null; }
+}
+
+function clip(s: string, max: number): string {
+  return s.length > max ? `${s.slice(0, max - 1).trimEnd()}…` : s;
+}
+
+function Card({ s, logo }: { s: HomeSummary; logo: string | null }) {
+  const { next, last, stats, latest } = s;
+  const d = next ? daysToMatch(next) : null;
+  const countdown = d === null ? '' : d <= 0 ? 'HÔM NAY!' : d === 1 ? 'NGÀY MAI' : `CÒN ${d} NGÀY`;
+
+  return (
+    <div style={{ width: '100%', height: '100%', display: 'flex', background: BG, color: '#fff', fontFamily: 'sans-serif' }}>
+      {/* Cột trái: nhận diện đội + thành tích mùa */}
+      <div style={{ width: 380, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 32px', background: FANTA, color: BG }}>
+        {logo
+          ? <img src={logo} width={170} height={170} style={{ objectFit: 'contain' }} />
+          : <div style={{ fontSize: 120, display: 'flex' }}>⚽</div>}
+        <div style={{ fontSize: 44, fontWeight: 800, marginTop: 18, letterSpacing: '-0.01em', whiteSpace: 'nowrap', display: 'flex' }}>LON FANTA FC</div>
+        <div style={{ fontSize: 22, fontWeight: 600, marginTop: 6, display: 'flex' }}>Đội bóng phong trào Hà Nội</div>
+        <div style={{ fontSize: 22, fontWeight: 700, marginTop: 2, display: 'flex' }}>#ĐamMêBấtTận</div>
+        {stats && stats.played > 0 && (
+          <div style={{ display: 'flex', gap: 10, marginTop: 30 }}>
+            {[
+              { n: stats.wins, l: 'THẮNG' },
+              { n: stats.draws, l: 'HÒA' },
+              { n: stats.losses, l: 'THUA' },
+            ].map(x => (
+              <div key={x.l} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: BG, color: '#fff', padding: '10px 16px', minWidth: 88 }}>
+                <div style={{ fontSize: 40, fontWeight: 800, color: FANTA, display: 'flex' }}>{x.n}</div>
+                <div style={{ fontSize: 15, letterSpacing: '0.12em', color: '#bbb', display: 'flex' }}>{x.l}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Cột phải: trận kế tiếp, kết quả gần nhất, tin mới */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '44px 48px 36px' }}>
+        {next ? (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ fontSize: 22, letterSpacing: '0.2em', color: FANTA, fontWeight: 700, display: 'flex' }}>TRẬN KẾ TIẾP</div>
+              <div style={{ fontSize: 22, letterSpacing: '0.16em', color: MUTED, display: 'flex' }}>{`· TUẦN ${next.week}`}</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', marginTop: 12, gap: 20 }}>
+              <div style={{ fontSize: 30, color: MUTED, fontWeight: 700, display: 'flex' }}>VS</div>
+              <div style={{ fontSize: 76, fontWeight: 800, lineHeight: 1, display: 'flex' }}>{clip(next.opponent.toUpperCase(), 16)}</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 22 }}>
+              <div style={{ fontSize: 32, fontWeight: 700, display: 'flex' }}>{matchDayLabel(next)}</div>
+              {next.time && <div style={{ fontSize: 32, fontWeight: 800, color: FANTA, display: 'flex' }}>{next.time}</div>}
+              {countdown && (
+                <div style={{ fontSize: 22, fontWeight: 800, background: FANTA, color: BG, padding: '6px 14px', display: 'flex' }}>{countdown}</div>
+              )}
+            </div>
+            {next.venue && (
+              <div style={{ fontSize: 24, color: '#cfcfcf', marginTop: 10, display: 'flex' }}>
+                {`📍 ${clip(next.venue, 40)} · Sân ${next.pitch_size || 7} người`}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ fontSize: 22, letterSpacing: '0.2em', color: FANTA, fontWeight: 700, display: 'flex' }}>LỊCH THI ĐẤU</div>
+            <div style={{ fontSize: 56, fontWeight: 800, marginTop: 12, display: 'flex' }}>Sắp công bố trận mới</div>
+          </div>
+        )}
+
+        <div style={{ flex: 1, display: 'flex' }} />
+
+        {last && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, background: PANEL, padding: '14px 18px', borderLeft: `6px solid ${RESULT_COLOR[last.result] || FANTA}` }}>
+            <div style={{ fontSize: 18, letterSpacing: '0.14em', color: MUTED, display: 'flex' }}>KẾT QUẢ GẦN NHẤT</div>
+            <div style={{ fontSize: 22, fontWeight: 800, background: RESULT_COLOR[last.result] || FANTA, color: last.result === 'W' ? BG : '#fff', padding: '2px 10px', display: 'flex' }}>
+              {RESULT_WORD[last.result] || last.result}
+            </div>
+            <div style={{ fontSize: 28, fontWeight: 800, display: 'flex' }}>{`${last.goals_for} - ${last.goals_against}`}</div>
+            <div style={{ fontSize: 26, color: '#ddd', display: 'flex' }}>{clip(last.opponent, 22)}</div>
+          </div>
+        )}
+
+        {latest && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, background: PANEL, padding: '14px 18px', marginTop: 12, borderLeft: `6px solid ${FANTA}` }}>
+            <div style={{ fontSize: 18, letterSpacing: '0.14em', color: MUTED, display: 'flex', flexShrink: 0 }}>TIN MỚI</div>
+            <div style={{ fontSize: 24, fontWeight: 700, display: 'flex' }}>{clip(latest.title, 46)}</div>
+          </div>
+        )}
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 18, fontSize: 22, color: MUTED }}>
+          <div style={{ display: 'flex' }}>www.lonfantafc.com</div>
+          <div style={{ display: 'flex' }}>Lịch đấu · Đội hình · Highlight</div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default async function Image() {
+  const [summary, logo] = await Promise.all([getHomeSummary(), logoDataUrl()]);
   try {
-    const match = await getNextMatch();
-
-    if (!match) {
-      return new ImageResponse(
-        (
-          <div
-            style={{
-              fontSize: 60,
-              color: FANTA,
-              background: BG,
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontFamily: 'Anton',
-              flexDirection: 'column',
-              padding: '40px',
-              textAlign: 'center',
-            }}
-          >
-            <div style={{ fontSize: 80, marginBottom: 20, fontWeight: 'bold' }}>⚽</div>
-            <div>LON FANTA FC</div>
-            <div style={{ fontSize: 32, color: '#666', marginTop: 20 }}>
-              Đội bóng phong trào Hà Nội
-            </div>
-          </div>
-        ),
-        { ...size }
-      );
-    }
-
-    const formatDate = (date: string) => {
-      return new Date(date).toLocaleDateString('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      });
-    };
-
-    const daysUntil = (date: string) => {
-      const now = new Date();
-      const d = new Date(date);
-      const diff = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      return diff;
-    };
-
-    const d = daysUntil(match.date);
-    const countdown = d <= 0 ? 'HÔM NAY!' : `${d} NGÀY`;
-
+    return new ImageResponse(<Card s={summary} logo={logo} />, { ...size });
+  } catch {
     return new ImageResponse(
       (
-        <div
-          style={{
-            background: BG,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: '60px',
-            fontFamily: 'Anton',
-            color: '#fff',
-          }}
-        >
-          {/* Header */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              marginBottom: 40,
-              gap: 16,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 40,
-                color: FANTA,
-                fontWeight: 'bold',
-                paddingRight: 16,
-                borderRight: `3px solid ${FANTA}`,
-              }}
-            >
-              ⚽
-            </div>
-            <div style={{ fontSize: 48, fontWeight: 'bold' }}>TRẬN KẾ TIẾP</div>
-          </div>
-
-          {/* Match Info Grid */}
-          <div
-            style={{
-              display: 'flex',
-              gap: 40,
-              flex: 1,
-              alignItems: 'center',
-            }}
-          >
-            {/* Left: Teams */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 24,
-                flex: 1,
-              }}
-            >
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <div
-                  style={{
-                    fontSize: 24,
-                    color: '#888',
-                    marginBottom: 8,
-                    letterSpacing: '0.1em',
-                  }}
-                >
-                  {`TUẦN ${match.week}`}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-                  <div
-                    style={{
-                      fontSize: 64,
-                      color: FANTA,
-                      fontWeight: 'bold',
-                      flex: 1,
-                    }}
-                  >
-                    LON FANTA
-                  </div>
-                  <div style={{ fontSize: 48, color: '#666' }}>VS</div>
-                  <div
-                    style={{
-                      fontSize: 64,
-                      fontWeight: 'bold',
-                      flex: 1,
-                      textAlign: 'right',
-                    }}
-                  >
-                    {match.opponent.toUpperCase()}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: Date & Time */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 32,
-                alignItems: 'flex-end',
-                borderLeft: `3px solid ${FANTA}`,
-                paddingLeft: 32,
-                minWidth: 280,
-              }}
-            >
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <div
-                  style={{
-                    fontSize: 20,
-                    color: '#888',
-                    marginBottom: 8,
-                    letterSpacing: '0.1em',
-                  }}
-                >
-                  NGÀY
-                </div>
-                <div style={{ fontSize: 48, fontWeight: 'bold' }}>
-                  {formatDate(match.date)}
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <div
-                  style={{
-                    fontSize: 20,
-                    color: '#888',
-                    marginBottom: 8,
-                    letterSpacing: '0.1em',
-                  }}
-                >
-                  GIỜ
-                </div>
-                <div
-                  style={{
-                    fontSize: 56,
-                    fontWeight: 'bold',
-                    color: FANTA,
-                  }}
-                >
-                  {match.time || '17:30'}
-                </div>
-              </div>
-
-              {match.venue && (
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <div
-                    style={{
-                      fontSize: 20,
-                      color: '#888',
-                      marginBottom: 8,
-                      letterSpacing: '0.1em',
-                    }}
-                  >
-                    SÂN
-                  </div>
-                  <div style={{ fontSize: 28, fontWeight: 'bold' }}>
-                    {match.venue}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Countdown Badge */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginTop: 40,
-              paddingTop: 40,
-              borderTop: `2px solid ${FANTA}33`,
-            }}
-          >
-            <div style={{ fontSize: 32, color: '#888' }}>
-              lonfantafc.com
-            </div>
-            <div
-              style={{
-                background: FANTA,
-                color: BG,
-                padding: '12px 32px',
-                borderRadius: 8,
-                fontSize: 32,
-                fontWeight: 'bold',
-                letterSpacing: '0.05em',
-              }}
-            >
-              {`⏱ ${countdown}`}
-            </div>
-          </div>
-        </div>
-      ),
-      { ...size }
-    );
-  } catch (error) {
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            fontSize: 60,
-            color: FANTA,
-            background: BG,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontFamily: 'Anton',
-          }}
-        >
+        <div style={{ fontSize: 72, fontWeight: 800, color: FANTA, background: BG, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           LON FANTA FC
         </div>
       ),
-      { ...size }
+      { ...size },
     );
   }
 }

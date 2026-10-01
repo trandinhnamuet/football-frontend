@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -10,6 +11,20 @@ const BLACK = 'var(--bg)';
 const CARD = 'var(--card)';
 const INK = 'var(--ink)';
 const MUTED = 'var(--muted)';
+
+export const metadata: Metadata = {
+  title: 'Thành viên | Lon Fanta FC',
+  description: 'Đội hình Lon Fanta FC: thủ môn, hậu vệ, tiền vệ, tiền đạo — số áo, biệt danh và hồ sơ từng thành viên.',
+  alternates: { canonical: '/players' },
+  openGraph: {
+    type: 'website',
+    title: 'Thành viên | Lon Fanta FC',
+    description: 'Đội hình Lon Fanta FC: số áo, vai trò, biệt danh và hồ sơ từng thành viên.',
+    url: '/players',
+    siteName: 'Lon Fanta FC',
+    locale: 'vi_VN',
+  },
+};
 
 async function getPlayers(): Promise<Player[]> {
   try {

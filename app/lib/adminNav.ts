@@ -70,9 +70,9 @@ export const adminSections: AdminSection[] = [
     ],
   },
   {
-    title: 'Quản lý Thông Báo',
-    short: 'Thông báo',
-    description: 'Tạo, chỉnh sửa và đăng các thông báo của đội bóng; đánh dấu một thông báo quan trọng hiện ngay khi mở app',
+    title: 'Quản lý Tin Tức',
+    short: 'Tin tức',
+    description: 'Tạo, chỉnh sửa và đăng bài viết của đội bóng (link dạng /news/ten-bai-viet); đánh dấu một bài quan trọng hiện ngay khi mở app',
     href: '/admin/news-management',
     icon: '📰',
     features: [
@@ -167,6 +167,19 @@ export const adminSections: AdminSection[] = [
       'Đặt chú thích tiếng Việt & tiếng Anh',
       'Thêm link khi bấm vào ảnh (tuỳ chọn)',
       'Bật/tắt hiển thị & sắp xếp thứ tự',
+    ],
+  },
+  {
+    title: 'Thông Báo Trang Chủ',
+    short: 'Thông báo',
+    description: 'Thông báo ngắn (ảnh + đoạn text) hiện ngay dưới banner trang chủ, người xem kéo ngang để xem thông báo khác',
+    href: '/admin/announcements',
+    icon: '📣',
+    features: [
+      'Thêm / sửa / xóa thông báo',
+      'Tải ảnh và nhập đoạn text ngắn (tiếng Việt & tiếng Anh)',
+      'Bật/tắt hiển thị & sắp xếp thứ tự',
+      'Không có trang chi tiết — nội dung hiện trọn trên trang chủ',
     ],
   },
   {

@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { BannerSlide, FANTA } from '../lib/types';
 import { api } from '../lib/api';
 import { useApp } from '../contexts/AppContext';
+import { useSwipe } from '../lib/useSwipe';
 
 const BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 
@@ -28,12 +29,18 @@ export default function BannerSlider() {
     setIdx(((next % total) + total) % total);
   }, [total]);
 
-  // Auto-advance
+  const { dx, dragging, handlers } = useSwipe({
+    onPrev: () => setIdx(i => (i - 1 + total) % total),
+    onNext: () => setIdx(i => (i + 1) % total),
+  });
+
+  // Auto-advance — đứng yên khi đang kéo, và đếm lại từ đầu sau mỗi lần đổi
+  // slide (kể cả do người dùng kéo/bấm) để không nhảy ngay sau khi vừa vuốt.
   useEffect(() => {
-    if (total <= 1) return;
+    if (total <= 1 || dragging) return;
     const timer = setInterval(() => setIdx(i => (i + 1) % total), 4500);
     return () => clearInterval(timer);
-  }, [total]);
+  }, [total, dragging, idx]);
 
   if (total === 0) return null;
 
@@ -47,10 +54,15 @@ export default function BannerSlider() {
       {/* Track */}
       <div
         className="banner-track"
+        {...(total > 1 ? handlers : {})}
         style={{
           display: 'flex',
-          transform: `translateX(-${idx * 100}%)`,
-          transition: 'transform 0.6s cubic-bezier(0.4,0,0.2,1)',
+          transform: `translateX(calc(-${idx * 100}% + ${dx}px))`,
+          transition: dragging ? 'none' : 'transform 0.6s cubic-bezier(0.4,0,0.2,1)',
+          // Trình duyệt vẫn cuộn dọc; cử chỉ ngang để slider xử lý.
+          touchAction: 'pan-y',
+          userSelect: 'none',
+          cursor: total > 1 ? (dragging ? 'grabbing' : 'grab') : undefined,
         }}
       >
         {slides.map(s => {
@@ -61,6 +73,7 @@ export default function BannerSlider() {
                 <img
                   src={resolveSrc(s.image_url)}
                   alt=""
+                  draggable={false}
                   style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'blur(10px) brightness(0.45)', zIndex: 0 }}
                 />
               )}
@@ -68,6 +81,7 @@ export default function BannerSlider() {
               <img
                 src={resolveSrc(s.image_url)}
                 alt={caption(s) || 'Banner'}
+                draggable={false}
                 style={{ position: 'absolute', inset: 0, zIndex: 1, width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
               />
               {/* gradient + caption */}
@@ -93,7 +107,7 @@ export default function BannerSlider() {
               style={{ flex: '0 0 100%', width: '100%', aspectRatio: '1920 / 850', background: '#0a0a0a' }}
             >
               {s.link_url
-                ? <a href={s.link_url} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100%', height: '100%' }}>{inner}</a>
+                ? <a href={s.link_url} target="_blank" rel="noopener noreferrer" draggable={false} style={{ display: 'block', width: '100%', height: '100%' }}>{inner}</a>
                 : inner}
             </div>
           );

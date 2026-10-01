@@ -6,12 +6,17 @@ import BottomNav from './components/BottomNav';
 import GoogleAnalytics from './components/GoogleAnalytics';
 import VisitTracker from './components/VisitTracker';
 import PwaRegister from './components/PwaRegister';
+import { SITE_NAME, SITE_TAGLINE, SITE_URL } from './lib/seo';
 
+// Mặc định cho mọi trang; từng trang (trang chủ, tin tức, hồ sơ thành viên…)
+// ghi đè title/description/openGraph của riêng nó. KHÔNG đặt openGraph.url ở
+// đây — trước kia url cố định về trang chủ khiến Facebook/Zalo coi mọi link là
+// trang chủ và hiện cùng một preview.
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://lonfantafc.com'),
-  title: 'Lon Fanta FC',
-  description: 'Đội bóng phong trào Hà Nội — #ĐamMêBấtTận',
-  applicationName: 'Lon Fanta FC',
+  metadataBase: new URL(SITE_URL),
+  title: SITE_NAME,
+  description: SITE_TAGLINE,
+  applicationName: SITE_NAME,
   manifest: '/manifest.webmanifest',
   icons: {
     icon: [
@@ -29,18 +34,17 @@ export const metadata: Metadata = {
   },
   formatDetection: { telephone: false },
   openGraph: {
-    title: 'Lon Fanta FC',
-    description: 'Đội bóng phong trào Hà Nội — #ĐamMêBấtTận',
+    title: SITE_NAME,
+    description: SITE_TAGLINE,
     type: 'website',
     locale: 'vi_VN',
-    url: 'https://lonfantafc.com',
-    siteName: 'Lon Fanta FC',
+    siteName: SITE_NAME,
     // og:image tags are emitted automatically from app/opengraph-image.tsx
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Lon Fanta FC',
-    description: 'Đội bóng phong trào Hà Nội — #ĐamMêBấtTận',
+    title: SITE_NAME,
+    description: SITE_TAGLINE,
     // twitter:image tags are emitted automatically from app/twitter-image.tsx
   },
 };

@@ -4,7 +4,7 @@ const vi = {
   nav: {
     intro: 'Giới thiệu',
     squad: 'Thành viên',
-    news: 'Thông báo',
+    news: 'Tin tức',
     schedule: 'Lịch thi đấu',
     dashboard: 'Dashboard',
     scoring: 'Cách tính điểm',
@@ -68,7 +68,7 @@ const vi = {
   sections: {
     s01: 'GIỚI THIỆU',
     s02: 'THÀNH VIÊN',
-    s03: 'THÔNG BÁO',
+    s03: 'TIN TỨC',
     s04: 'LỊCH THI ĐẤU',
     s05: 'GIỚI THIỆU THÀNH VIÊN',
   },
@@ -100,10 +100,10 @@ const vi = {
     noData: 'Đang đồng bộ dữ liệu cầu thủ...',
   },
   news: {
-    title: 'Thông báo',
-    viewAll: 'TẤT CẢ THÔNG BÁO →',
-    noData: 'Chưa có thông báo.',
-    addNews: 'Thêm thông báo →',
+    title: 'Tin tức',
+    viewAll: 'TẤT CẢ TIN TỨC →',
+    noData: 'Chưa có bài viết.',
+    addNews: 'Thêm bài viết →',
     important: 'Thông báo quan trọng',
     readMore: 'Xem chi tiết →',
     swipeHint: 'Vuốt ngang để xem thêm',
@@ -156,6 +156,10 @@ const vi = {
   banner: {
     moments: 'Khoảnh khắc',
   },
+  announcements: {
+    label: 'BẢNG TIN',
+    title: 'Thông báo',
+  },
   cta: {
     label: 'XEM SỐ',
     title1: 'MỞ DASHBOARD',
@@ -183,7 +187,7 @@ const en = {
   nav: {
     intro: 'About',
     squad: 'Members',
-    news: 'Announcements',
+    news: 'News',
     schedule: 'Schedule',
     dashboard: 'Dashboard',
     scoring: 'Scoring',
@@ -247,7 +251,7 @@ const en = {
   sections: {
     s01: 'ABOUT',
     s02: 'MEMBERS',
-    s03: 'ANNOUNCEMENTS',
+    s03: 'NEWS',
     s04: 'SCHEDULE',
     s05: 'MEMBERS',
   },
@@ -279,10 +283,10 @@ const en = {
     noData: 'Syncing player data...',
   },
   news: {
-    title: 'Announcements',
-    viewAll: 'ALL ANNOUNCEMENTS →',
-    noData: 'No announcements yet.',
-    addNews: 'Add announcement →',
+    title: 'News',
+    viewAll: 'ALL NEWS →',
+    noData: 'No articles yet.',
+    addNews: 'Add article →',
     important: 'Important announcement',
     readMore: 'Read more →',
     swipeHint: 'Swipe to see more',
@@ -334,6 +338,10 @@ const en = {
   },
   banner: {
     moments: 'Moments',
+  },
+  announcements: {
+    label: 'NOTICE BOARD',
+    title: 'Announcements',
   },
   cta: {
     label: 'STATS',

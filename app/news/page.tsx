@@ -1,8 +1,10 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SyncTrigger from '../components/SyncTrigger';
-import { Article, FANTA, fmtDate, isImportantActive } from '../lib/types';
+import { Article, FANTA, fmtDate, isImportantActive, articleHref } from '../lib/types';
+import { SITE_NAME } from '../lib/seo';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const BLACK = 'var(--bg)';
@@ -12,6 +14,20 @@ const MUTED = 'var(--muted)';
 // Text sitting on a FANTA-orange fill stays dark in both themes — light text on
 // orange fails contrast.
 const ON_FANTA = '#0a0a0a';
+
+export const metadata: Metadata = {
+  title: `Tin tức | ${SITE_NAME}`,
+  description: 'Tin tức Lon Fanta FC: kết quả trận đấu, lịch Match Day, Man of the Week và hồ sơ thành viên của đội bóng phong trào Hà Nội.',
+  alternates: { canonical: '/news' },
+  openGraph: {
+    type: 'website',
+    title: `Tin tức | ${SITE_NAME}`,
+    description: 'Kết quả trận đấu, Match Day, Man of the Week và hồ sơ thành viên Lon Fanta FC.',
+    url: '/news',
+    siteName: SITE_NAME,
+    locale: 'vi_VN',
+  },
+};
 
 async function getArticles(): Promise<Article[]> {
   try {
@@ -31,25 +47,25 @@ export default async function NewsPage() {
         <div style={{ marginBottom: 40 }}>
           <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 24 }}>
             <Link href="/" style={{ color: MUTED, textDecoration: 'none' }}>← Trang chủ</Link>
-            {' '}/ Thông báo
+            {' '}/ Tin tức
           </div>
           <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 'clamp(56px, 8vw, 96px)', lineHeight: 0.92, letterSpacing: '0.01em', textTransform: 'uppercase', margin: 0 }}>
-            THÔNG <span style={{ color: FANTA }}>BÁO</span>
+            TIN <span style={{ color: FANTA }}>TỨC</span>
           </h1>
-          <p style={{ color: MUTED, fontSize: 15, marginTop: 28 }}>{articles.length} thông báo</p>
+          <p style={{ color: MUTED, fontSize: 15, marginTop: 28 }}>{articles.length} bài viết</p>
         </div>
 
         {articles.length === 0 ? (
           <div style={{ padding: '80px 40px', textAlign: 'center', background: CARD, borderLeft: `4px solid ${FANTA}` }}>
-            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 32, color: MUTED, textTransform: 'uppercase' }}>Chưa có thông báo nào</div>
+            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 32, color: MUTED, textTransform: 'uppercase' }}>Chưa có bài viết nào</div>
             <Link href="/admin/news-management" style={{ display: 'inline-block', marginTop: 20, background: FANTA, color: ON_FANTA, padding: '14px 28px', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 16, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              + Đăng thông báo đầu tiên
+              + Đăng bài viết đầu tiên
             </Link>
           </div>
         ) : (
           <div className="mob-news-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
             {articles.map(article => (
-              <Link key={article.id} href={`/news/${article.id}`} style={{ textDecoration: 'none', color: 'inherit', background: CARD, overflow: 'hidden', display: 'block' }}>
+              <Link key={article.id} href={articleHref(article)} style={{ textDecoration: 'none', color: 'inherit', background: CARD, overflow: 'hidden', display: 'block' }}>
                 <div style={{
                   aspectRatio: '16/9',
                   background: 'var(--alt-bg)',

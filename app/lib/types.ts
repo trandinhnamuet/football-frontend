@@ -23,6 +23,8 @@ export interface Player {
 
 export interface Article {
   id: number;
+  /** Đường dẫn SEO /news/<slug>; null với bài chưa được sinh slug. */
+  slug: string | null;
   title: string;
   title_en: string;
   content: string;
@@ -37,6 +39,11 @@ export interface Article {
   is_important: boolean;
   /** Ngày cuối còn quan trọng (YYYY-MM-DD), null = không hẹn. */
   important_until: string | null;
+}
+
+/** Link trang chi tiết bài viết — ưu tiên slug, bài chưa có slug dùng id. */
+export function articleHref(a: Pick<Article, 'id' | 'slug'>): string {
+  return `/news/${a.slug || a.id}`;
 }
 
 /** Bài quan trọng còn hiệu lực hôm nay (chưa qua ngày hẹn). */
@@ -245,6 +252,18 @@ export interface RecommendedVideo {
   published: string;
   thumbnail: string;
   url: string;
+}
+
+/** Thông báo ngắn trên trang chủ: ảnh + đoạn text, không có trang chi tiết. */
+export interface Announcement {
+  id: number;
+  image_url: string;
+  text: string;
+  text_en: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface BannerSlide {

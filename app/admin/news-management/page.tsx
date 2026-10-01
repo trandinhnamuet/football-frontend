@@ -5,7 +5,7 @@ import Link from 'next/link';
 import AdminGuard from '../../components/AdminGuard';
 import AdminHeader from '../../components/AdminHeader';
 import ArticleImageLibrary, { absoluteUrl } from '../../components/ArticleImageLibrary';
-import { Article, FANTA, fmtDate, isImportantActive } from '../../lib/types';
+import { Article, FANTA, fmtDate, isImportantActive, articleHref, slugify } from '../../lib/types';
 import { api } from '../../lib/api';
 import { compressImage, formatBytes } from '../../lib/imageCompress';
 
@@ -22,7 +22,7 @@ function getPassword() {
   return typeof window !== 'undefined' ? (localStorage.getItem('lffc_admin_pw') || '') : '';
 }
 
-const emptyForm = { title: '', title_en: '', content: '', content_en: '', excerpt: '', excerpt_en: '', tag: '', tag_en: '', image_url: '', published_at: new Date().toISOString().slice(0, 10), is_important: false, important_until: '' };
+const emptyForm = { title: '', title_en: '', slug: '', content: '', content_en: '', excerpt: '', excerpt_en: '', tag: '', tag_en: '', image_url: '', published_at: new Date().toISOString().slice(0, 10), is_important: false, important_until: '' };
 
 function NewsForm({ initial, onSave, onCancel }: { initial: typeof emptyForm & { id?: number }; onSave: (data: any) => Promise<void>; onCancel: () => void }) {
   const [form, setForm] = useState(initial);
@@ -101,6 +101,14 @@ function NewsForm({ initial, onSave, onCancel }: { initial: typeof emptyForm & {
         <div>
           <label style={labelStyle}>Title (EN)</label>
           <input style={inputStyle} value={form.title_en} onChange={set('title_en')} placeholder="Article title in English" />
+        </div>
+      </div>
+      <div>
+        <label style={labelStyle}>Đường dẫn (slug)</label>
+        <input style={inputStyle} value={form.slug} onChange={set('slug')} placeholder="Để trống để tự tạo từ tiêu đề" />
+        <div style={{ fontSize: 12, color: MUTED, marginTop: 6 }}>
+          lonfantafc.com/news/<b>{form.slug ? slugify(form.slug) : (slugify(form.title) || '…')}</b>
+          {' · '}Đổi đường dẫn sẽ làm hỏng các link đã chia sẻ trước đó.
         </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -234,12 +242,12 @@ function NewsManagementContent() {
           <div>
             <div style={{ fontSize: 12, color: FANTA, letterSpacing: '0.2em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 16 }}>Quản trị nội dung</div>
             <h1 style={{ fontFamily: 'Anton, sans-serif', fontSize: 56, lineHeight: 0.92, letterSpacing: '0.01em', textTransform: 'uppercase', margin: 0 }}>
-              QUẢN LÝ <span style={{ color: FANTA }}>THÔNG BÁO</span>
+              QUẢN LÝ <span style={{ color: FANTA }}>TIN TỨC</span>
             </h1>
           </div>
           {mode === 'list' && (
             <button onClick={() => { setEditing(null); setMode('new'); }} style={{ background: FANTA, color: ON_FANTA, border: 'none', padding: '14px 28px', fontFamily: 'Anton, sans-serif', fontSize: 18, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>
-              + THÔNG BÁO MỚI
+              + BÀI VIẾT MỚI
             </button>
           )}
         </div>
@@ -247,11 +255,12 @@ function NewsManagementContent() {
         {mode !== 'list' && (
           <div style={{ background: CARD, border: `1px solid rgba(255,107,26,0.3)`, padding: '32px', marginBottom: 40 }}>
             <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 24, textTransform: 'uppercase', marginBottom: 24, color: FANTA }}>
-              {mode === 'new' ? '+ Thông báo mới' : '✎ Chỉnh sửa thông báo'}
+              {mode === 'new' ? '+ Bài viết mới' : '✎ Chỉnh sửa bài viết'}
             </div>
             <NewsForm
               initial={editing ? {
                 title: editing.title || '', title_en: editing.title_en || '',
+                slug: editing.slug || '',
                 content: editing.content || '', content_en: editing.content_en || '',
                 excerpt: editing.excerpt || '', excerpt_en: editing.excerpt_en || '',
                 tag: editing.tag || '', tag_en: editing.tag_en || '',
@@ -271,7 +280,7 @@ function NewsManagementContent() {
           <div style={{ textAlign: 'center', padding: 60, color: MUTED, fontFamily: 'Anton, sans-serif', fontSize: 24 }}>Đang tải...</div>
         ) : articles.length === 0 ? (
           <div style={{ textAlign: 'center', padding: 60, background: CARD, borderLeft: `4px solid ${FANTA}` }}>
-            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 28, color: MUTED, textTransform: 'uppercase' }}>Chưa có thông báo</div>
+            <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 28, color: MUTED, textTransform: 'uppercase' }}>Chưa có bài viết</div>
           </div>
         ) : (
           <div style={{ display: 'grid', gap: 12 }}>
@@ -291,7 +300,7 @@ function NewsManagementContent() {
                   {article.excerpt && <div style={{ fontSize: 13, color: MUTED, marginTop: 4 }}>{article.excerpt.slice(0, 120)}...</div>}
                 </div>
                 <div style={{ display: 'flex', gap: 10 }}>
-                  <Link href={`/news/${article.id}`} target="_blank" style={{ background: 'var(--hover-bg)', color: INK, padding: '8px 16px', textDecoration: 'none', fontSize: 12, fontFamily: 'Anton, sans-serif', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Xem</Link>
+                  <Link href={articleHref(article)} target="_blank" style={{ background: 'var(--hover-bg)', color: INK, padding: '8px 16px', textDecoration: 'none', fontSize: 12, fontFamily: 'Anton, sans-serif', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Xem</Link>
                   <button onClick={() => { setEditing(article); setMode('edit'); window.scrollTo(0, 0); }} style={{ background: 'rgba(255,107,26,0.15)', color: FANTA, border: `1px solid ${FANTA}33`, padding: '8px 16px', fontFamily: 'Anton, sans-serif', fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>Sửa</button>
                   <button onClick={() => handleDelete(article.id)} disabled={deleting === article.id} style={{ background: 'rgba(204,68,68,0.1)', color: '#cc4444', border: '1px solid rgba(204,68,68,0.3)', padding: '8px 16px', fontFamily: 'Anton, sans-serif', fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>
                     {deleting === article.id ? '...' : 'Xóa'}
