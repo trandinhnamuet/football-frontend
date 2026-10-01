@@ -14,6 +14,7 @@ import KitColors from './components/KitColors';
 import { smoothScrollToHash } from './lib/scroll';
 import { api } from './lib/api';
 import { useApp } from './contexts/AppContext';
+import { useSwipe } from './lib/useSwipe';
 import { DEFAULT_PLAYER_AVATAR_URL } from './lib/assets';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -164,12 +165,19 @@ export default function HomeClient() {
   const squadPageSize = isMobile ? 4 : SQUAD_PAGE_SIZE;
   const totalSquadPages = Math.max(1, Math.ceil(players.length / squadPageSize));
 
-  // Auto-slide squad every 5s
+  // Kéo tay / kéo chuột để chuyển trang thành viên.
+  const squadSwipe = useSwipe({
+    onPrev: () => goSquad('prev'),
+    onNext: () => goSquad('next'),
+  });
+
+  // Auto-slide squad every 5s — dừng khi đang kéo, đếm lại sau mỗi lần đổi
+  // trang để không tự nhảy ngay sau khi vừa vuốt.
   useEffect(() => {
-    if (totalSquadPages <= 1) return;
+    if (totalSquadPages <= 1 || squadSwipe.dragging) return;
     const timer = setInterval(() => goSquad('next'), 5000);
     return () => clearInterval(timer);
-  }, [totalSquadPages]);
+  }, [totalSquadPages, squadSwipe.dragging, squadPage]);
 
   function goSquad(dir: 'next' | 'prev') {
     const cls = dir === 'next' ? 'slide-from-right' : 'slide-from-left';
@@ -564,7 +572,23 @@ export default function HomeClient() {
             </div>
 
             {/* Carousel */}
-            <div className="mob-squad-wrap" style={{ paddingTop: 110, overflow: 'visible' }}>
+            <div
+              className="mob-squad-wrap"
+              {...(totalSquadPages > 1 ? squadSwipe.handlers : {})}
+              style={{
+                paddingTop: 110, overflow: 'visible',
+                // Trình duyệt vẫn cuộn dọc; cử chỉ ngang để carousel xử lý.
+                touchAction: 'pan-y', userSelect: 'none',
+                cursor: totalSquadPages > 1 ? (squadSwipe.dragging ? 'grabbing' : 'grab') : undefined,
+                // Trang đi theo ngón tay/chuột khi kéo (đặt ở lớp bọc vì grid bên
+                // trong có animation trượt giữ transform); nhả ra thì chuyển trang
+                // bằng hiệu ứng trượt sẵn có, chưa đủ xa thì trôi về chỗ cũ.
+                // 'none' khi đứng yên để không tạo stacking context thường trực.
+                transform: squadSwipe.dx ? `translateX(${squadSwipe.dx * 0.6}px)` : 'none',
+                opacity: squadSwipe.dragging ? Math.max(0.5, 1 - Math.abs(squadSwipe.dx) / 600) : 1,
+                transition: squadSwipe.dragging ? 'none' : 'transform 0.25s ease, opacity 0.25s ease',
+              }}
+            >
               <div
                 key={animKey}
                 className={`${slideClass} mob-squad-grid`}
@@ -581,6 +605,7 @@ export default function HomeClient() {
                           src={(p.zoom_image_url || p.image_url) ? `${BASE}${p.zoom_image_url || p.image_url}` : DEFAULT_AVATAR}
                           alt={p.first_name}
                           width={240} height={240}
+                          draggable={false}
                           style={{ objectFit: 'cover', clipPath: 'polygon(15% 0, 100% 0, 85% 100%, 0 100%)', display: 'block' }}
                         />
                       </div>
