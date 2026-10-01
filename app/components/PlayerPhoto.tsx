@@ -10,7 +10,7 @@ const BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replac
  * Ảnh cầu thủ trên trang Đội hình: hiện trọn ảnh (contain) trên nền mờ, bấm
  * vào thì mở to toàn màn hình. Ảnh mặc định (chưa có ảnh thật) thì không mở.
  */
-export default function PlayerPhoto({ p }: { p: Player }) {
+export default function PlayerPhoto({ p, children }: { p: Player; children?: React.ReactNode }) {
   const src = p.zoom_image_url || p.image_url;
   const url = src ? `${BASE}${src}` : DEFAULT_PLAYER_AVATAR_URL;
   const name = `${p.first_name} ${p.last_name}`;
@@ -36,6 +36,7 @@ export default function PlayerPhoto({ p }: { p: Player }) {
         role={src ? 'button' : undefined}
         aria-label={src ? `Xem ảnh ${name}` : undefined}
         title={src ? 'Bấm để xem ảnh to' : undefined}
+        className="player-photo"
         style={{ position: 'relative', width: '100%', aspectRatio: '3/4', background: '#0a0a0a', overflow: 'hidden', cursor: src ? 'zoom-in' : 'default' }}
       >
         {src && (
@@ -46,8 +47,9 @@ export default function PlayerPhoto({ p }: { p: Player }) {
           alt={name}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
         />
+        {children}
         {src && (
-          <div style={{ position: 'absolute', right: 10, bottom: 10, background: 'rgba(0,0,0,0.55)', color: '#fff', fontSize: 14, lineHeight: 1, padding: '6px 8px', borderRadius: 2, pointerEvents: 'none' }}>⤢</div>
+          <div className="player-photo-zoom" style={{ position: 'absolute', right: 10, bottom: 10, background: 'rgba(0,0,0,0.55)', color: '#fff', fontSize: 14, lineHeight: 1, padding: '6px 8px', borderRadius: 2, pointerEvents: 'none' }}>⤢</div>
         )}
       </div>
 

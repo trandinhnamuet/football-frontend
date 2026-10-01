@@ -25,7 +25,7 @@ interface Props {
  * Nhận dữ liệu từ server component cha nên vẫn render sẵn HTML cho SEO.
  */
 export default function PlayersGrid({ players, profileLinks }: Props) {
-  const { t } = useApp();
+  const { t, lang } = useApp();
   const [q, setQ] = useState('');
 
   const filtered = useMemo(() => {
@@ -85,29 +85,37 @@ export default function PlayersGrid({ players, profileLinks }: Props) {
             <div className="mob-players-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 18 }}>
               {group.map(p => {
                 const href = profileLinks[p.id];
+                const color = roleColors[role] || '#6b6b6b';
+                // Chữ trên nền cam phải tối mới đủ tương phản; các màu khác chữ trắng.
+                const onColor = color === FANTA ? '#0a0a0a' : '#fff';
+                const roleName = ROLES[role]?.[lang] || role;
                 return (
-                  <div key={p.id} style={{ background: CARD, position: 'relative', overflow: 'hidden', borderLeft: `4px solid ${roleColors[role]}` }}>
-                    <PlayerPhoto p={p} />
-                    <div style={{ padding: 20, position: 'relative' }}>
-                      <div style={{ position: 'absolute', top: -4, right: 12, fontFamily: 'Anton, sans-serif', fontSize: 64, lineHeight: 0.85, color: 'rgba(128,128,128,0.10)', letterSpacing: '-0.02em', pointerEvents: 'none' }}>{p.num}</div>
-                      <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, letterSpacing: '0.02em', textTransform: 'uppercase', position: 'relative' }}>{p.first_name} {p.last_name}</div>
-                      <div style={{ fontSize: 11, color: roleColors[role], letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: 4, fontWeight: 700 }}>#{p.num} · {role}</div>
-                      <div style={{ fontSize: 12, color: MUTED, marginTop: 4, fontStyle: 'italic' }}>&quot;{p.nick}&quot;</div>
-                      <div style={{ marginTop: 12, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, paddingTop: 12, borderTop: `1px solid ${LINE}` }}>
-                        {role === 'GK' ? (
-                          <><StatChip label="Cứu" value={p.stat_saves} /><StatChip label="Đ.chuyền" value={p.stat_passes} /><StatChip label="Trận" value={p.stat_attendance} /></>
-                        ) : (
-                          <><StatChip label="Bàn" value={p.stat_goals} /><StatChip label="Kiến tạo" value={p.stat_assists} /><StatChip label="Tắc" value={p.stat_tackles} /></>
-                        )}
+                  <div key={p.id} className="pcard" style={{ background: CARD, position: 'relative', overflow: 'hidden', borderLeft: `4px solid ${color}`, display: 'flex', flexDirection: 'column' }}>
+                    <PlayerPhoto p={p}>
+                      {/* Số áo nổi trên ảnh: nền màu vai trò, chữ tương phản */}
+                      <div className="pcard-num" style={{ position: 'absolute', left: 0, top: 0, zIndex: 2, background: color, color: onColor, fontFamily: 'Anton, sans-serif', fontSize: 22, lineHeight: 1, padding: '8px 12px 7px', letterSpacing: '0.02em' }}>
+                        #{p.num}
                       </div>
-                      {p.stat_points > 0 && (
-                        <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: 10, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Điểm</span>
-                          <span style={{ fontFamily: 'Anton, sans-serif', fontSize: 22, color: FANTA }}>{Math.round(p.stat_points)}</span>
-                        </div>
-                      )}
+                    </PlayerPhoto>
+                    <div className="pcard-body" style={{ padding: 18, display: 'flex', flexDirection: 'column', flex: 1 }}>
+                      <div className="pcard-name" style={{ fontFamily: 'Anton, sans-serif', fontSize: 20, lineHeight: 1.15, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{p.first_name} {p.last_name}</div>
+                      <div className="pcard-meta" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+                        <span className="pcard-role" style={{ background: color, color: onColor, fontSize: 12, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', padding: '3px 8px', lineHeight: 1.3 }}>
+                          {roleName}
+                        </span>
+                        {p.nick && <span className="pcard-nick" style={{ fontSize: 13, color: 'var(--prose)', fontStyle: 'italic', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>&quot;{p.nick}&quot;</span>}
+                      </div>
+                      <div className="pcard-stats" style={{ marginTop: 12, display: 'grid', gridTemplateColumns: p.stat_points > 0 ? '1fr 1fr 1fr 1fr' : '1fr 1fr 1fr', gap: 4, paddingTop: 10, borderTop: `1px solid ${LINE}` }}>
+                        {role === 'GK' ? (
+                          <><StatChip label="Cứu" value={p.stat_saves} /><StatChip label="Chuyền" value={p.stat_passes} /><StatChip label="Trận" value={p.stat_attendance} /></>
+                        ) : (
+                          <><StatChip label="Bàn" value={p.stat_goals} /><StatChip label="K.tạo" value={p.stat_assists} /><StatChip label="Tắc" value={p.stat_tackles} /></>
+                        )}
+                        {p.stat_points > 0 && <StatChip label="Điểm" value={Math.round(p.stat_points)} accent />}
+                      </div>
+                      {href && <div style={{ flex: 1, minHeight: 12 }} />}
                       {href && (
-                        <Link href={href} className="player-profile-link" style={{ display: 'block', marginTop: 12, padding: '9px 12px', textAlign: 'center', background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}55`, color: FANTA, textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                        <Link href={href} className="player-profile-link pcard-profile" style={{ display: 'block', padding: '8px 10px', textAlign: 'center', background: 'rgba(255,107,26,0.1)', border: `1px solid ${FANTA}55`, color: FANTA, textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                           {t('players.profile')}
                         </Link>
                       )}
@@ -123,11 +131,11 @@ export default function PlayersGrid({ players, profileLinks }: Props) {
   );
 }
 
-function StatChip({ label, value }: { label: string; value: number }) {
+function StatChip({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
   return (
-    <div style={{ textAlign: 'center' }}>
-      <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, color: INK }}>{value}</div>
-      <div style={{ fontSize: 10, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 1 }}>{label}</div>
+    <div className="pcard-stat" style={{ textAlign: 'center', minWidth: 0 }}>
+      <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, lineHeight: 1.1, color: accent ? FANTA : INK }}>{value}</div>
+      <div style={{ fontSize: 10, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2, whiteSpace: 'nowrap' }}>{label}</div>
     </div>
   );
 }

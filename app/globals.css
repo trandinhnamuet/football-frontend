@@ -1097,3 +1097,56 @@ section[id] { scroll-margin-top: 80px; }
   .ann-section { padding-top: 32px !important; padding-bottom: 32px !important; }
   .ann-arrow { width: 34px; height: 34px; font-size: 18px; opacity: 0.7; }
 }
+
+/* ── Header mobile: tài khoản / ngôn ngữ / sáng-tối cạnh nút menu ─────────── */
+.nav-mobile-tools { display: none; }
+@media (max-width: 768px) {
+  .nav-mobile-tools { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .nav-mobile-tool {
+    height: 34px;
+    min-width: 34px;
+    padding: 0 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #d6d1c9;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-mobile-tool:active { background: #FF6B1A; color: #0a0a0a; border-color: #FF6B1A; }
+  .nav-mobile-lang { color: #FF6B1A; border-color: rgba(255, 107, 26, 0.45); }
+  .nav-mobile-account { min-width: 0; }
+  .nav-mobile-account span { max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nav-mobile-btn { padding: 6px 11px !important; font-size: 19px !important; height: 34px; }
+  .nav-brand-text { font-size: 17px !important; }
+}
+/* Máy rất hẹp: bỏ chữ tên đội, giữ logo để đủ chỗ cho các nút. */
+@media (max-width: 350px) {
+  .nav-brand-text { display: none; }
+}
+
+/* ── Thẻ cầu thủ trang Đội hình: gọn trên mobile (2 cột) ─────────────────── */
+@media (max-width: 768px) {
+  .mob-players-grid { gap: 10px !important; }
+  .pcard .player-photo { aspect-ratio: 1 / 1 !important; }
+  .pcard .player-photo-zoom { right: 6px !important; bottom: 6px !important; font-size: 12px !important; padding: 4px 6px !important; }
+  .pcard-num { font-size: 17px !important; padding: 6px 9px 5px !important; }
+  .pcard-body { padding: 10px 10px 12px !important; }
+  .pcard-name { font-size: 15px !important; }
+  .pcard-meta { margin-top: 6px !important; gap: 4px !important; }
+  .pcard-role { font-size: 11px !important; padding: 2px 6px !important; }
+  .pcard-nick { font-size: 12px !important; width: 100%; }
+  .pcard-stats { margin-top: 8px !important; padding-top: 8px !important; gap: 2px !important; }
+  .pcard-stat > div:first-child { font-size: 16px !important; }
+  .pcard-stat > div:last-child { font-size: 9px !important; letter-spacing: 0.02em !important; }
+  .pcard-profile { padding: 7px 6px !important; font-size: 12px !important; }
+}
