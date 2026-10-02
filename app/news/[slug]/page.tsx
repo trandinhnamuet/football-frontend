@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
+import ShareButtons from '../../components/ShareButtons';
 import { FANTA, fmtDate } from '../../lib/types';
 import { normalizeProse } from '../../lib/prose';
 import { SITE_NAME, SITE_URL, absoluteImage, plainText, truncate } from '../../lib/seo';
@@ -56,6 +57,8 @@ export default async function ArticlePage({ params }: Props) {
   // Link cũ dạng /news/33 → chuyển hẳn (308) sang đường dẫn slug.
   if (article.slug && slug !== article.slug) permanentRedirect(`/news/${article.slug}`);
 
+  // Luôn chia sẻ URL canonical (slug) để crawler lấy đúng ảnh/tiêu đề preview.
+  const shareUrl = `${SITE_URL}/news/${article.slug || article.id}`;
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
@@ -86,8 +89,11 @@ export default async function ArticlePage({ params }: Props) {
           {article.title}
         </h1>
 
-        <div style={{ fontSize: 13, color: MUTED, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 32 }}>
-          {fmtDate(article.published_at)}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 32 }}>
+          <div style={{ fontSize: 13, color: MUTED, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+            {fmtDate(article.published_at)}
+          </div>
+          <ShareButtons url={shareUrl} title={article.title} id={article.id} />
         </div>
 
         {article.image_url && (
@@ -108,6 +114,10 @@ export default async function ArticlePage({ params }: Props) {
           style={{ fontSize: 16, lineHeight: 1.8, color: 'var(--prose)' }}
           dangerouslySetInnerHTML={{ __html: normalizeProse(article.content) }}
         />
+
+        <div style={{ marginTop: 48, paddingTop: 24, borderTop: '1px solid var(--line)' }}>
+          <ShareButtons url={shareUrl} title={article.title} id={article.id} />
+        </div>
       </main>
       <Footer />
     </div>
