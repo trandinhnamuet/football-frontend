@@ -11,7 +11,11 @@ const INK = 'var(--ink)';
 const MUTED = 'var(--muted)';
 const LINE = 'var(--line)';
 
-const roleColors: Record<string, string> = { GK: '#aa3333', DEF: '#2a6fdb', MID: '#1f8a5b', FWD: FANTA };
+// Tiền đạo dùng cyan thay vì cam để không lẫn với màu thương hiệu của trang.
+const FWD_CYAN = '#06b6d4';
+const roleColors: Record<string, string> = { GK: '#aa3333', DEF: '#2a6fdb', MID: '#1f8a5b', FWD: FWD_CYAN };
+// Nền sáng (cam, cyan) cần chữ tối mới đủ tương phản; các màu khác chữ trắng.
+const DARK_TEXT_ON = new Set([FANTA, FWD_CYAN]);
 const ROLE_ORDER = ['GK', 'DEF', 'MID', 'FWD', 'Tự do'];
 
 interface Props {
@@ -86,8 +90,7 @@ export default function PlayersGrid({ players, profileLinks }: Props) {
               {group.map(p => {
                 const href = profileLinks[p.id];
                 const color = roleColors[role] || '#6b6b6b';
-                // Chữ trên nền cam phải tối mới đủ tương phản; các màu khác chữ trắng.
-                const onColor = color === FANTA ? '#0a0a0a' : '#fff';
+                const onColor = DARK_TEXT_ON.has(color) ? '#0a0a0a' : '#fff';
                 const roleName = ROLES[role]?.[lang] || role;
                 return (
                   <div key={p.id} className="pcard" style={{ background: CARD, position: 'relative', overflow: 'hidden', borderLeft: `4px solid ${color}`, display: 'flex', flexDirection: 'column' }}>
