@@ -9,7 +9,7 @@ import BannerSlider from './components/BannerSlider';
 import AnnouncementsSection from './components/AnnouncementsSection';
 import FirstOpenPopup from './components/FirstOpenPopup';
 import ScrollToHash from './components/ScrollToHash';
-import { Player, Article, Match, MemorialPost, RecommendedVideo, FANTA, ROLES, CANCELLED_RESULT, fmtDate, dayStart, daysUntil, isMatchPast, pitchLabel, resultLabel, matchKits, memberProfileLinks, isImportantActive, articleHref } from './lib/types';
+import { Player, Article, Match, MemorialPost, RecommendedVideo, FANTA, ROLES, CANCELLED_RESULT, fmtDate, fmtScore, dayStart, daysUntil, isMatchPast, pitchLabel, resultLabel, matchKits, memberProfileLinks, isImportantActive, articleHref } from './lib/types';
 import KitColors from './components/KitColors';
 import { smoothScrollToHash } from './lib/scroll';
 import { api } from './lib/api';
@@ -397,7 +397,7 @@ export default function HomeClient() {
           const countdown = d <= 0 ? t('schedule.countdownToday') : `${d} ${t('schedule.countdownDays')}`;
           const kits = matchKits(next);
           const isCancelled = next.result === CANCELLED_RESULT;
-          const scoreText = next.score || `${next.goals_for} - ${next.goals_against}`;
+          const scoreText = fmtScore(next);
           const badge = RESULT_BADGE[next.result];
           return (
             <div id="featured-match" key={next.id} className={`mob-nextmatch next-match-card ${featuredIsPast ? 'featured-past' : ''}`} style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.8fr', gap: 0, marginBottom: 28, background: 'var(--card)', borderLeft: `5px solid ${featuredIsPast ? (badge?.bg || 'var(--muted)') : FANTA}`, overflow: 'hidden', scrollMarginTop: 90 }}>
@@ -520,7 +520,8 @@ export default function HomeClient() {
                   </div>
                 ) : m.result ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
-                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 15, color: 'var(--ink)', fontWeight: 600, minWidth: 32, textAlign: 'center' }}>{m.score || `${m.goals_for} - ${m.goals_against}`}</div>
+                    {/* Đối thủ bên trái, Lon Fanta bên phải nên tỷ số đảo theo cùng thứ tự */}
+                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 15, color: 'var(--ink)', fontWeight: 600, minWidth: 32, textAlign: 'center' }}>{fmtScore(m, true)}</div>
                     <div title={resultLabel(m.result, lang)} style={{ width: 22, height: 22, background: RESULT_BADGE[m.result]?.bg || 'var(--muted)', color: RESULT_BADGE[m.result]?.fg || '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 10, flexShrink: 0 }}>{m.result}</div>
                   </div>
                 ) : (

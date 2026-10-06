@@ -205,6 +205,17 @@ export function resultLabel(code: string, lang: 'vi' | 'en' = 'vi'): string {
   return MATCH_RESULTS.find(r => r.code === code)?.[lang] || code;
 }
 
+/**
+ * Tỷ số luôn tính từ bàn ghi/bàn thủng — không dùng cột `score` nhập tay vì dễ
+ * lệch hoặc bị nhập ngược. Mặc định Lon Fanta trước; `opponentFirst` khi tên
+ * đối thủ nằm bên trái.
+ */
+export function fmtScore(m: Pick<Match, 'goals_for' | 'goals_against'>, opponentFirst = false): string {
+  const gf = m.goals_for || 0;
+  const ga = m.goals_against || 0;
+  return opponentFirst ? `${ga} - ${gf}` : `${gf} - ${ga}`;
+}
+
 
 /** "Sân 7 người" / "7-a-side" */
 export function pitchLabel(n: number | null | undefined, lang: 'vi' | 'en'): string {

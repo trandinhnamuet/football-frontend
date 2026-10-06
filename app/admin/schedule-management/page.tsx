@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import AdminGuard from '../../components/AdminGuard';
 import AdminHeader from '../../components/AdminHeader';
-import { Match, FANTA, PITCH_SIZES, KIT_COLORS, MATCH_RESULTS, SPLIT_RESULT, CANCELLED_RESULT, fmtDate, isMatchPast, resultLabel, kitColorHex } from '../../lib/types';
+import { Match, FANTA, PITCH_SIZES, KIT_COLORS, MATCH_RESULTS, SPLIT_RESULT, CANCELLED_RESULT, fmtDate, fmtScore, isMatchPast, resultLabel, kitColorHex } from '../../lib/types';
 import { useTableSort } from '../../lib/useTableSort';
 import { api } from '../../lib/api';
 
@@ -100,7 +100,9 @@ function MatchModal({ initial, mode, onSave, onClose }: MatchModalProps) {
     setSaving(true);
     setError('');
     try {
-      await onSave(form);
+      // Cột score vẫn lưu cho dữ liệu cũ/đồng bộ, nhưng luôn sinh từ bàn ghi/bàn thủng.
+      const score = form.is_upcoming || form.result === CANCELLED_RESULT ? '' : fmtScore(form);
+      await onSave({ ...form, score });
       onClose();
     } catch (e: any) { setError(e.message || 'Lỗi lưu'); }
     finally { setSaving(false); }
@@ -260,7 +262,7 @@ function MatchModal({ initial, mode, onSave, onClose }: MatchModalProps) {
               </div>
               {/* Trận hủy không được đá nên không có bàn thắng lẫn tỷ số để nhập. */}
               {!cancelled && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 2fr', gap: 16 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                   <div>
                     <label style={labelStyle}>Bàn ghi (GF)</label>
                     <input style={inputStyle} type="number" min={0} value={form.goals_for} onChange={set('goals_for')} />
@@ -268,10 +270,6 @@ function MatchModal({ initial, mode, onSave, onClose }: MatchModalProps) {
                   <div>
                     <label style={labelStyle}>Bàn thủng (GA)</label>
                     <input style={inputStyle} type="number" min={0} value={form.goals_against} onChange={set('goals_against')} />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Tỷ số (hiển thị)</label>
-                    <input style={inputStyle} value={form.score} onChange={set('score')} placeholder="vd: 3 - 1" />
                   </div>
                 </div>
               )}
@@ -405,7 +403,7 @@ function ScheduleManagementContent() {
     time: m => m.time || '17:30',
     opponent: m => m.opponent,
     venue: m => `${m.venue || ''} ${m.pitch_size || 7}`,
-    score: m => (m.result === CANCELLED_RESULT ? null : m.score ? m.score : m.is_upcoming ? null : m.goals_for - m.goals_against),
+    score: m => (m.result === CANCELLED_RESULT || m.is_upcoming ? null : m.goals_for - m.goals_against),
     result: m => m.result,
   });
 
@@ -510,7 +508,7 @@ function ScheduleManagementContent() {
                 </div>
                 <div style={{ fontSize: 12, color: MUTED }}>{m.venue}{m.venue ? ' · ' : ''}Sân {m.pitch_size || 7}</div>
                 <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18 }}>
-                  {m.result === CANCELLED_RESULT ? '—' : m.score || (m.is_upcoming ? '—' : `${m.goals_for}-${m.goals_against}`)}
+                  {m.result === CANCELLED_RESULT || m.is_upcoming ? '—' : fmtScore(m)}
                 </div>
                 <div>
                   {m.result ? (
