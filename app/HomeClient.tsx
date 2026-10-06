@@ -509,8 +509,9 @@ export default function HomeClient() {
                 className={`schedule-row result-row ${selectedPast?.id === m.id ? 'result-row-active' : ''}`}
                 style={{ background: 'var(--card)', padding: '10px 12px', marginBottom: 8, display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, alignItems: 'center', fontSize: 12, cursor: 'pointer', borderLeft: `3px solid ${selectedPast?.id === m.id ? FANTA : 'transparent'}` }}
               >
+                {/* Lon Fanta bên trái, đối thủ bên phải — giống card trận nổi bật */}
                 <div style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}>
-                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 13, textTransform: 'uppercase' }}>{m.image_url ? '📷 ' : ''}{m.opponent}</div>
+                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 13, textTransform: 'uppercase', color: FANTA }}>{m.image_url ? '📷 ' : ''}Lon Fanta</div>
                   <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 1 }}>{fmtDate(m.date)}</div>
                 </div>
                 {/* A past match with no score yet still shows up here, marked as pending. */}
@@ -520,8 +521,7 @@ export default function HomeClient() {
                   </div>
                 ) : m.result ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
-                    {/* Đối thủ bên trái, Lon Fanta bên phải nên tỷ số đảo theo cùng thứ tự */}
-                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 15, color: 'var(--ink)', fontWeight: 600, minWidth: 32, textAlign: 'center' }}>{fmtScore(m, true)}</div>
+                    <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 15, color: 'var(--ink)', fontWeight: 600, minWidth: 32, textAlign: 'center' }}>{fmtScore(m)}</div>
                     <div title={resultLabel(m.result, lang)} style={{ width: 22, height: 22, background: RESULT_BADGE[m.result]?.bg || 'var(--muted)', color: RESULT_BADGE[m.result]?.fg || '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Anton, sans-serif', fontSize: 10, flexShrink: 0 }}>{m.result}</div>
                   </div>
                 ) : (
@@ -530,7 +530,7 @@ export default function HomeClient() {
                   </div>
                 )}
                 <div style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'right' }}>
-                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 13, textTransform: 'uppercase' }}>Lon Fanta</div>
+                  <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 13, textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.opponent}</div>
                 </div>
               </div>
             ))}

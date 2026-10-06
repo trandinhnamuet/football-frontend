@@ -206,14 +206,11 @@ export function resultLabel(code: string, lang: 'vi' | 'en' = 'vi'): string {
 }
 
 /**
- * Tỷ số luôn tính từ bàn ghi/bàn thủng — không dùng cột `score` nhập tay vì dễ
- * lệch hoặc bị nhập ngược. Mặc định Lon Fanta trước; `opponentFirst` khi tên
- * đối thủ nằm bên trái.
+ * Tỷ số luôn tính từ bàn ghi/bàn thủng, Lon Fanta trước — không dùng cột `score`
+ * nhập tay vì dễ lệch hoặc bị nhập ngược.
  */
-export function fmtScore(m: Pick<Match, 'goals_for' | 'goals_against'>, opponentFirst = false): string {
-  const gf = m.goals_for || 0;
-  const ga = m.goals_against || 0;
-  return opponentFirst ? `${ga} - ${gf}` : `${gf} - ${ga}`;
+export function fmtScore(m: Pick<Match, 'goals_for' | 'goals_against'>): string {
+  return `${m.goals_for || 0} - ${m.goals_against || 0}`;
 }
 
 
