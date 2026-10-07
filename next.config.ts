@@ -8,6 +8,13 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'api.lonfantafc.com', pathname: '/uploads/**' },
     ],
   },
+  // Trang quản trị / tài khoản không được lên Google. Dùng noindex thay vì chặn ở
+  // robots.txt — bị chặn crawl thì Google không đọc được noindex và vẫn có thể
+  // hiện URL trong kết quả tìm kiếm.
+  async headers() {
+    const noindex = [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }];
+    return ['/admin', '/admin/:path*', '/account', '/account/:path*', '/login'].map(source => ({ source, headers: noindex }));
+  },
 };
 
 export default nextConfig;
