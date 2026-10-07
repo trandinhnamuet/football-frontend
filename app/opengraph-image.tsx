@@ -116,7 +116,7 @@ function Card({ s, logo }: { s: HomeSummary; logo: string | null }) {
         )}
 
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 18, fontSize: 22, color: MUTED }}>
-          <div style={{ display: 'flex' }}>www.lonfantafc.com</div>
+          <div style={{ display: 'flex' }}>lonfantafc.com</div>
           <div style={{ display: 'flex' }}>Lịch đấu · Đội hình · Highlight</div>
         </div>
       </div>

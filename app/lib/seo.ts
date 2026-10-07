@@ -1,7 +1,7 @@
 // Dùng cho metadata phía server (Open Graph / Twitter / canonical): crawler của
 // Facebook, Messenger, Zalo chỉ đọc thẻ <meta> trong HTML trả về lần đầu.
 
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.lonfantafc.com').replace(/\/$/, '');
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://lonfantafc.com').replace(/\/$/, '');
 export const SITE_NAME = 'Lon Fanta FC';
 export const SITE_TAGLINE = 'Đội bóng phong trào Hà Nội — #ĐamMêBấtTận';
 
