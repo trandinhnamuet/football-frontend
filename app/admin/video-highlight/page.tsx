@@ -55,7 +55,7 @@ export default function VideoHighlightAdminPage() {
       setTitle(data.title || '');
       setTitleEn(data.title_en || '');
       setIsActive(data.is_active ?? true);
-      setChannelUrl(data.channel_url || 'https://www.youtube.com/@fclonfanta');
+      setChannelUrl(data.channel_url || 'https://www.youtube.com/@lonfantafc');
       setPreviewEmbed(toYoutubeEmbed(data.youtube_url || ''));
       setAuthed(true);
       localStorage.setItem(KEY, pw);
@@ -177,7 +177,7 @@ export default function VideoHighlightAdminPage() {
                       type="url"
                       value={channelUrl}
                       onChange={e => setChannelUrl(e.target.value)}
-                      placeholder="https://www.youtube.com/@fclonfanta"
+                      placeholder="https://www.youtube.com/@lonfantafc"
                       style={inputStyle}
                     />
                     <div style={{ fontSize: 12, color: MUTED, marginTop: 6 }}>

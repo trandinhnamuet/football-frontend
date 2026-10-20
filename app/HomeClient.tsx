@@ -730,7 +730,7 @@ export default function HomeClient() {
                 </div>
               )}
               <a
-                href={videoHighlight?.channel_url || 'https://www.youtube.com/@fclonfanta'}
+                href={videoHighlight?.channel_url || 'https://www.youtube.com/@lonfantafc'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-yt-channel"

@@ -59,7 +59,7 @@ export default function Footer() {
         </div>
         <div>
           <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, color: FANTA, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{t('footer.follow')}</div>
-          <a href="https://www.youtube.com/@fclonfanta" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12, color: 'var(--ink)', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 20, letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+          <a href="https://www.youtube.com/@lonfantafc" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12, color: 'var(--ink)', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 20, letterSpacing: '0.02em', textTransform: 'uppercase' }}>
             <YoutubeIcon /> YOUTUBE
           </a>
           <a href="https://www.facebook.com/lonfantafc" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8, color: 'var(--ink)', textDecoration: 'none', fontFamily: 'Anton, sans-serif', fontSize: 20, letterSpacing: '0.02em', textTransform: 'uppercase' }}>
