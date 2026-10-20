@@ -8,9 +8,9 @@ import { useApp } from '../contexts/AppContext';
 
 /**
  * Thanh menu dưới kiểu mobile app. Chỉ hiện trên màn hình nhỏ khi đã đăng nhập
- * (CSS `html[data-app="1"] .app-bottom-nav`). Khi bật, CSS cũng ẩn footer và
- * nút hamburger để giao diện gọn như app; ngôn ngữ / giao diện chuyển sang
- * trang Tài khoản.
+ * (CSS `html[data-app="1"] .app-bottom-nav`). Khi bật, CSS cũng ẩn nút
+ * hamburger để giao diện gọn như app; ngôn ngữ / giao diện chuyển sang trang
+ * Tài khoản. Footer vẫn hiện (thông tin liên hệ), nằm trên thanh menu.
  */
 
 const ICON_PROPS = { width: 22, height: 22, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
