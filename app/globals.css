@@ -911,17 +911,19 @@ select option {
 
 /* ── Chế độ app trên mobile (đã đăng nhập) ───────────────────────────────
    BottomNav đặt html[data-app="1"] khi có người đăng nhập. Chỉ ở màn hình
-   nhỏ mới đổi giao diện: thanh menu dưới, ẩn footer + hamburger. ─────── */
+   nhỏ mới đổi giao diện: thanh menu dưới, ẩn hamburger. Footer vẫn giữ vì
+   là chỗ duy nhất có mạng xã hội + địa chỉ sân; padding-bottom của body
+   chừa chỗ để thanh menu không che footer. ─────── */
 .app-bottom-nav { display: none; }
 .mob-only { display: none !important; }
 
 @media (max-width: 768px) {
   .mob-only { display: block !important; }
 
+  /* !important vì layout.tsx đặt inline style padding: 0 trên <body> */
   html[data-app="1"] body {
-    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px)) !important;
   }
-  html[data-app="1"] footer { display: none !important; }
   html[data-app="1"] .nav-mobile-btn { display: none !important; }
 
   html[data-app="1"] .app-bottom-nav {
